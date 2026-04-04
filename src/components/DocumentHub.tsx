@@ -39,6 +39,15 @@ const documentTypeConfig = {
   },
 };
 
+// Helper function to format date consistently
+function formatDate(date: Date): string {
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}/${month}/${day}`;
+}
+
 export function DocumentHub({ documents = [] }: DocumentHubProps) {
   const { t } = useLanguage();
 
@@ -136,7 +145,7 @@ export function DocumentHub({ documents = [] }: DocumentHubProps) {
                       <p className="font-medium text-sm">{doc.title}</p>
                       <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
                         <Calendar className="h-3 w-3" />
-                        <span>{new Date(doc.date).toLocaleDateString()}</span>
+                        <span>{formatDate(doc.date)}</span>
                       </div>
                       <p className="text-xs text-muted-foreground mt-1">
                         {doc.projectName}

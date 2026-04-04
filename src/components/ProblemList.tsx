@@ -43,6 +43,15 @@ const statusConfig = {
   },
 };
 
+// Helper function to format date consistently
+function formatDate(date: Date): string {
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}/${month}/${day}`;
+}
+
 export function ProblemList({ problems = [] }: ProblemListProps) {
   const { t } = useLanguage();
   const [filter, setFilter] = useState<'all' | 'PENDING' | 'IN_PROGRESS' | 'RESOLVED'>('all');
@@ -201,7 +210,7 @@ export function ProblemList({ problems = [] }: ProblemListProps) {
                         </div>
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                           <Clock className="h-3 w-3" />
-                          <span>{new Date(problem.createdAt).toLocaleDateString()}</span>
+                          <span>{formatDate(problem.createdAt)}</span>
                         </div>
                         {problem.images && problem.images.length > 0 && (
                           <div className="flex items-center gap-1 text-xs text-muted-foreground mt-2">
