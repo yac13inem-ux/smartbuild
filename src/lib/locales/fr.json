@@ -1,0 +1,103 @@
+{
+  "common": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "loading": "Chargement...",
+    "noData": "Aucune donnée disponible",
+    "confirm": "Confirmer",
+    "back": "Retour",
+    "next": "Suivant",
+    "submit": "Soumettre"
+  },
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "projects": "Projets",
+    "documents": "Documents",
+    "problems": "Problèmes",
+    "settings": "Paramètres"
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "totalProgress": "Progression totale",
+    "grosOeuvre": "Gros Œuvre",
+    "ces": "CES",
+    "cet": "CET",
+    "openProblems": "Problèmes ouverts",
+    "weeklyReports": "Rapports hebdomadaires",
+    "blocks": "Blocs",
+    "recentActivity": "Activité récente",
+    "viewAll": "Voir tout"
+  },
+  "project": {
+    "title": "Projets",
+    "addProject": "Ajouter un projet",
+    "editProject": "Modifier le projet",
+    "projectName": "Nom du projet",
+    "description": "Description",
+    "location": "Lieu",
+    "blocks": "Blocs",
+    "units": "Unités",
+    "progress": "Progression"
+  },
+  "block": {
+    "title": "Blocs",
+    "addBlock": "Ajouter un bloc",
+    "editBlock": "Modifier le bloc",
+    "blockName": "Nom du bloc",
+    "selectProject": "Sélectionner un projet"
+  },
+  "unit": {
+    "title": "Unités",
+    "addUnit": "Ajouter une unité",
+    "editUnit": "Modifier l'unité",
+    "unitName": "Nom de l'unité",
+    "selectBlock": "Sélectionner un bloc"
+  },
+  "documents": {
+    "title": "Documents",
+    "pvVisite": "PV de Visite",
+    "pvConstat": "PV Constat",
+    "rapportMensuel": "Rapport Mensuel",
+    "createDocument": "Créer un document",
+    "documentTitle": "Titre du document",
+    "selectType": "Sélectionner le type",
+    "selectProject": "Sélectionner le projet",
+    "selectBlock": "Sélectionner le bloc",
+    "selectUnit": "Sélectionner l'unité (Optionnel)",
+    "date": "Date",
+    "description": "Description",
+    "observations": "Observations",
+    "uploadImages": "Télécharger des images",
+    "generatePDF": "Générer PDF",
+    "downloadPDF": "Télécharger PDF"
+  },
+  "problems": {
+    "title": "Problèmes",
+    "addProblem": "Ajouter un problème",
+    "editProblem": "Modifier le problème",
+    "problemDescription": "Description du problème",
+    "status": "Statut",
+    "pending": "En attente",
+    "inProgress": "En cours",
+    "resolved": "Résolu",
+    "selectProject": "Sélectionner le projet",
+    "selectBlock": "Sélectionner le bloc",
+    "selectUnit": "Sélectionner l'unité (Optionnel)",
+    "uploadImages": "Télécharger des images",
+    "whatsapp": "Envoyer via WhatsApp"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "language": "Langue",
+    "theme": "Thème",
+    "light": "Clair",
+    "dark": "Sombre",
+    "profile": "Profil",
+    "logout": "Déconnexion"
+  }
+}

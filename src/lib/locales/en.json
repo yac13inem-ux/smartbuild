@@ -1,0 +1,103 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "filter": "Filter",
+    "loading": "Loading...",
+    "noData": "No data available",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "projects": "Projects",
+    "documents": "Documents",
+    "problems": "Problems",
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "totalProgress": "Total Progress",
+    "grosOeuvre": "Gros Œuvre",
+    "ces": "CES",
+    "cet": "CET",
+    "openProblems": "Open Problems",
+    "weeklyReports": "Weekly Reports",
+    "blocks": "Blocks",
+    "recentActivity": "Recent Activity",
+    "viewAll": "View All"
+  },
+  "project": {
+    "title": "Projects",
+    "addProject": "Add Project",
+    "editProject": "Edit Project",
+    "projectName": "Project Name",
+    "description": "Description",
+    "location": "Location",
+    "blocks": "Blocks",
+    "units": "Units",
+    "progress": "Progress"
+  },
+  "block": {
+    "title": "Blocks",
+    "addBlock": "Add Block",
+    "editBlock": "Edit Block",
+    "blockName": "Block Name",
+    "selectProject": "Select Project"
+  },
+  "unit": {
+    "title": "Units",
+    "addUnit": "Add Unit",
+    "editUnit": "Edit Unit",
+    "unitName": "Unit Name",
+    "selectBlock": "Select Block"
+  },
+  "documents": {
+    "title": "Documents",
+    "pvVisite": "PV de Visite",
+    "pvConstat": "PV Constat",
+    "rapportMensuel": "Rapport Mensuel",
+    "createDocument": "Create Document",
+    "documentTitle": "Document Title",
+    "selectType": "Select Type",
+    "selectProject": "Select Project",
+    "selectBlock": "Select Block",
+    "selectUnit": "Select Unit (Optional)",
+    "date": "Date",
+    "description": "Description",
+    "observations": "Observations",
+    "uploadImages": "Upload Images",
+    "generatePDF": "Generate PDF",
+    "downloadPDF": "Download PDF"
+  },
+  "problems": {
+    "title": "Problems",
+    "addProblem": "Add Problem",
+    "editProblem": "Edit Problem",
+    "problemDescription": "Problem Description",
+    "status": "Status",
+    "pending": "Pending",
+    "inProgress": "In Progress",
+    "resolved": "Resolved",
+    "selectProject": "Select Project",
+    "selectBlock": "Select Block",
+    "selectUnit": "Select Unit (Optional)",
+    "uploadImages": "Upload Images",
+    "whatsapp": "Send via WhatsApp"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "profile": "Profile",
+    "logout": "Logout"
+  }
+}

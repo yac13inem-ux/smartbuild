@@ -1,0 +1,103 @@
+{
+  "common": {
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "add": "إضافة",
+    "search": "بحث",
+    "filter": "تصفية",
+    "loading": "جاري التحميل...",
+    "noData": "لا توجد بيانات متاحة",
+    "confirm": "تأكيد",
+    "back": "رجوع",
+    "next": "التالي",
+    "submit": "إرسال"
+  },
+  "nav": {
+    "dashboard": "لوحة التحكم",
+    "projects": "المشاريع",
+    "documents": "الوثائق",
+    "problems": "المشاكل",
+    "settings": "الإعدادات"
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "totalProgress": "إجمالي التقدم",
+    "grosOeuvre": "الأشغال الكبرى",
+    "ces": "الأشغال التشطيبية",
+    "cet": "الأشغال التقنية",
+    "openProblems": "المشاكل المفتوحة",
+    "weeklyReports": "التقارير الأسبوعية",
+    "blocks": "المباني",
+    "recentActivity": "النشاط الأخير",
+    "viewAll": "عرض الكل"
+  },
+  "project": {
+    "title": "المشاريع",
+    "addProject": "إضافة مشروع",
+    "editProject": "تعديل المشروع",
+    "projectName": "اسم المشروع",
+    "description": "الوصف",
+    "location": "الموقع",
+    "blocks": "المباني",
+    "units": "الوحدات",
+    "progress": "التقدم"
+  },
+  "block": {
+    "title": "المباني",
+    "addBlock": "إضافة مبنى",
+    "editBlock": "تعديل المبنى",
+    "blockName": "اسم المبنى",
+    "selectProject": "اختر المشروع"
+  },
+  "unit": {
+    "title": "الوحدات",
+    "addUnit": "إضافة وحدة",
+    "editUnit": "تعديل الوحدة",
+    "unitName": "اسم الوحدة",
+    "selectBlock": "اختر المبنى"
+  },
+  "documents": {
+    "title": "الوثائق",
+    "pvVisite": "محضر الزيارة",
+    "pvConstat": "محضر المعاينة",
+    "rapportMensuel": "التقرير الشهري",
+    "createDocument": "إنشاء وثيقة",
+    "documentTitle": "عنوان الوثيقة",
+    "selectType": "اختر النوع",
+    "selectProject": "اختر المشروع",
+    "selectBlock": "اختر المبنى",
+    "selectUnit": "اختر الوحدة (اختياري)",
+    "date": "التاريخ",
+    "description": "الوصف",
+    "observations": "الملاحظات",
+    "uploadImages": "رفع الصور",
+    "generatePDF": "إنشاء PDF",
+    "downloadPDF": "تحميل PDF"
+  },
+  "problems": {
+    "title": "المشاكل",
+    "addProblem": "إضافة مشكلة",
+    "editProblem": "تعديل المشكلة",
+    "problemDescription": "وصف المشكلة",
+    "status": "الحالة",
+    "pending": "قيد الانتظار",
+    "inProgress": "جاري العمل",
+    "resolved": "تم الحل",
+    "selectProject": "اختر المشروع",
+    "selectBlock": "اختر المبنى",
+    "selectUnit": "اختر الوحدة (اختياري)",
+    "uploadImages": "رفع الصور",
+    "whatsapp": "إرسال عبر واتساب"
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "language": "اللغة",
+    "theme": "المظهر",
+    "light": "فاتح",
+    "dark": "داكن",
+    "profile": "الملف الشخصي",
+    "logout": "تسجيل الخروج"
+  }
+}

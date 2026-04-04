@@ -1,0 +1,131 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  role      String   @default("engineer") // engineer, contractor, client
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ownedProjects Project[] @relation("ProjectOwner")
+  reports       Report[]
+  problems      Problem[]
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  location    String?
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  authorId String?
+  author   User?    @relation("ProjectOwner", fields: [authorId], references: [id])
+
+  blocks   Block[]
+  reports  Report[]
+  problems Problem[]
+}
+
+model Block {
+  id               String   @id @default(cuid())
+  name             String
+  description      String?
+  projectId        String
+  grosOeuvreProgress Int    @default(0) // 0-100
+  cesProgress      Int     @default(0) // 0-100
+  cetProgress      Int     @default(0) // 0-100
+  globalProgress   Int     @default(0) // 0-100, calculated
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  project  Project  @relation(fields: [projectId], references: [id])
+  units    Unit[]
+  reports  Report[]
+  problems Problem[]
+}
+
+model Unit {
+  id               String   @id @default(cuid())
+  name             String
+  description      String?
+  blockId          String
+  grosOeuvreProgress Int    @default(0) // 0-100
+  cesProgress      Int     @default(0) // 0-100
+  cetProgress      Int     @default(0) // 0-100
+  globalProgress   Int     @default(0) // 0-100, calculated
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  block    Block    @relation(fields: [blockId], references: [id])
+  reports  Report[]
+  problems Problem[]
+}
+
+enum ReportType {
+  PV_VISITE
+  PV_CONSTAT
+  RAPPORT_MENSUEL
+}
+
+model Report {
+  id          String     @id @default(cuid())
+  title       String
+  description String?
+  type        ReportType
+  date        DateTime   @default(now())
+  images      String?    // JSON array of image paths
+  observations String?
+  pdfPath     String?
+  projectId   String?
+  blockId     String?
+  unitId      String?
+  createdBy   String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  author   User?    @relation(fields: [createdBy], references: [id])
+  project  Project? @relation(fields: [projectId], references: [id])
+  block    Block?   @relation(fields: [blockId], references: [id])
+  unit     Unit?    @relation(fields: [unitId], references: [id])
+}
+
+enum ProblemStatus {
+  PENDING
+  IN_PROGRESS
+  RESOLVED
+}
+
+model Problem {
+  id          String        @id @default(cuid())
+  description String
+  images      String?       // JSON array of image paths
+  status      ProblemStatus @default(PENDING)
+  blockId     String?
+  unitId      String?
+  projectId   String?
+  createdBy   String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  project Project? @relation(fields: [projectId], references: [id])
+  block   Block?   @relation(fields: [blockId], references: [id])
+  unit    Unit?    @relation(fields: [unitId], references: [id])
+  author  User?    @relation(fields: [createdBy], references: [id])
+}
