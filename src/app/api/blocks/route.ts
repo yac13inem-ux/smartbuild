@@ -58,6 +58,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { name, description, projectId, numberOfFloors, floorsData, grosOeuvreProgress, cesProgress, cetProgress, globalProgress } = body;
 
+    console.log('Creating block with data:', { name, projectId, numberOfFloors, grosOeuvreProgress, cesProgress, cetProgress, globalProgress });
+
     if (!name || !projectId) {
       return NextResponse.json(
         { error: 'Block name and project ID are required' },
@@ -70,12 +72,12 @@ export async function POST(request: NextRequest) {
         name,
         description,
         projectId,
-        numberOfFloors: numberOfFloors || null,
+        numberOfFloors: numberOfFloors ? parseInt(numberOfFloors) : null,
         floorsData: floorsData ? JSON.stringify(floorsData) : null,
-        grosOeuvreProgress: grosOeuvreProgress || 0,
-        cesProgress: cesProgress || 0,
-        cetProgress: cetProgress || 0,
-        globalProgress: globalProgress || 0,
+        grosOeuvreProgress: grosOeuvreProgress ? parseInt(grosOeuvreProgress) : 0,
+        cesProgress: cesProgress ? parseInt(cesProgress) : 0,
+        cetProgress: cetProgress ? parseInt(cetProgress) : 0,
+        globalProgress: globalProgress ? parseInt(globalProgress) : 0,
       },
     });
 
@@ -85,8 +87,9 @@ export async function POST(request: NextRequest) {
     }, { status: 201 });
   } catch (error) {
     console.error('Error creating block:', error);
+    console.error('Error details:', JSON.stringify(error, null, 2));
     return NextResponse.json(
-      { error: 'Failed to create block' },
+      { error: error instanceof Error ? error.message : 'Failed to create block' },
       { status: 500 }
     );
   }

@@ -112,8 +112,8 @@ export function AddBlockDialog({ projectId, onBlockAdded }: AddBlockDialogProps)
 
       floorsData.forEach((floor) => {
         totalGrosOeuvre += floor.grosOeuvreProgress || 0;
-        totalCes += floor.ces || 0;
-        totalCet += floor.cet || 0;
+        totalCes += floor.cesProgress || 0;
+        totalCet += floor.cetProgress || 0;
       });
 
       const numFloors = floorsData.length;
