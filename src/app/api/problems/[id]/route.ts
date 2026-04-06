@@ -4,10 +4,10 @@ import { db } from '@/lib/db';
 // GET /api/problems/[id] - Get a single problem
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const problem = await db.problem.findUnique({
       where: { id },
@@ -41,10 +41,10 @@ export async function GET(
 // PUT /api/problems/[id] - Update a problem
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     const {
       description,
@@ -83,10 +83,10 @@ export async function PUT(
 // DELETE /api/problems/[id] - Delete a problem
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     await db.problem.delete({
       where: { id },

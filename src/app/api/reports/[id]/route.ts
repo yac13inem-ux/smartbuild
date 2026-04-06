@@ -4,10 +4,10 @@ import { db } from '@/lib/db';
 // GET /api/reports/[id] - Get a single report
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const report = await db.report.findUnique({
       where: { id },
@@ -41,10 +41,10 @@ export async function GET(
 // PUT /api/reports/[id] - Update a report
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     const {
       title,
@@ -89,10 +89,10 @@ export async function PUT(
 // DELETE /api/reports/[id] - Delete a report
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     await db.report.delete({
       where: { id },
