@@ -1,6 +1,6 @@
 'use client';
 
-import { User, Palette, Globe, LogOut, Bell, Shield } from 'lucide-react';
+import { Palette, Globe, Info } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -13,17 +13,6 @@ export function Settings() {
   const { theme, setTheme } = useTheme();
 
   const settingsSections = [
-    {
-      title: t('settings.profile'),
-      items: [
-        {
-          icon: User,
-          label: 'John Doe',
-          description: 'Engineer',
-          action: null,
-        },
-      ],
-    },
     {
       title: t('settings.language'),
       items: [
@@ -46,49 +35,11 @@ export function Settings() {
         },
       ],
     },
-    {
-      title: 'Notifications',
-      items: [
-        {
-          icon: Bell,
-          label: 'Push Notifications',
-          description: 'Enabled',
-          action: null,
-        },
-      ],
-    },
-    {
-      title: 'Security',
-      items: [
-        {
-          icon: Shield,
-          label: 'Change Password',
-          description: 'Last changed 30 days ago',
-          action: null,
-        },
-      ],
-    },
   ];
 
   return (
     <div className="space-y-4 pb-20">
       <h2 className="text-lg font-semibold">{t('settings.title')}</h2>
-
-      {/* Profile Card */}
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-              <User className="h-8 w-8 text-primary" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-lg">John Doe</h3>
-              <p className="text-sm text-muted-foreground">Civil Engineer</p>
-              <p className="text-xs text-muted-foreground mt-1">john.doe@example.com</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Settings Sections */}
       {settingsSections.map((section, index) => (
@@ -128,23 +79,25 @@ export function Settings() {
         </Card>
       ))}
 
-      {/* Logout Button */}
-      <Button
-        variant="destructive"
-        className="w-full gap-2"
-        onClick={() => {
-          // Handle logout
-          console.log('Logout clicked');
-        }}
-      >
-        <LogOut className="h-4 w-4" />
-        {t('settings.logout')}
-      </Button>
+      {/* About App */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Info className="h-5 w-5" />
+            {t('settings.about') || 'About'}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center text-sm text-muted-foreground space-y-2">
+            <p className="font-semibold text-foreground">Construction Management</p>
+            <p>Version 1.0.0</p>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* App Info */}
       <div className="text-center text-xs text-muted-foreground pb-4">
-        <p>Construction Management v1.0.0</p>
-        <p className="mt-1">© 2025 Construction Team</p>
+        <p>© 2025 Construction Team</p>
       </div>
     </div>
   );

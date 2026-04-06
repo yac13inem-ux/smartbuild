@@ -140,7 +140,6 @@
     "theme": "Thème",
     "light": "Clair",
     "dark": "Sombre",
-    "profile": "Profil",
-    "logout": "Déconnexion"
+    "about": "À propos"
   }
 }

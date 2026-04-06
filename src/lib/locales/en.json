@@ -140,7 +140,6 @@
     "theme": "Theme",
     "light": "Light",
     "dark": "Dark",
-    "profile": "Profile",
-    "logout": "Logout"
+    "about": "About"
   }
 }
