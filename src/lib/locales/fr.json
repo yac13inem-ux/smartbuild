@@ -119,7 +119,10 @@
   "problems": {
     "title": "Problèmes",
     "addProblem": "Ajouter un problème",
+    "viewProblem": "Voir le problème",
     "editProblem": "Modifier le problème",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce problème ? Cette action ne peut pas être annulée.",
+    "date": "Date",
     "problemDescription": "Description du problème",
     "status": "Statut",
     "pending": "En attente",

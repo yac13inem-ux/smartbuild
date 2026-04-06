@@ -119,7 +119,10 @@
   "problems": {
     "title": "Problems",
     "addProblem": "Add Problem",
+    "viewProblem": "View Problem",
     "editProblem": "Edit Problem",
+    "deleteConfirm": "Are you sure you want to delete this problem? This action cannot be undone.",
+    "date": "Date",
     "problemDescription": "Problem Description",
     "status": "Status",
     "pending": "Pending",

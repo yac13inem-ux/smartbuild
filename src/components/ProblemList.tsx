@@ -1,6 +1,7 @@
 'use client';
 
-import { AlertTriangle, Clock, MapPin, MessageCircle, Filter, Plus } from 'lucide-react';
+import { useState } from 'react';
+import { AlertTriangle, Clock, MapPin, MessageCircle, Filter, Plus, Eye, Pencil, Trash2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,8 +11,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useState } from 'react';
 
 interface Problem {
   id: string;
@@ -26,6 +32,7 @@ interface Problem {
 
 interface ProblemListProps {
   problems?: Problem[];
+  onProblemsChange?: () => void;
 }
 
 const statusConfig = {
@@ -52,9 +59,13 @@ function formatDate(date: Date): string {
   return `${year}/${month}/${day}`;
 }
 
-export function ProblemList({ problems = [] }: ProblemListProps) {
+export function ProblemList({ problems = [], onProblemsChange }: ProblemListProps) {
   const { t } = useLanguage();
   const [filter, setFilter] = useState<'all' | 'PENDING' | 'IN_PROGRESS' | 'RESOLVED'>('all');
+  const [viewingProblem, setViewingProblem] = useState<Problem | null>(null);
+  const [editingProblem, setEditingProblem] = useState<Problem | null>(null);
+  const [deletingProblem, setDeletingProblem] = useState<Problem | null>(null);
+  const [editForm, setEditForm] = useState({ description: '', status: 'PENDING' as 'PENDING' | 'IN_PROGRESS' | 'RESOLVED' });
 
   // Mock data
   const mockProblems: Problem[] = [
@@ -98,6 +109,60 @@ export function ProblemList({ problems = [] }: ProblemListProps) {
   const filteredProblems = filter === 'all'
     ? displayProblems
     : displayProblems.filter((p) => p.status === filter);
+
+  const handleView = (problem: Problem) => {
+    setViewingProblem(problem);
+  };
+
+  const handleEdit = (problem: Problem) => {
+    setEditingProblem(problem);
+    setEditForm({ description: problem.description, status: problem.status });
+  };
+
+  const handleDelete = (problem: Problem) => {
+    setDeletingProblem(problem);
+  };
+
+  const confirmDelete = async () => {
+    if (!deletingProblem) return;
+    
+    try {
+      // In production, this would call the API to delete the problem
+      console.log('Deleting problem:', deletingProblem.id);
+      
+      // Remove from mock data (for demo purposes)
+      const index = mockProblems.findIndex(p => p.id === deletingProblem.id);
+      if (index > -1) {
+        mockProblems.splice(index, 1);
+      }
+      
+      setDeletingProblem(null);
+      if (onProblemsChange) onProblemsChange();
+    } catch (error) {
+      console.error('Error deleting problem:', error);
+    }
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingProblem) return;
+    
+    try {
+      // In production, this would call the API to update the problem
+      console.log('Updating problem:', editingProblem.id, editForm);
+      
+      // Update mock data (for demo purposes)
+      const problem = mockProblems.find(p => p.id === editingProblem.id);
+      if (problem) {
+        problem.description = editForm.description;
+        problem.status = editForm.status;
+      }
+      
+      setEditingProblem(null);
+      if (onProblemsChange) onProblemsChange();
+    } catch (error) {
+      console.error('Error updating problem:', error);
+    }
+  };
 
   const handleWhatsAppShare = (problem: Problem) => {
     const message = `🔴 ${problem.blockName || ''} - ${t('problems.title')}\n\n` +
@@ -220,19 +285,42 @@ export function ProblemList({ problems = [] }: ProblemListProps) {
                       </div>
                     </div>
                   </div>
-                  <div className="flex gap-2 mt-3">
+                  <div className="flex items-center justify-between mt-3">
                     <Button
                       variant="outline"
                       size="sm"
-                      className="flex-1 gap-2"
+                      className="flex-1 gap-2 mr-2"
                       onClick={() => handleWhatsAppShare(problem)}
                     >
                       <MessageCircle className="h-4 w-4 text-green-500" />
                       {t('problems.whatsapp')}
                     </Button>
-                    <Button variant="ghost" size="sm">
-                      {t('common.edit')}
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleView(problem)}
+                        className="h-8 w-8"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleEdit(problem)}
+                        className="h-8 w-8"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDelete(problem)}
+                        className="h-8 w-8 text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -240,6 +328,126 @@ export function ProblemList({ problems = [] }: ProblemListProps) {
           })
         )}
       </div>
+
+      {/* View Problem Dialog */}
+      <Dialog open={!!viewingProblem} onOpenChange={(open) => !open && setViewingProblem(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{t('problems.viewProblem') || 'View Problem'}</DialogTitle>
+          </DialogHeader>
+          {viewingProblem && (
+            <div className="space-y-4">
+              <div>
+                <Label className="text-sm text-muted-foreground">{t('problems.problemDescription') || 'Description'}</Label>
+                <p className="text-base mt-1">{viewingProblem.description}</p>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm text-muted-foreground">{t('problems.status') || 'Status'}</Label>
+                  <div className="mt-2">
+                    <Badge className={statusConfig[viewingProblem.status].color}>
+                      {t(statusConfig[viewingProblem.status].label)}
+                    </Badge>
+                  </div>
+                </div>
+                <div>
+                  <Label className="text-sm text-muted-foreground">{t('problems.date') || 'Date'}</Label>
+                  <p className="mt-1">{formatDate(viewingProblem.createdAt)}</p>
+                </div>
+              </div>
+              <div>
+                <Label className="text-sm text-muted-foreground">{t('project.projectName') || 'Project'}</Label>
+                <p className="mt-1">{viewingProblem.projectName}</p>
+              </div>
+              {viewingProblem.blockName && (
+                <div>
+                  <Label className="text-sm text-muted-foreground">{t('block.blockName') || 'Block'}</Label>
+                  <p className="mt-1">{viewingProblem.blockName}</p>
+                </div>
+              )}
+              {viewingProblem.unitName && (
+                <div>
+                  <Label className="text-sm text-muted-foreground">{t('unit.unitName') || 'Unit'}</Label>
+                  <p className="mt-1">{viewingProblem.unitName}</p>
+                </div>
+              )}
+              {viewingProblem.images && viewingProblem.images.length > 0 && (
+                <div>
+                  <Label className="text-sm text-muted-foreground">{t('problems.uploadImages') || 'Images'}</Label>
+                  <div className="mt-2 flex gap-2">
+                    {viewingProblem.images.map((image, index) => (
+                      <div key={index} className="text-sm text-muted-foreground">
+                        📷 {image.split('/').pop()}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Problem Dialog */}
+      <Dialog open={!!editingProblem} onOpenChange={(open) => !open && setEditingProblem(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('problems.editProblem') || 'Edit Problem'}</DialogTitle>
+          </DialogHeader>
+          {editingProblem && (
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="edit-description">{t('problems.problemDescription')}</Label>
+                <Textarea
+                  id="edit-description"
+                  value={editForm.description}
+                  onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                  rows={4}
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-status">{t('problems.status')}</Label>
+                <Select value={editForm.status} onValueChange={(value: any) => setEditForm({ ...editForm, status: value })}>
+                  <SelectTrigger id="edit-status">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="PENDING">{t('problems.pending')}</SelectItem>
+                    <SelectItem value="IN_PROGRESS">{t('problems.inProgress')}</SelectItem>
+                    <SelectItem value="RESOLVED">{t('problems.resolved')}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setEditingProblem(null)}>
+                  {t('common.cancel')}
+                </Button>
+                <Button onClick={handleSaveEdit}>
+                  {t('common.save')}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deletingProblem} onOpenChange={(open) => !open && setDeletingProblem(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('common.delete') || 'Delete'}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('problems.deleteConfirm') || 'Are you sure you want to delete this problem? This action cannot be undone.'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {t('common.delete')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

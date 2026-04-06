@@ -119,7 +119,10 @@
   "problems": {
     "title": "المشاكل",
     "addProblem": "إضافة مشكلة",
+    "viewProblem": "عرض المشكلة",
     "editProblem": "تعديل المشكلة",
+    "deleteConfirm": "هل أنت متأكد من حذف هذه المشكلة؟ لا يمكن التراجع عن هذا الإجراء.",
+    "date": "التاريخ",
     "problemDescription": "وصف المشكلة",
     "status": "الحالة",
     "pending": "قيد الانتظار",
