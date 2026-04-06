@@ -50,11 +50,11 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/projects - Create a new project
+// POST /api/projects - Create a new project with blocks and floors
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, description, location, authorId } = body;
+    const { name, description, location, totalApartments, blocks, authorId } = body;
 
     if (!name) {
       return NextResponse.json(
@@ -63,12 +63,57 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Calculate block progress from floor data
+    const calculateBlockProgress = (floorsData: any[]) => {
+      if (!floorsData || floorsData.length === 0) {
+        return { grosOeuvreProgress: 0, cesProgress: 0, cetProgress: 0, globalProgress: 0 };
+      }
+
+      let totalGrosOeuvre = 0;
+      let totalCes = 0;
+      let totalCet = 0;
+
+      floorsData.forEach((floor) => {
+        totalGrosOeuvre += floor.grosOeuvre || 0;
+        totalCes += floor.ces || 0;
+        totalCet += floor.cet || 0;
+      });
+
+      const grosOeuvreProgress = Math.round(totalGrosOeuvre / floorsData.length);
+      const cesProgress = Math.round(totalCes / floorsData.length);
+      const cetProgress = Math.round(totalCet / floorsData.length);
+      const globalProgress = Math.round((grosOeuvreProgress + cesProgress + cetProgress) / 3);
+
+      return { grosOeuvreProgress, cesProgress, cetProgress, globalProgress };
+    };
+
     const project = await db.project.create({
       data: {
         name,
         description,
         location,
+        totalApartments: totalApartments ? parseInt(totalApartments) : null,
         authorId,
+        ...(blocks && blocks.length > 0 && {
+          blocks: {
+            create: blocks.map((block: any) => {
+              const progress = calculateBlockProgress(block.floorsData);
+              return {
+                name: block.name,
+                description: block.description,
+                numberOfFloors: block.numberOfFloors ? parseInt(block.numberOfFloors) : null,
+                floorsData: block.floorsData ? JSON.stringify(block.floorsData) : null,
+                grosOeuvreProgress: progress.grosOeuvreProgress,
+                cesProgress: progress.cesProgress,
+                cetProgress: progress.cetProgress,
+                globalProgress: progress.globalProgress,
+              };
+            }),
+          },
+        }),
+      },
+      include: {
+        blocks: true,
       },
     });
 

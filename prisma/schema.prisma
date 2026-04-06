@@ -27,18 +27,14 @@ model User {
 }
 
 model Project {
-  id                          String   @id @default(cuid())
-  name                        String
-  description                 String?
-  location                    String?
-  grosOeuvre                  Boolean  @default(false)
-  numberOfFloors              Int?
-  concretePourFloor           Int?
-  reinforcementInspectionDate DateTime?
-  apartmentsPerFloor          String?  // JSON: { "floor1": { "apartments": 4, "ces": 0, "cet": 0 }, "floor2": { "apartments": 4, "ces": 0, "cet": 0 }, ... }
-  createdBy                   String?
-  createdAt                   DateTime @default(now())
-  updatedAt                   DateTime @updatedAt
+  id              String   @id @default(cuid())
+  name            String
+  description     String?
+  location        String?
+  totalApartments Int?
+  createdBy       String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   authorId String?
   author   User?    @relation("ProjectOwner", fields: [authorId], references: [id])
@@ -49,13 +45,15 @@ model Project {
 }
 
 model Block {
-  id               String   @id @default(cuid())
-  name             String
-  description      String?
-  projectId        String
-  grosOeuvreProgress Int    @default(0) // 0-100
-  cesProgress      Int     @default(0) // 0-100
-  cetProgress      Int     @default(0) // 0-100
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  projectId   String
+  numberOfFloors Int?
+  floorsData  String?  // JSON: [{ "floorNumber": 1, "apartments": 4, "grosOeuvre": 0, "ces": 0, "cet": 0, "concretePourDate": null, "reinforcementInspectionDate": null }, ...]
+  grosOeuvreProgress Int @default(0) // 0-100, calculated from floors
+  cesProgress      Int     @default(0) // 0-100, calculated from floors
+  cetProgress      Int     @default(0) // 0-100, calculated from floors
   globalProgress   Int     @default(0) // 0-100, calculated
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
