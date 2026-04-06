@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { AlertTriangle, Clock, MapPin, MessageCircle, Filter, Plus, Eye, Pencil, Trash2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -33,6 +33,7 @@ interface Problem {
 interface ProblemListProps {
   problems?: Problem[];
   onProblemsChange?: () => void;
+  problemUpdateKey?: number;
 }
 
 const statusConfig = {
@@ -59,7 +60,7 @@ function formatDate(date: Date): string {
   return `${year}/${month}/${day}`;
 }
 
-export function ProblemList({ problems = [], onProblemsChange }: ProblemListProps) {
+export function ProblemList({ problems = [], onProblemsChange, problemUpdateKey }: ProblemListProps) {
   const { t } = useLanguage();
   const [localProblems, setLocalProblems] = useState<Problem[]>(problems);
   const [filter, setFilter] = useState<'all' | 'PENDING' | 'IN_PROGRESS' | 'RESOLVED'>('all');
@@ -67,11 +68,98 @@ export function ProblemList({ problems = [], onProblemsChange }: ProblemListProp
   const [editingProblem, setEditingProblem] = useState<Problem | null>(null);
   const [deletingProblem, setDeletingProblem] = useState<Problem | null>(null);
   const [editForm, setEditForm] = useState({ description: '', status: 'PENDING' as 'PENDING' | 'IN_PROGRESS' | 'RESOLVED' });
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [createForm, setCreateForm] = useState({
+    description: '',
+    projectId: '',
+    blockId: '',
+    status: 'PENDING' as 'PENDING' | 'IN_PROGRESS' | 'RESOLVED'
+  });
+  const [projects, setProjects] = useState<any[]>([]);
+  const [blocks, setBlocks] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const problemsRef = useRef<Problem[]>(problems);
+
+  // Fetch problems from API
+  useEffect(() => {
+    fetchProblems();
+  }, []);
+
+  // Fetch problems when key changes
+  useEffect(() => {
+    fetchProblems();
+  }, [problemUpdateKey]);
+
+  // Fetch projects when create dialog opens
+  useEffect(() => {
+    if (isCreateDialogOpen) {
+      fetchProjects();
+    }
+  }, [isCreateDialogOpen]);
+
+  // Fetch blocks when project is selected
+  useEffect(() => {
+    if (createForm.projectId) {
+      fetchBlocks(createForm.projectId);
+    } else {
+      setBlocks([]);
+    }
+  }, [createForm.projectId]);
 
   // Update local problems when prop changes
   useEffect(() => {
-    setLocalProblems(problems);
+    const problemsChanged = JSON.stringify(problemsRef.current) !== JSON.stringify(problems);
+    if (problemsChanged) {
+      problemsRef.current = problems;
+      setLocalProblems(problems);
+    }
   }, [problems]);
+
+  const fetchProblems = async () => {
+    try {
+      const response = await fetch('/api/problems?limit=100');
+      const result = await response.json();
+      if (result.success) {
+        const transformedProblems = result.data.map((problem: any) => ({
+          id: problem.id,
+          description: problem.description,
+          status: problem.status,
+          projectName: problem.project?.name || 'Unknown',
+          blockName: problem.block?.name,
+          unitName: problem.unit?.name,
+          createdAt: new Date(problem.createdAt),
+          images: problem.images ? JSON.parse(problem.images) : [],
+        }));
+        setLocalProblems(transformedProblems);
+      }
+    } catch (error) {
+      console.error('Error fetching problems:', error);
+    }
+  };
+
+  const fetchProjects = async () => {
+    try {
+      const response = await fetch('/api/projects');
+      const result = await response.json();
+      if (result.success) {
+        setProjects(result.data);
+      }
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+    }
+  };
+
+  const fetchBlocks = async (projectId: string) => {
+    try {
+      const response = await fetch(`/api/blocks?projectId=${projectId}`);
+      const result = await response.json();
+      if (result.success) {
+        setBlocks(result.data);
+      }
+    } catch (error) {
+      console.error('Error fetching blocks:', error);
+    }
+  };
 
   const filteredProblems = filter === 'all'
     ? localProblems
@@ -92,10 +180,19 @@ export function ProblemList({ problems = [], onProblemsChange }: ProblemListProp
 
   const confirmDelete = async () => {
     if (!deletingProblem) return;
-    
+
     try {
       console.log('Deleting problem:', deletingProblem.id);
-      setLocalProblems(prev => prev.filter(p => p.id !== deletingProblem.id));
+      const response = await fetch(`/api/problems/${deletingProblem.id}`, {
+        method: 'DELETE',
+      });
+
+      const result = await response.json();
+      console.log('Delete result:', result);
+
+      if (response.ok || result.success) {
+        await fetchProblems();
+      }
       setDeletingProblem(null);
       if (onProblemsChange) onProblemsChange();
     } catch (error) {
@@ -105,20 +202,64 @@ export function ProblemList({ problems = [], onProblemsChange }: ProblemListProp
 
   const handleSaveEdit = async () => {
     if (!editingProblem) return;
-    
+
     try {
       console.log('Updating problem:', editingProblem.id, editForm);
-      setLocalProblems(prev => 
-        prev.map(problem => 
-          problem.id === editingProblem.id 
-            ? { ...problem, description: editForm.description, status: editForm.status }
-            : problem
-        )
-      );
+      const response = await fetch(`/api/problems/${editingProblem.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          description: editForm.description,
+          status: editForm.status,
+        }),
+      });
+
+      if (response.ok) {
+        await fetchProblems();
+      }
       setEditingProblem(null);
       if (onProblemsChange) onProblemsChange();
     } catch (error) {
       console.error('Error updating problem:', error);
+    }
+  };
+
+  const handleCreateProblem = async () => {
+    if (!createForm.description) {
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/problems', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          description: createForm.description,
+          projectId: createForm.projectId || undefined,
+          blockId: createForm.blockId || undefined,
+          status: createForm.status,
+        }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        setIsCreateDialogOpen(false);
+        setCreateForm({
+          description: '',
+          projectId: '',
+          blockId: '',
+          status: 'PENDING',
+        });
+        await fetchProblems();
+        if (onProblemsChange) onProblemsChange();
+      }
+    } catch (error) {
+      console.error('Error creating problem:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -160,7 +301,7 @@ export function ProblemList({ problems = [], onProblemsChange }: ProblemListProp
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button size="sm" className="gap-2">
+          <Button size="sm" className="gap-2" onClick={() => setIsCreateDialogOpen(true)}>
             <Plus className="h-4 w-4" />
             {t('problems.addProblem')}
           </Button>
@@ -406,6 +547,77 @@ export function ProblemList({ problems = [], onProblemsChange }: ProblemListProp
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Create Problem Dialog */}
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{t('problems.addProblem')}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="create-description">{t('problems.problemDescription')}</Label>
+              <Textarea
+                id="create-description"
+                value={createForm.description}
+                onChange={(e) => setCreateForm({ ...createForm, description: e.target.value })}
+                rows={4}
+                placeholder={t('problems.problemDescription')}
+              />
+            </div>
+            <div>
+              <Label htmlFor="create-project">{t('problems.selectProject')}</Label>
+              <select
+                id="create-project"
+                value={createForm.projectId}
+                onChange={(e) => setCreateForm({ ...createForm, projectId: e.target.value, blockId: '' })}
+                className="w-full p-2 border rounded-md bg-background"
+              >
+                <option value="">{t('problems.selectProject')}</option>
+                {projects.map((project) => (
+                  <option key={project.id} value={project.id}>{project.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <Label htmlFor="create-block">{t('problems.selectBlock')}</Label>
+              <select
+                id="create-block"
+                value={createForm.blockId}
+                onChange={(e) => setCreateForm({ ...createForm, blockId: e.target.value })}
+                disabled={!createForm.projectId}
+                className="w-full p-2 border rounded-md bg-background disabled:opacity-50"
+              >
+                <option value="">{t('problems.selectBlock')}</option>
+                {blocks.map((block) => (
+                  <option key={block.id} value={block.id}>{block.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <Label htmlFor="create-status">{t('problems.status')}</Label>
+              <Select value={createForm.status} onValueChange={(value: any) => setCreateForm({ ...createForm, status: value })}>
+                <SelectTrigger id="create-status">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="PENDING">{t('problems.pending')}</SelectItem>
+                  <SelectItem value="IN_PROGRESS">{t('problems.inProgress')}</SelectItem>
+                  <SelectItem value="RESOLVED">{t('problems.resolved')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+                {t('common.cancel')}
+              </Button>
+              <Button onClick={handleCreateProblem} disabled={isLoading || !createForm.description}>
+                {isLoading ? t('common.loading') : t('common.save')}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

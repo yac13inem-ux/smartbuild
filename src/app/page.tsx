@@ -40,8 +40,9 @@ export default function Home() {
         );
       case 'problems':
         return (
-          <ProblemList 
+          <ProblemList
             key={problemUpdateKey}
+            problemUpdateKey={problemUpdateKey}
             onProblemsChange={handleProblemChange}
           />
         );
