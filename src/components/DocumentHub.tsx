@@ -47,41 +47,6 @@ const documentTypeConfig = {
   },
 };
 
-// Initial mock data
-const initialDocuments: Document[] = [
-  {
-    id: '1',
-    title: 'Weekly Site Visit - Block A',
-    type: 'PV_VISITE',
-    date: new Date(Date.now() - 2 * 60 * 60 * 1000),
-    projectName: 'Residential Complex Alpha',
-    blockName: 'Block A',
-  },
-  {
-    id: '2',
-    title: 'Wall Crack Constat',
-    type: 'PV_CONSTAT',
-    date: new Date(Date.now() - 24 * 60 * 60 * 1000),
-    projectName: 'Residential Complex Alpha',
-    blockName: 'Block A',
-  },
-  {
-    id: '3',
-    title: 'Monthly Progress Report',
-    type: 'RAPPORT_MENSUEL',
-    date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-    projectName: 'Residential Complex Alpha',
-  },
-  {
-    id: '4',
-    title: 'Structural Inspection - Block B',
-    type: 'PV_VISITE',
-    date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-    projectName: 'Residential Complex Alpha',
-    blockName: 'Block B',
-  },
-];
-
 // Helper function to format date consistently
 function formatDate(date: Date): string {
   const d = new Date(date);
@@ -93,7 +58,7 @@ function formatDate(date: Date): string {
 
 export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubProps) {
   const { t } = useLanguage();
-  const [localDocuments, setLocalDocuments] = useState<Document[]>(documents.length > 0 ? documents : initialDocuments);
+  const [localDocuments, setLocalDocuments] = useState<Document[]>(documents);
   const [viewingDoc, setViewingDoc] = useState<Document | null>(null);
   const [editingDoc, setEditingDoc] = useState<Document | null>(null);
   const [deletingDoc, setDeletingDoc] = useState<Document | null>(null);
@@ -101,9 +66,7 @@ export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubPr
 
   // Update local documents when prop changes
   useEffect(() => {
-    if (documents.length > 0) {
-      setLocalDocuments(documents);
-    }
+    setLocalDocuments(documents);
   }, [documents]);
 
   const handleView = (doc: Document) => {
@@ -123,12 +86,8 @@ export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubPr
     if (!deletingDoc) return;
     
     try {
-      // In production, this would call the API to delete the document
       console.log('Deleting document:', deletingDoc.id);
-      
-      // Remove from local state
       setLocalDocuments(prev => prev.filter(d => d.id !== deletingDoc.id));
-      
       setDeletingDoc(null);
       if (onDocumentsChange) onDocumentsChange();
     } catch (error) {
@@ -140,10 +99,7 @@ export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubPr
     if (!editingDoc) return;
     
     try {
-      // In production, this would call the API to update the document
       console.log('Updating document:', editingDoc.id, editForm);
-      
-      // Update local state
       setLocalDocuments(prev => 
         prev.map(doc => 
           doc.id === editingDoc.id 
@@ -151,7 +107,6 @@ export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubPr
             : doc
         )
       );
-      
       setEditingDoc(null);
       if (onDocumentsChange) onDocumentsChange();
     } catch (error) {
@@ -197,70 +152,81 @@ export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubPr
       {/* Document List */}
       <div className="space-y-3">
         <h3 className="font-medium">{t('common.recentActivity') || 'Recent'}</h3>
-        {localDocuments.map((doc) => {
-          const config = documentTypeConfig[doc.type];
-          const Icon = config.icon;
+        {localDocuments.length === 0 ? (
+          <Card>
+            <CardContent className="p-8 text-center">
+              <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+              <p className="text-sm text-muted-foreground">
+                {t('common.noData')}
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          localDocuments.map((doc) => {
+            const config = documentTypeConfig[doc.type];
+            const Icon = config.icon;
 
-          return (
-            <Card
-              key={doc.id}
-              className="hover:shadow-md transition-shadow"
-            >
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-start gap-3 flex-1">
-                    <div className={`p-2 rounded-lg ${config.color} mt-1`}>
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm">{doc.title}</p>
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
-                        <Calendar className="h-3 w-3" />
-                        <span>{formatDate(doc.date)}</span>
+            return (
+              <Card
+                key={doc.id}
+                className="hover:shadow-md transition-shadow"
+              >
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-start gap-3 flex-1">
+                      <div className={`p-2 rounded-lg ${config.color} mt-1`}>
+                        <Icon className="h-5 w-5" />
                       </div>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {doc.projectName}
-                        {doc.blockName && ` > ${doc.blockName}`}
-                        {doc.unitName && ` > ${doc.unitName}`}
-                      </p>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm">{doc.title}</p>
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+                          <Calendar className="h-3 w-3" />
+                          <span>{formatDate(doc.date)}</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {doc.projectName}
+                          {doc.blockName && ` > ${doc.blockName}`}
+                          {doc.unitName && ` > ${doc.unitName}`}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleView(doc)}
+                        className="h-8 w-8"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleEdit(doc)}
+                        className="h-8 w-8"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDelete(doc)}
+                        className="h-8 w-8 text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                      {doc.pdfPath && (
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Download className="h-4 w-4" />
+                        </Button>
+                      )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleView(doc)}
-                      className="h-8 w-8"
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleEdit(doc)}
-                      className="h-8 w-8"
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDelete(doc)}
-                      className="h-8 w-8 text-destructive hover:text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                    {doc.pdfPath && (
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <Download className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+                </CardContent>
+              </Card>
+            );
+          })
+        )}
       </div>
 
       {/* View Document Dialog */}
@@ -301,7 +267,7 @@ export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubPr
                   <p className="mt-1">{viewingDoc.unitName}</p>
                 </div>
               )}
-              {(viewingDoc.description) && (
+              {viewingDoc.description && (
                 <div>
                   <Label className="text-sm text-muted-foreground">{t('documents.description') || 'Description'}</Label>
                   <p className="mt-1">{viewingDoc.description}</p>
