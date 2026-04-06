@@ -97,7 +97,7 @@ export function Settings() {
 
       {/* App Info */}
       <div className="text-center text-xs text-muted-foreground pb-4">
-        <p>© 2025 Construction Team</p>
+        <p>© 2026 DzBuild Team</p>
       </div>
     </div>
   );

@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   title: "Construction Management - Civil Engineering SaaS",
   description: "Professional construction project management platform for field engineers, contractors, and project owners",
   keywords: ["Construction", "Civil Engineering", "Project Management", "SaaS", "Field Management"],
-  authors: [{ name: "Construction Team" }],
+  authors: [{ name: "DzBuild Team" }],
 };
 
 export default function RootLayout({
