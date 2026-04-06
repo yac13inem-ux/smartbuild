@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { SimpleAddProjectDialog } from './SimpleAddProjectDialog';
 
 interface DashboardProps {
   projects?: any[];
@@ -195,9 +196,9 @@ export function Dashboard({
             <p className="text-muted-foreground mb-4">
               ابدأ بإضافة مشروع جديد لتتبع التقدم وإدارة الفريق
             </p>
-            <p className="text-sm text-muted-foreground">
-              اذهب إلى صفحة المشاريع لإضافة مشروع جديد
-            </p>
+            <div className="flex justify-center">
+              <SimpleAddProjectDialog onProjectAdded={fetchDashboardData} />
+            </div>
           </CardContent>
         </Card>
       </div>
