@@ -210,7 +210,7 @@ export function Dashboard({
       {/* Progress Sections - All circles in one row */}
       <Card>
         <CardContent className="p-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             {/* Gros Œuvre Progress */}
             <div className="flex flex-col items-center text-center">
               <CircularProgress
@@ -253,19 +253,6 @@ export function Dashboard({
               <div className="mt-2">
                 <p className="text-xs text-muted-foreground mb-1">{t('dashboard.cet')}</p>
                 <span className="font-bold text-green-500 text-sm">{cetProgress}%</span>
-              </div>
-            </div>
-
-            {/* Total Progress */}
-            <div className="flex flex-col items-center text-center">
-              <CircularProgress
-                value={totalProgress}
-                size={70}
-                strokeWidth={6}
-                color="orange"
-              />
-              <div className="mt-2">
-                <span className="font-bold text-orange-500 text-sm">{totalProgress}%</span>
               </div>
             </div>
           </div>
