@@ -336,30 +336,80 @@ export function Dashboard({
             const projectBlocks = blocksByProject[project.id] || [];
             const isExpanded = expandedProjects.has(project.id);
 
+            // Calculate project progress
+            const projectTotalProgress = projectBlocks.length > 0
+              ? Math.round(projectBlocks.reduce((sum: number, b: any) => sum + (b.globalProgress || 0), 0) / projectBlocks.length)
+              : 0;
+            const projectGrosOeuvre = projectBlocks.length > 0
+              ? Math.round(projectBlocks.reduce((sum: number, b: any) => sum + (b.grosOeuvreProgress || 0), 0) / projectBlocks.length)
+              : 0;
+            const projectCES = projectBlocks.length > 0
+              ? Math.round(projectBlocks.reduce((sum: number, b: any) => sum + (b.cesProgress || 0), 0) / projectBlocks.length)
+              : 0;
+            const projectCET = projectBlocks.length > 0
+              ? Math.round(projectBlocks.reduce((sum: number, b: any) => sum + (b.cetProgress || 0), 0) / projectBlocks.length)
+              : 0;
+
             return (
               <Card key={project.id}>
                 <CardHeader
-                  className="cursor-pointer hover:bg-muted/50 transition-colors py-3"
+                  className="cursor-pointer hover:bg-muted/50 transition-colors py-4"
                   onClick={() => toggleProject(project.id)}
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">
                       {isExpanded ? (
-                        <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                        <ChevronDown className="h-5 w-5 text-muted-foreground" />
                       ) : (
-                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                        <ChevronRight className="h-5 w-5 text-muted-foreground" />
                       )}
-                      <CardTitle className="text-base">{project.name}</CardTitle>
+                      <CardTitle className="text-lg">{project.name}</CardTitle>
+                    </div>
+                    <div className="flex items-center gap-2">
                       <Badge variant="secondary" className="text-xs">
                         {projectBlocks.length} {t('common.blocksCount')}
                       </Badge>
+                      <Badge variant={projectTotalProgress === 100 ? 'default' : 'outline'} className="text-sm font-bold">
+                        {projectTotalProgress}%
+                      </Badge>
                     </div>
-                    {projectBlocks.length > 0 && (
-                      <div className="text-sm font-medium">
-                        {Math.round(projectBlocks.reduce((sum: number, b: any) => sum + (b.globalProgress || 0), 0) / projectBlocks.length)}%
-                      </div>
-                    )}
                   </div>
+
+                  {/* Project Progress Bar */}
+                  {projectBlocks.length > 0 && (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>{t('dashboard.overallProgress')}</span>
+                        <span className="font-bold">{projectTotalProgress}%</span>
+                      </div>
+                      <Progress value={projectTotalProgress} className="h-2" />
+
+                      {/* Sub-progress bars */}
+                      <div className="grid grid-cols-3 gap-3 mt-3">
+                        <div>
+                          <div className="flex items-center justify-between text-xs mb-1">
+                            <span className="text-muted-foreground">Gros Œuvre</span>
+                            <span className="font-medium">{projectGrosOeuvre}%</span>
+                          </div>
+                          <Progress value={projectGrosOeuvre} className="h-1.5" />
+                        </div>
+                        <div>
+                          <div className="flex items-center justify-between text-xs mb-1">
+                            <span className="text-muted-foreground">CES</span>
+                            <span className="font-medium">{projectCES}%</span>
+                          </div>
+                          <Progress value={projectCES} className="h-1.5" />
+                        </div>
+                        <div>
+                          <div className="flex items-center justify-between text-xs mb-1">
+                            <span className="text-muted-foreground">CET</span>
+                            <span className="font-medium">{projectCET}%</span>
+                          </div>
+                          <Progress value={projectCET} className="h-1.5" />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </CardHeader>
                 {isExpanded && (
                   <CardContent className="pt-0 pb-4 px-4">
