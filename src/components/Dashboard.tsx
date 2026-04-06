@@ -260,13 +260,11 @@ export function Dashboard({
             <div className="flex flex-col items-center text-center">
               <CircularProgress
                 value={totalProgress}
-                label={t('common.percent')}
                 size={70}
                 strokeWidth={6}
                 color="orange"
               />
               <div className="mt-2">
-                <p className="text-xs text-muted-foreground mb-1">{t('dashboard.overallProgress')}</p>
                 <span className="font-bold text-orange-500 text-sm">{totalProgress}%</span>
               </div>
             </div>
@@ -347,7 +345,6 @@ export function Dashboard({
                   {projectBlocks.length > 0 && (
                     <div className="space-y-3">
                       <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <span>{t('dashboard.overallProgress')}</span>
                         <span className="font-bold">{projectTotalProgress}%</span>
                       </div>
 
