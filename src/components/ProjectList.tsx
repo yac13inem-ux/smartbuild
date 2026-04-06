@@ -65,6 +65,7 @@ export function ProjectList() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingFloor, setEditingFloor] = useState<number | string | null>(null);
   const [blockToDelete, setBlockToDelete] = useState<Block | null>(null);
+  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
 
   const fetchProjects = async () => {
     try {
@@ -207,6 +208,29 @@ export function ProjectList() {
       }
     } catch (error) {
       console.error('Error deleting block:', error);
+      toast.error('حدث خطأ أثناء الحذف');
+    }
+  };
+
+  const handleDeleteProject = async () => {
+    if (!projectToDelete) return;
+
+    try {
+      const response = await fetch(`/api/projects/${projectToDelete.id}`, {
+        method: 'DELETE',
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        toast.success('تم حذف المشروع بنجاح');
+        setProjectToDelete(null);
+        await fetchProjects();
+      } else {
+        toast.error('فشل حذف المشروع');
+      }
+    } catch (error) {
+      console.error('Error deleting project:', error);
       toast.error('حدث خطأ أثناء الحذف');
     }
   };
@@ -855,13 +879,12 @@ export function ProjectList() {
       {projects.map((project) => (
         <Card
           key={project.id}
-          className="hover:shadow-md transition-shadow cursor-pointer"
-          onClick={() => handleProjectClick(project)}
+          className="hover:shadow-md transition-shadow"
         >
-          <CardHeader>
+          <CardHeader onClick={() => handleProjectClick(project)} className="cursor-pointer">
             <div className="flex items-start justify-between">
-              <CardTitle className="text-base">{project.name}</CardTitle>
-              <ChevronRight className="h-5 w-5 text-muted-foreground" />
+              <CardTitle className="text-base flex-1">{project.name}</CardTitle>
+              <ChevronRight className="h-5 w-5 text-muted-foreground ml-2" />
             </div>
             {project.description && (
               <p className="text-sm text-muted-foreground mt-1">
@@ -888,6 +911,40 @@ export function ProjectList() {
                   {project._count?.blocks || project.blocks?.length || 0} {t('project.blocks')}
                 </span>
               </div>
+
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setProjectToDelete(project);
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>تأكيد حذف المشروع</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      هل أنت متأكد من حذف المشروع "{projectToDelete?.name}"؟
+                      سيتم حذف جميع العمارات والتقارير والمشاكل المرتبطة بهذا المشروع.
+                      لا يمكن التراجع عن هذا الإجراء.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel onClick={() => setProjectToDelete(null)}>
+                      إلغاء
+                    </AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDeleteProject} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                      حذف
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </CardContent>
         </Card>
