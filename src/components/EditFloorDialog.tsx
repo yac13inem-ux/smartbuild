@@ -98,6 +98,16 @@ export function EditFloorDialog({
     setLoading(true);
 
     try {
+      console.log('Saving floors data:', editFloors);
+      console.log('Block ID:', blockId);
+
+      // Validate that we have floors data
+      if (!editFloors || editFloors.length === 0) {
+        toast.error('لا توجد بيانات للطوابق للحفظ');
+        setLoading(false);
+        return;
+      }
+
       // Calculate block progress from floor data
       let totalGrosOeuvre = 0;
       let totalCes = 0;
@@ -123,13 +133,17 @@ export function EditFloorDialog({
         globalProgress,
       };
 
+      console.log('Sending payload:', payload);
+
       const response = await fetch(`/api/blocks/${blockId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
+      console.log('Response status:', response.status);
       const result = await response.json();
+      console.log('Response result:', result);
 
       if (result.success) {
         toast.success('تم حفظ التغييرات بنجاح');

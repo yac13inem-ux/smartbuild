@@ -4,11 +4,12 @@ import { db } from '@/lib/db';
 // GET /api/blocks/[id] - Get a specific block
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const block = await db.block.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         project: true,
         units: true,
@@ -46,9 +47,10 @@ export async function GET(
 // PUT /api/blocks/[id] - Update block progress
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const {
       name,
@@ -67,7 +69,7 @@ export async function PUT(
     const globalProgress = Math.round((go * 0.5) + (ce * 0.3) + (ct * 0.2));
 
     const block = await db.block.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(name && { name }),
         ...(description !== undefined && { description }),
@@ -96,11 +98,12 @@ export async function PUT(
 // DELETE /api/blocks/[id] - Delete a block
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     await db.block.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({
