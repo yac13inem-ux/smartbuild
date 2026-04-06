@@ -139,7 +139,6 @@ export function ProjectList() {
             size="sm"
             variant="outline"
             onClick={() => setEditDialogOpen(true)}
-            disabled={floorsData.length === 0}
           >
             <Edit className="h-4 w-4 mr-1" />
             {t('common.edit')}
@@ -324,6 +323,7 @@ export function ProjectList() {
           blockId={selectedBlock.id}
           blockName={selectedBlock.name}
           floorsData={floorsData}
+          numberOfFloors={selectedBlock.numberOfFloors}
           open={editDialogOpen}
           onOpenChange={setEditDialogOpen}
           onSave={(updatedFloors) => {

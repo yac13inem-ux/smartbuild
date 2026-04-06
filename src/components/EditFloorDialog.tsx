@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -37,6 +37,7 @@ interface EditFloorDialogProps {
   blockId: string;
   blockName: string;
   floorsData: FloorData[];
+  numberOfFloors?: number;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave?: (updatedFloors: FloorData[]) => void;
@@ -46,6 +47,7 @@ export function EditFloorDialog({
   blockId,
   blockName,
   floorsData,
+  numberOfFloors,
   open,
   onOpenChange,
   onSave,
@@ -53,6 +55,29 @@ export function EditFloorDialog({
   const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [editFloors, setEditFloors] = useState<FloorData[]>(floorsData);
+
+  // Create empty floors data if empty when dialog opens
+  useEffect(() => {
+    if (open && floorsData.length === 0 && numberOfFloors) {
+      const newFloors: FloorData[] = [];
+      for (let i = 1; i <= numberOfFloors; i++) {
+        newFloors.push({
+          floorNumber: i,
+          apartments: 0,
+          grosOeuvreProgress: 0,
+          concretePourDate: null,
+          reinforcementInspectionDate: null,
+          grosOeuvreNotes: '',
+          cesProgress: 0,
+          cetProgress: 0,
+          cesCetNotes: '',
+        });
+      }
+      setEditFloors(newFloors);
+    } else if (open) {
+      setEditFloors(floorsData);
+    }
+  }, [open, floorsData, numberOfFloors]);
 
   const handleFloorChange = (
     floorIndex: number,
@@ -129,15 +154,26 @@ export function EditFloorDialog({
         </DialogHeader>
 
         <ScrollArea className="h-[calc(90vh-180px)] px-1">
-          <Tabs defaultValue="grosOeuvre" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="grosOeuvre">
-                {t('project.grosOeuvreSection')}
-              </TabsTrigger>
-              <TabsTrigger value="cesCet">
-                {t('project.cesCetSection')}
-              </TabsTrigger>
-            </TabsList>
+          {editFloors.length === 0 ? (
+            <Card>
+              <CardContent className="p-8 text-center">
+                <p className="text-muted-foreground">
+                  لم يتم تحديد عدد الطوابق لهذه العمارة.
+                  <br />
+                  الرجاء إنشاء عمارة جديدة مع عدد الطوابق المحدد.
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <Tabs defaultValue="grosOeuvre" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="grosOeuvre">
+                  {t('project.grosOeuvreSection')}
+                </TabsTrigger>
+                <TabsTrigger value="cesCet">
+                  {t('project.cesCetSection')}
+                </TabsTrigger>
+              </TabsList>
 
             {/* Gros Œuvre Tab */}
             <TabsContent value="grosOeuvre" className="space-y-3 mt-4">
@@ -342,6 +378,7 @@ export function EditFloorDialog({
               </Card>
             </TabsContent>
           </Tabs>
+          )}
         </ScrollArea>
 
         <DialogFooter className="pt-4">
