@@ -7,7 +7,7 @@ import { RecentActivity } from './RecentActivity';
 import { Building2, FileText, AlertTriangle, Blocks, ChevronDown, ChevronRight, HardHat } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
+import { Progress, ProgressBlue, ProgressGreen } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { SimpleAddProjectDialog } from './SimpleAddProjectDialog';
@@ -377,35 +377,34 @@ export function Dashboard({
 
                   {/* Project Progress Bar */}
                   {projectBlocks.length > 0 && (
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       <div className="flex items-center justify-between text-xs text-muted-foreground">
                         <span>{t('dashboard.overallProgress')}</span>
                         <span className="font-bold">{projectTotalProgress}%</span>
                       </div>
-                      <Progress value={projectTotalProgress} className="h-2" />
 
-                      {/* Sub-progress bars */}
-                      <div className="grid grid-cols-3 gap-3 mt-3">
-                        <div>
+                      {/* Combined Progress Bars in one row with colors */}
+                      <div className="flex gap-2">
+                        <div className="flex-1">
                           <div className="flex items-center justify-between text-xs mb-1">
-                            <span className="text-muted-foreground">Gros Œuvre</span>
-                            <span className="font-medium">{projectGrosOeuvre}%</span>
+                            <span className="text-muted-foreground font-medium">Gros Œuvre</span>
+                            <span className="font-bold text-primary">{projectGrosOeuvre}%</span>
                           </div>
-                          <Progress value={projectGrosOeuvre} className="h-1.5" />
+                          <Progress value={projectGrosOeuvre} className="h-2.5" />
                         </div>
-                        <div>
+                        <div className="flex-1">
                           <div className="flex items-center justify-between text-xs mb-1">
-                            <span className="text-muted-foreground">CES</span>
-                            <span className="font-medium">{projectCES}%</span>
+                            <span className="text-muted-foreground font-medium">CES</span>
+                            <span className="font-bold text-blue-500">{projectCES}%</span>
                           </div>
-                          <Progress value={projectCES} className="h-1.5" />
+                          <ProgressBlue value={projectCES} className="h-2.5" />
                         </div>
-                        <div>
+                        <div className="flex-1">
                           <div className="flex items-center justify-between text-xs mb-1">
-                            <span className="text-muted-foreground">CET</span>
-                            <span className="font-medium">{projectCET}%</span>
+                            <span className="text-muted-foreground font-medium">CET</span>
+                            <span className="font-bold text-green-500">{projectCET}%</span>
                           </div>
-                          <Progress value={projectCET} className="h-1.5" />
+                          <ProgressGreen value={projectCET} className="h-2.5" />
                         </div>
                       </div>
                     </div>
