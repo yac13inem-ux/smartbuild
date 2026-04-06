@@ -63,11 +63,89 @@ export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubPr
   const [editingDoc, setEditingDoc] = useState<Document | null>(null);
   const [deletingDoc, setDeletingDoc] = useState<Document | null>(null);
   const [editForm, setEditForm] = useState({ title: '', description: '' });
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [createForm, setCreateForm] = useState({
+    title: '',
+    type: 'PV_VISITE' as 'PV_VISITE' | 'PV_CONSTAT' | 'RAPPORT_MENSUEL',
+    projectId: '',
+    blockId: '',
+    unitId: '',
+    description: ''
+  });
+  const [projects, setProjects] = useState<any[]>([]);
+  const [blocks, setBlocks] = useState<any[]>([]);
+  const [units, setUnits] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Update local documents when prop changes
   useEffect(() => {
     setLocalDocuments(documents);
   }, [documents]);
+
+  // Fetch projects when create dialog opens
+  useEffect(() => {
+    if (isCreateDialogOpen) {
+      fetchProjects();
+    }
+  }, [isCreateDialogOpen]);
+
+  // Fetch blocks when project is selected
+  useEffect(() => {
+    if (createForm.projectId) {
+      fetchBlocks(createForm.projectId);
+    } else {
+      setBlocks([]);
+      setUnits([]);
+    }
+  }, [createForm.projectId]);
+
+  // Fetch units when block is selected
+  useEffect(() => {
+    if (createForm.blockId) {
+      fetchUnits(createForm.blockId);
+    } else {
+      setUnits([]);
+    }
+  }, [createForm.blockId]);
+
+  const fetchProjects = async () => {
+    try {
+      const response = await fetch('/api/projects');
+      const result = await response.json();
+      if (result.success) {
+        setProjects(result.data);
+      }
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+    }
+  };
+
+  const fetchBlocks = async (projectId: string) => {
+    try {
+      const response = await fetch(`/api/blocks?projectId=${projectId}`);
+      const result = await response.json();
+      if (result.success) {
+        setBlocks(result.data);
+      }
+    } catch (error) {
+      console.error('Error fetching blocks:', error);
+    }
+  };
+
+  const fetchUnits = async (blockId: string) => {
+    try {
+      const response = await fetch(`/api/units?blockId=${blockId}`);
+      const result = await response.json();
+      if (result.success) {
+        setUnits(result.data);
+      } else {
+        setUnits([]);
+      }
+    } catch (error) {
+      console.error('Error fetching units:', error);
+      setUnits([]);
+    }
+  };
 
   const handleView = (doc: Document) => {
     setViewingDoc(doc);
@@ -114,11 +192,53 @@ export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubPr
     }
   };
 
+  const handleCreateDocument = async () => {
+    if (!createForm.title || !createForm.type) {
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/reports', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: createForm.title,
+          description: createForm.description,
+          type: createForm.type,
+          projectId: createForm.projectId || undefined,
+          blockId: createForm.blockId || undefined,
+          unitId: createForm.unitId || undefined,
+        }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        setIsCreateDialogOpen(false);
+        setCreateForm({
+          title: '',
+          type: 'PV_VISITE',
+          projectId: '',
+          blockId: '',
+          unitId: '',
+          description: ''
+        });
+        if (onDocumentsChange) onDocumentsChange();
+      }
+    } catch (error) {
+      console.error('Error creating document:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-4 pb-20">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">{t('documents.title')}</h2>
-        <Button size="sm" className="gap-2">
+        <Button size="sm" className="gap-2" onClick={() => setIsCreateDialogOpen(true)}>
           <Plus className="h-4 w-4" />
           {t('documents.createDocument')}
         </Button>
@@ -339,6 +459,101 @@ export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubPr
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Create Document Dialog */}
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{t('documents.createDocument')}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="create-title">{t('documents.documentTitle')}</Label>
+              <Input
+                id="create-title"
+                value={createForm.title}
+                onChange={(e) => setCreateForm({ ...createForm, title: e.target.value })}
+                placeholder={t('documents.documentTitle')}
+              />
+            </div>
+            <div>
+              <Label htmlFor="create-type">{t('documents.selectType')}</Label>
+              <select
+                id="create-type"
+                value={createForm.type}
+                onChange={(e) => setCreateForm({ ...createForm, type: e.target.value as any })}
+                className="w-full p-2 border rounded-md bg-background"
+              >
+                <option value="PV_VISITE">{t('documents.pvVisite')}</option>
+                <option value="PV_CONSTAT">{t('documents.pvConstat')}</option>
+                <option value="RAPPORT_MENSUEL">{t('documents.rapportMensuel')}</option>
+              </select>
+            </div>
+            <div>
+              <Label htmlFor="create-project">{t('documents.selectProject')}</Label>
+              <select
+                id="create-project"
+                value={createForm.projectId}
+                onChange={(e) => setCreateForm({ ...createForm, projectId: e.target.value, blockId: '', unitId: '' })}
+                className="w-full p-2 border rounded-md bg-background"
+              >
+                <option value="">{t('documents.selectProject')}</option>
+                {projects.map((project) => (
+                  <option key={project.id} value={project.id}>{project.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <Label htmlFor="create-block">{t('documents.selectBlock')}</Label>
+              <select
+                id="create-block"
+                value={createForm.blockId}
+                onChange={(e) => setCreateForm({ ...createForm, blockId: e.target.value, unitId: '' })}
+                disabled={!createForm.projectId}
+                className="w-full p-2 border rounded-md bg-background disabled:opacity-50"
+              >
+                <option value="">{t('documents.selectBlock')}</option>
+                {blocks.map((block) => (
+                  <option key={block.id} value={block.id}>{block.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <Label htmlFor="create-unit">{t('documents.selectUnit')}</Label>
+              <select
+                id="create-unit"
+                value={createForm.unitId}
+                onChange={(e) => setCreateForm({ ...createForm, unitId: e.target.value })}
+                disabled={!createForm.blockId}
+                className="w-full p-2 border rounded-md bg-background disabled:opacity-50"
+              >
+                <option value="">{t('documents.selectUnit')}</option>
+                {units.map((unit) => (
+                  <option key={unit.id} value={unit.id}>{unit.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <Label htmlFor="create-description">{t('documents.description')}</Label>
+              <Textarea
+                id="create-description"
+                value={createForm.description}
+                onChange={(e) => setCreateForm({ ...createForm, description: e.target.value })}
+                rows={3}
+                placeholder={t('documents.description')}
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+                {t('common.cancel')}
+              </Button>
+              <Button onClick={handleCreateDocument} disabled={isLoading || !createForm.title || !createForm.type}>
+                {isLoading ? t('common.loading') : t('common.save')}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
