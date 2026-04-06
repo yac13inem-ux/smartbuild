@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Language, defaultLanguage } from '@/lib/i18n';
+import { Language, defaultLanguage, translations } from '@/lib/i18n';
 
 interface LanguageContextType {
   language: Language;
@@ -39,11 +39,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   const t = (key: string) => {
     const keys = key.split('.');
-    let value: any = language === 'en'
-      ? require('@/lib/locales/en.json')
-      : language === 'fr'
-      ? require('@/lib/locales/fr.json')
-      : require('@/lib/locales/ar.json');
+    let value: any = translations[language];
 
     for (const k of keys) {
       value = value?.[k];
