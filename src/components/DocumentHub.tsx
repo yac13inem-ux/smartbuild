@@ -340,29 +340,28 @@ export function DocumentHub({ documents = [], onDocumentsChange, documentUpdateK
                 className="hover:shadow-md transition-shadow"
               >
                 <CardContent className="p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-start gap-3 flex-1">
-                      <div className={`p-2 rounded-lg ${config.color} mt-1`}>
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm">{doc.title}</p>
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
-                          <Calendar className="h-3 w-3" />
-                          <span>{formatDate(doc.date)}</span>
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {doc.projectName}
-                          {doc.blockName && ` > ${doc.blockName}`}
-                          {doc.unitName && ` > ${doc.unitName}`}
-                        </p>
-                      </div>
+                  <div className="flex items-start gap-3">
+                    <div className={`p-2 rounded-lg ${config.color} mt-1`}>
+                      <Icon className="h-5 w-5" />
                     </div>
-                  <div className="flex items-center justify-between mt-3">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm">{doc.title}</p>
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+                        <Calendar className="h-3 w-3" />
+                        <span>{formatDate(doc.date)}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {doc.projectName}
+                        {doc.blockName && ` > ${doc.blockName}`}
+                        {doc.unitName && ` > ${doc.unitName}`}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 mt-3">
                     <Button
                       variant="outline"
                       size="sm"
-                      className="flex-1 gap-2 mr-2"
+                      className="flex-1 gap-2"
                       onClick={() => handleWhatsAppShare(doc)}
                     >
                       <MessageCircle className="h-4 w-4 text-green-500" />
