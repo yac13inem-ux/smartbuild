@@ -69,6 +69,7 @@ export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubPr
     type: 'PV_VISITE' as 'PV_VISITE' | 'PV_CONSTAT' | 'RAPPORT_MENSUEL',
     projectId: '',
     blockId: '',
+    date: '',
     description: ''
   });
   const [projects, setProjects] = useState<any[]>([]);
@@ -189,6 +190,7 @@ export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubPr
           type: createForm.type,
           projectId: createForm.projectId || undefined,
           blockId: createForm.blockId || undefined,
+          date: createForm.date ? new Date(createForm.date) : new Date(),
         }),
       });
 
@@ -200,6 +202,7 @@ export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubPr
           type: 'PV_VISITE',
           projectId: '',
           blockId: '',
+          date: '',
           description: ''
         });
         if (onDocumentsChange) onDocumentsChange();
@@ -494,6 +497,16 @@ export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubPr
                   <option key={block.id} value={block.id}>{block.name}</option>
                 ))}
               </select>
+            </div>
+            <div>
+              <Label htmlFor="create-date">{t('documents.date')}</Label>
+              <Input
+                id="create-date"
+                type="date"
+                value={createForm.date}
+                onChange={(e) => setCreateForm({ ...createForm, date: e.target.value })}
+                className="w-full p-2 border rounded-md bg-background"
+              />
             </div>
             <div>
               <Label htmlFor="create-description">{t('documents.description')}</Label>
