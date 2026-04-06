@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FileText, Calendar, Download, Plus, Eye, Pencil, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -76,10 +76,16 @@ export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubPr
   const [blocks, setBlocks] = useState<any[]>([]);
   const [units, setUnits] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const documentsRef = useRef<Document[]>(documents);
 
   // Update local documents when prop changes
   useEffect(() => {
-    setLocalDocuments(documents);
+    // Only update if the documents array has actually changed
+    const documentsChanged = JSON.stringify(documentsRef.current) !== JSON.stringify(documents);
+    if (documentsChanged) {
+      documentsRef.current = documents;
+      setLocalDocuments(documents);
+    }
   }, [documents]);
 
   // Fetch projects when create dialog opens
