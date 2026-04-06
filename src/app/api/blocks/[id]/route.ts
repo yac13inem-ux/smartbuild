@@ -53,6 +53,7 @@ export async function PUT(
     const {
       name,
       description,
+      floorsData,
       grosOeuvreProgress,
       cesProgress,
       cetProgress,
@@ -70,6 +71,7 @@ export async function PUT(
       data: {
         ...(name && { name }),
         ...(description !== undefined && { description }),
+        ...(floorsData !== undefined && { floorsData: JSON.stringify(floorsData) }),
         ...(grosOeuvreProgress !== undefined && { grosOeuvreProgress: go }),
         ...(cesProgress !== undefined && { cesProgress: ce }),
         ...(cetProgress !== undefined && { cetProgress: ct }),

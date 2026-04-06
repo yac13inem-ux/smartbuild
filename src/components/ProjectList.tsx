@@ -1,11 +1,12 @@
 'use client';
 
-import { Building2, MapPin, ChevronRight, Calendar, Home, HardHat, Hammer, Settings, FileText } from 'lucide-react';
+import { Building2, MapPin, ChevronRight, Calendar, Home, HardHat, Hammer, Settings, FileText, Edit } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ProgressCard } from './ProgressCard';
 import { SimpleAddProjectDialog } from './SimpleAddProjectDialog';
 import { AddBlockDialog } from './AddBlockDialog';
+import { EditFloorDialog } from './EditFloorDialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useState, useEffect } from 'react';
@@ -57,6 +58,7 @@ export function ProjectList() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [selectedBlock, setSelectedBlock] = useState<Block | null>(null);
   const [refreshBlocks, setRefreshBlocks] = useState(0);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const fetchProjects = async () => {
     try {
@@ -122,15 +124,26 @@ export function ProjectList() {
 
     return (
       <div className="space-y-4 pb-20">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSelectedBlock(null)}
+            >
+              ← {t('common.back')}
+            </Button>
+            <h2 className="text-lg font-semibold">{selectedBlock.name}</h2>
+          </div>
           <Button
-            variant="ghost"
             size="sm"
-            onClick={() => setSelectedBlock(null)}
+            variant="outline"
+            onClick={() => setEditDialogOpen(true)}
+            disabled={floorsData.length === 0}
           >
-            ← {t('common.back')}
+            <Edit className="h-4 w-4 mr-1" />
+            {t('common.edit')}
           </Button>
-          <h2 className="text-lg font-semibold">{selectedBlock.name}</h2>
         </div>
 
         <Card>
@@ -302,6 +315,37 @@ export function ProjectList() {
           </Card>
         )}
       </div>
+    );
+
+    return (
+      <>
+        {blockDetails}
+        <EditFloorDialog
+          blockId={selectedBlock.id}
+          blockName={selectedBlock.name}
+          floorsData={floorsData}
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          onSave={(updatedFloors) => {
+            // Update selectedBlock with new floorsData
+            setSelectedBlock({
+              ...selectedBlock,
+              floorsData: JSON.stringify(updatedFloors),
+            });
+            // Also update the project's blocks list
+            if (selectedProject.blocks) {
+              setSelectedProject({
+                ...selectedProject,
+                blocks: selectedProject.blocks.map(b =>
+                  b.id === selectedBlock.id
+                    ? { ...b, floorsData: JSON.stringify(updatedFloors) }
+                    : b
+                ),
+              });
+            }
+          }}
+        />
+      </>
     );
   }
 
