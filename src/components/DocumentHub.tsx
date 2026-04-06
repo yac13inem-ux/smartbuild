@@ -180,10 +180,21 @@ export function DocumentHub({ documents = [], onDocumentsChange, documentUpdateK
 
   const confirmDelete = async () => {
     if (!deletingDoc) return;
-    
+
     try {
       console.log('Deleting document:', deletingDoc.id);
-      setLocalDocuments(prev => prev.filter(d => d.id !== deletingDoc.id));
+      // Call API to delete the document
+      const response = await fetch(`/api/reports/${deletingDoc.id}`, {
+        method: 'DELETE',
+      });
+
+      const result = await response.json();
+      console.log('Delete result:', result);
+
+      if (response.ok || result.success) {
+        // Refresh the documents list
+        await fetchDocuments();
+      }
       setDeletingDoc(null);
       if (onDocumentsChange) onDocumentsChange();
     } catch (error) {
