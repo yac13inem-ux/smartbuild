@@ -59,6 +59,7 @@ export function ProjectList() {
   const [selectedBlock, setSelectedBlock] = useState<Block | null>(null);
   const [refreshBlocks, setRefreshBlocks] = useState(0);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editingFloor, setEditingFloor] = useState<number | null>(null);
 
   const fetchProjects = async () => {
     try {
@@ -116,6 +117,64 @@ export function ProjectList() {
   const formatDate = (dateString: string | null) => {
     if (!dateString) return '-';
     return new Date(dateString).toLocaleDateString('ar-DZ');
+  };
+
+  const handleFloorUpdate = async (floorIndex: number, updatedFloor: FloorData) => {
+    if (!selectedBlock) return;
+
+    const updatedFloors = [...floorsData];
+    updatedFloors[floorIndex] = updatedFloor;
+
+    try {
+      // Calculate block progress
+      let totalGrosOeuvre = 0;
+      let totalCes = 0;
+      let totalCet = 0;
+
+      updatedFloors.forEach((floor) => {
+        totalGrosOeuvre += floor.grosOeuvreProgress || 0;
+        totalCes += floor.cesProgress || 0;
+        totalCet += floor.cetProgress || 0;
+      });
+
+      const numFloors = updatedFloors.length;
+      const grosOeuvreProgress = numFloors > 0 ? Math.round(totalGrosOeuvre / numFloors) : 0;
+      const cesProgress = numFloors > 0 ? Math.round(totalCes / numFloors) : 0;
+      const cetProgress = numFloors > 0 ? Math.round(totalCet / numFloors) : 0;
+      const globalProgress = Math.round((grosOeuvreProgress + cesProgress + cetProgress) / 3);
+
+      const response = await fetch(`/api/blocks/${selectedBlock.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          floorsData: updatedFloors,
+          grosOeuvreProgress,
+          cesProgress,
+          cetProgress,
+          globalProgress,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        toast.success('تم حفظ التعديلات');
+        setSelectedBlock({
+          ...selectedBlock,
+          floorsData: JSON.stringify(updatedFloors),
+          grosOeuvreProgress,
+          cesProgress,
+          cetProgress,
+          globalProgress,
+        });
+        setEditingFloor(null);
+      } else {
+        toast.error('فشل الحفظ');
+      }
+    } catch (error) {
+      console.error('Error updating floor:', error);
+      toast.error('حدث خطأ');
+    }
   };
 
   // Show block details view
@@ -176,7 +235,7 @@ export function ProjectList() {
 
             {/* Gros Œuvre Tab */}
             <TabsContent value="grosOeuvre" className="space-y-3 mt-4">
-              {floorsData.map((floor) => (
+              {floorsData.map((floor, floorIndex) => (
                 <Card key={floor.floorNumber} className="border-l-4 border-l-primary">
                   <CardContent className="p-4 space-y-3">
                     {/* Floor Header */}
@@ -185,28 +244,161 @@ export function ProjectList() {
                         <Building2 className="h-4 w-4 text-primary" />
                         <span className="font-semibold">{t('project.floorNumber')} {floor.floorNumber}</span>
                       </div>
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                        <Home className="h-4 w-4" />
-                        <span>{floor.apartments} {t('project.apartmentsCount')}</span>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setEditingFloor(editingFloor === floorIndex ? null : floorIndex)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                          <Home className="h-4 w-4" />
+                          <span>{floor.apartments} {t('project.apartmentsCount')}</span>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Progress */}
-                    <div className="space-y-1">
-                      <div className="flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-1">
-                          <HardHat className="h-3 w-3" />
-                          <span>{t('project.grosOeuvreProgress')}</span>
+                    {/* Edit Form */}
+                    {editingFloor === floorIndex ? (
+                      <div className="space-y-3 p-3 bg-muted/50 rounded-lg border">
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="space-y-1">
+                            <Label className="text-xs">نسبة التقدم (%)</Label>
+                            <Input
+                              type="number"
+                              min="0"
+                              max="100"
+                              value={floor.grosOeuvreProgress}
+                              onChange={(e) => {
+                                const updated = [...floorsData];
+                                updated[floorIndex] = {
+                                  ...floor,
+                                  grosOeuvreProgress: Math.min(100, Math.max(0, parseInt(e.target.value) || 0))
+                                };
+                                setSelectedBlock({
+                                  ...selectedBlock,
+                                  floorsData: JSON.stringify(updated)
+                                });
+                              }}
+                              className="h-8 text-sm"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs">عدد الشقق</Label>
+                            <Input
+                              type="number"
+                              min="0"
+                              value={floor.apartments}
+                              onChange={(e) => {
+                                const updated = [...floorsData];
+                                updated[floorIndex] = {
+                                  ...floor,
+                                  apartments: parseInt(e.target.value) || 0
+                                };
+                                setSelectedBlock({
+                                  ...selectedBlock,
+                                  floorsData: JSON.stringify(updated)
+                                });
+                              }}
+                              className="h-8 text-sm"
+                            />
+                          </div>
                         </div>
-                        <span className="font-medium">{floor.grosOeuvreProgress}%</span>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="space-y-1">
+                            <Label className="text-xs">تاريخ الصب</Label>
+                            <Input
+                              type="date"
+                              value={floor.concretePourDate || ''}
+                              onChange={(e) => {
+                                const updated = [...floorsData];
+                                updated[floorIndex] = {
+                                  ...floor,
+                                  concretePourDate: e.target.value || null
+                                };
+                                setSelectedBlock({
+                                  ...selectedBlock,
+                                  floorsData: JSON.stringify(updated)
+                                });
+                              }}
+                              className="h-8 text-sm"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs">تاريخ فحص التسليح</Label>
+                            <Input
+                              type="date"
+                              value={floor.reinforcementInspectionDate || ''}
+                              onChange={(e) => {
+                                const updated = [...floorsData];
+                                updated[floorIndex] = {
+                                  ...floor,
+                                  reinforcementInspectionDate: e.target.value || null
+                                };
+                                setSelectedBlock({
+                                  ...selectedBlock,
+                                  floorsData: JSON.stringify(updated)
+                                });
+                              }}
+                              className="h-8 text-sm"
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">ملاحظات</Label>
+                          <Textarea
+                            value={floor.grosOeuvreNotes}
+                            onChange={(e) => {
+                              const updated = [...floorsData];
+                              updated[floorIndex] = {
+                                ...floor,
+                                grosOeuvreNotes: e.target.value
+                              };
+                              setSelectedBlock({
+                                ...selectedBlock,
+                                floorsData: JSON.stringify(updated)
+                              });
+                            }}
+                            rows={2}
+                            className="text-sm"
+                          />
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            onClick={() => handleFloorUpdate(floorIndex, floorsData[floorIndex])}
+                            className="flex-1"
+                          >
+                            حفظ
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setEditingFloor(null)}
+                          >
+                            إلغاء
+                          </Button>
+                        </div>
                       </div>
-                      <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-primary transition-all"
-                          style={{ width: `${floor.grosOeuvreProgress}%` }}
-                        />
-                      </div>
-                    </div>
+                    ) : (
+                      <>
+                        {/* Progress */}
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-xs">
+                            <div className="flex items-center gap-1">
+                              <HardHat className="h-3 w-3" />
+                              <span>{t('project.grosOeuvreProgress')}</span>
+                            </div>
+                            <span className="font-medium">{floor.grosOeuvreProgress}%</span>
+                          </div>
+                          <div className="h-2 bg-muted rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-primary transition-all"
+                              style={{ width: `${floor.grosOeuvreProgress}%` }}
+                            />
+                          </div>
+                        </div>
 
                     {/* Dates */}
                     <div className="grid grid-cols-2 gap-3 text-sm">
@@ -236,6 +428,8 @@ export function ProjectList() {
                         <p className="text-sm">{floor.grosOeuvreNotes}</p>
                       </div>
                     )}
+                  </>
+                  )}
                   </CardContent>
                 </Card>
               ))}
@@ -243,7 +437,7 @@ export function ProjectList() {
 
             {/* CES & CET Tab */}
             <TabsContent value="cesCet" className="space-y-3 mt-4">
-              {floorsData.map((floor) => (
+              {floorsData.map((floor, floorIndex) => (
                 <Card key={floor.floorNumber} className="border-l-4 border-l-blue-500">
                   <CardContent className="p-4 space-y-3">
                     {/* Floor Header */}
@@ -252,58 +446,154 @@ export function ProjectList() {
                         <Building2 className="h-4 w-4 text-blue-500" />
                         <span className="font-semibold">{t('project.floorNumber')} {floor.floorNumber}</span>
                       </div>
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                        <Home className="h-4 w-4" />
-                        <span>{floor.apartments} {t('project.apartmentsCount')}</span>
-                      </div>
-                    </div>
-
-                    {/* Progress Bars */}
-                    <div className="grid grid-cols-2 gap-3">
-                      {/* CES */}
-                      <div className="space-y-1">
-                        <div className="flex items-center justify-between text-xs">
-                          <div className="flex items-center gap-1">
-                            <Hammer className="h-3 w-3" />
-                            <span>{t('project.cesProgress')}</span>
-                          </div>
-                          <span className="font-medium">{floor.cesProgress}%</span>
-                        </div>
-                        <div className="h-2 bg-muted rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-blue-500 transition-all"
-                            style={{ width: `${floor.cesProgress}%` }}
-                          />
-                        </div>
-                      </div>
-
-                      {/* CET */}
-                      <div className="space-y-1">
-                        <div className="flex items-center justify-between text-xs">
-                          <div className="flex items-center gap-1">
-                            <Settings className="h-3 w-3" />
-                            <span>{t('project.cetProgress')}</span>
-                          </div>
-                          <span className="font-medium">{floor.cetProgress}%</span>
-                        </div>
-                        <div className="h-2 bg-muted rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-green-500 transition-all"
-                            style={{ width: `${floor.cetProgress}%` }}
-                          />
+                      <div className="flex items-center gap-2">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setEditingFloor(editingFloor === `ces-${floorIndex}` ? null : `ces-${floorIndex}`)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                          <Home className="h-4 w-4" />
+                          <span>{floor.apartments} {t('project.apartmentsCount')}</span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Notes */}
-                    {floor.cesCetNotes && (
-                      <div className="bg-muted/50 rounded-lg p-3 space-y-1">
-                        <div className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
-                          <FileText className="h-3 w-3" />
-                          <span>{t('project.cesCetNotes')}</span>
+                    {/* Edit Form */}
+                    {editingFloor === `ces-${floorIndex}` ? (
+                      <div className="space-y-3 p-3 bg-muted/50 rounded-lg border">
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="space-y-1">
+                            <Label className="text-xs">تقدم CES (%)</Label>
+                            <Input
+                              type="number"
+                              min="0"
+                              max="100"
+                              value={floor.cesProgress}
+                              onChange={(e) => {
+                                const updated = [...floorsData];
+                                updated[floorIndex] = {
+                                  ...floor,
+                                  cesProgress: Math.min(100, Math.max(0, parseInt(e.target.value) || 0))
+                                };
+                                setSelectedBlock({
+                                  ...selectedBlock,
+                                  floorsData: JSON.stringify(updated)
+                                });
+                              }}
+                              className="h-8 text-sm"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs">تقدم CET (%)</Label>
+                            <Input
+                              type="number"
+                              min="0"
+                              max="100"
+                              value={floor.cetProgress}
+                              onChange={(e) => {
+                                const updated = [...floorsData];
+                                updated[floorIndex] = {
+                                  ...floor,
+                                  cetProgress: Math.min(100, Math.max(0, parseInt(e.target.value) || 0))
+                                };
+                                setSelectedBlock({
+                                  ...selectedBlock,
+                                  floorsData: JSON.stringify(updated)
+                                });
+                              }}
+                              className="h-8 text-sm"
+                            />
+                          </div>
                         </div>
-                        <p className="text-sm">{floor.cesCetNotes}</p>
+                        <div className="space-y-1">
+                          <Label className="text-xs">ملاحظات</Label>
+                          <Textarea
+                            value={floor.cesCetNotes}
+                            onChange={(e) => {
+                              const updated = [...floorsData];
+                              updated[floorIndex] = {
+                                ...floor,
+                                cesCetNotes: e.target.value
+                              };
+                              setSelectedBlock({
+                                ...selectedBlock,
+                                floorsData: JSON.stringify(updated)
+                              });
+                            }}
+                            rows={2}
+                            className="text-sm"
+                          />
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            onClick={() => handleFloorUpdate(floorIndex, floorsData[floorIndex])}
+                            className="flex-1"
+                          >
+                            حفظ
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setEditingFloor(null)}
+                          >
+                            إلغاء
+                          </Button>
+                        </div>
                       </div>
+                    ) : (
+                      <>
+                        {/* Progress Bars */}
+                        <div className="grid grid-cols-2 gap-3">
+                          {/* CES */}
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between text-xs">
+                              <div className="flex items-center gap-1">
+                                <Hammer className="h-3 w-3" />
+                                <span>{t('project.cesProgress')}</span>
+                              </div>
+                              <span className="font-medium">{floor.cesProgress}%</span>
+                            </div>
+                            <div className="h-2 bg-muted rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-blue-500 transition-all"
+                                style={{ width: `${floor.cesProgress}%` }}
+                              />
+                            </div>
+                          </div>
+
+                          {/* CET */}
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between text-xs">
+                              <div className="flex items-center gap-1">
+                                <Settings className="h-3 w-3" />
+                                <span>{t('project.cetProgress')}</span>
+                              </div>
+                              <span className="font-medium">{floor.cetProgress}%</span>
+                            </div>
+                            <div className="h-2 bg-muted rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-green-500 transition-all"
+                                style={{ width: `${floor.cetProgress}%` }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Notes */}
+                        {floor.cesCetNotes && (
+                          <div className="bg-muted/50 rounded-lg p-3 space-y-1">
+                            <div className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+                              <FileText className="h-3 w-3" />
+                              <span>{t('project.cesCetNotes')}</span>
+                            </div>
+                            <p className="text-sm">{floor.cesCetNotes}</p>
+                          </div>
+                        )}
+                      </>
                     )}
                   </CardContent>
                 </Card>
