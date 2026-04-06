@@ -1,23 +1,31 @@
 'use client';
 
-import { Building2, MapPin, ChevronRight, Plus } from 'lucide-react';
+import { Building2, MapPin, ChevronRight, Calendar, Home, HardHat, Hammer, Settings } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ProgressCard } from './ProgressCard';
 import { SimpleAddProjectDialog } from './SimpleAddProjectDialog';
+import { AddBlockDialog } from './AddBlockDialog';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+
+interface FloorData {
+  floorNumber: number;
+  apartments: number;
+  grosOeuvre: number;
+  ces: number;
+  cet: number;
+  concretePourDate: string | null;
+  reinforcementInspectionDate: string | null;
+}
 
 interface Project {
   id: string;
   name: string;
   description?: string;
   location?: string;
-  globalProgress: number;
-  grosOeuvreProgress: number;
-  cesProgress: number;
-  cetProgress: number;
+  totalApartments?: number;
   blocks?: Block[];
   _count?: {
     blocks: number;
@@ -27,7 +35,14 @@ interface Project {
 interface Block {
   id: string;
   name: string;
+  description?: string;
+  numberOfFloors?: number;
+  floorsData?: string;
   globalProgress: number;
+  grosOeuvreProgress: number;
+  cesProgress: number;
+  cetProgress: number;
+  projectId: string;
 }
 
 export function ProjectList() {
@@ -35,6 +50,8 @@ export function ProjectList() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [selectedBlock, setSelectedBlock] = useState<Block | null>(null);
+  const [refreshBlocks, setRefreshBlocks] = useState(0);
 
   const fetchProjects = async () => {
     try {
@@ -57,50 +74,159 @@ export function ProjectList() {
     fetchProjects();
   }, []);
 
-  if (selectedProject) {
-    // Show blocks view
+  const fetchProjectBlocks = async (projectId: string) => {
+    try {
+      const response = await fetch(`/api/blocks?projectId=${projectId}`);
+      const result = await response.json();
+
+      if (result.success && selectedProject) {
+        setSelectedProject({
+          ...selectedProject,
+          blocks: result.data,
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching blocks:', error);
+      toast.error('فشل تحميل العمارات');
+    }
+  };
+
+  const handleProjectClick = async (project: Project) => {
+    setSelectedProject(project);
+    setSelectedBlock(null);
+    await fetchProjectBlocks(project.id);
+  };
+
+  const parseFloorsData = (floorsDataString: string | null): FloorData[] => {
+    if (!floorsDataString) return [];
+    try {
+      return JSON.parse(floorsDataString);
+    } catch {
+      return [];
+    }
+  };
+
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return '-';
+    return new Date(dateString).toLocaleDateString('ar-DZ');
+  };
+
+  // Show block details view
+  if (selectedBlock && selectedProject) {
+    const floorsData = parseFloorsData(selectedBlock.floorsData);
+
     return (
       <div className="space-y-4 pb-20">
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setSelectedProject(null)}
+            onClick={() => setSelectedBlock(null)}
           >
             ← {t('common.back')}
           </Button>
-          <h2 className="text-lg font-semibold">{selectedProject.name}</h2>
+          <h2 className="text-lg font-semibold">{selectedBlock.name}</h2>
         </div>
 
-        <ProgressCard
-          grosOeuvre={selectedProject.grosOeuvreProgress}
-          ces={selectedProject.cesProgress}
-          cet={selectedProject.cetProgress}
-          global={selectedProject.globalProgress}
-        />
+        <Card>
+          <CardContent className="p-4">
+            <ProgressCard
+              grosOeuvre={selectedBlock.grosOeuvreProgress}
+              ces={selectedBlock.cesProgress}
+              cet={selectedBlock.cetProgress}
+              global={selectedBlock.globalProgress}
+            />
+          </CardContent>
+        </Card>
 
-        {selectedProject.blocks && selectedProject.blocks.length > 0 ? (
+        {floorsData.length > 0 ? (
           <div className="space-y-3">
-            <h3 className="font-medium">{t('block.title')}</h3>
-            {selectedProject.blocks.map((block) => (
-              <Card
-                key={block.id}
-                className="hover:shadow-md transition-shadow cursor-pointer"
-              >
-                <CardContent className="p-4">
+            <h3 className="font-medium">{t('project.trackPerFloor')}</h3>
+            {floorsData.map((floor) => (
+              <Card key={floor.floorNumber} className="border-l-4 border-l-primary">
+                <CardContent className="p-4 space-y-3">
+                  {/* Floor Header */}
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-primary/10">
-                        <Building2 className="h-5 w-5 text-primary" />
+                    <div className="flex items-center gap-2">
+                      <Building2 className="h-4 w-4 text-primary" />
+                      <span className="font-semibold">{t('project.floorNumber')} {floor.floorNumber}</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                      <Home className="h-4 w-4" />
+                      <span>{floor.apartments} {t('project.apartmentsCount')}</span>
+                    </div>
+                  </div>
+
+                  {/* Progress Bars */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {/* Gros Oeuvre */}
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-1">
+                          <HardHat className="h-3 w-3" />
+                          <span>{t('project.grosOeuvreProgress')}</span>
+                        </div>
+                        <span className="font-medium">{floor.grosOeuvre}%</span>
                       </div>
-                      <div>
-                        <p className="font-medium">{block.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {t('dashboard.totalProgress')}: {block.globalProgress}%
-                        </p>
+                      <div className="h-2 bg-muted rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-primary transition-all"
+                          style={{ width: `${floor.grosOeuvre}%` }}
+                        />
                       </div>
                     </div>
-                    <ChevronRight className="h-5 w-5 text-muted-foreground" />
+
+                    {/* CES */}
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-1">
+                          <Hammer className="h-3 w-3" />
+                          <span>{t('project.cesProgress')}</span>
+                        </div>
+                        <span className="font-medium">{floor.ces}%</span>
+                      </div>
+                      <div className="h-2 bg-muted rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-blue-500 transition-all"
+                          style={{ width: `${floor.ces}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* CET */}
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-1">
+                          <Settings className="h-3 w-3" />
+                          <span>{t('project.cetProgress')}</span>
+                        </div>
+                        <span className="font-medium">{floor.cet}%</span>
+                      </div>
+                      <div className="h-2 bg-muted rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-green-500 transition-all"
+                          style={{ width: `${floor.cet}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Dates */}
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Calendar className="h-4 w-4" />
+                      <div>
+                        <p className="text-xs">{t('project.concretePourDate')}</p>
+                        <p className="font-medium">{formatDate(floor.concretePourDate)}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Calendar className="h-4 w-4" />
+                      <div>
+                        <p className="text-xs">{t('project.reinforcementInspectionDate')}</p>
+                        <p className="font-medium">{formatDate(floor.reinforcementInspectionDate)}</p>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -111,8 +237,107 @@ export function ProjectList() {
             <CardContent className="p-8 text-center">
               <Building2 className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
               <p className="text-muted-foreground">
-                لا توجد مباني في هذا المشروع بعد
+                لا توجد بيانات للطوابق بعد
               </p>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    );
+  }
+
+  // Show project blocks view
+  if (selectedProject) {
+    return (
+      <div className="space-y-4 pb-20">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSelectedProject(null)}
+            >
+              ← {t('common.back')}
+            </Button>
+            <h2 className="text-lg font-semibold">{selectedProject.name}</h2>
+          </div>
+          <AddBlockDialog
+            projectId={selectedProject.id}
+            onBlockAdded={() => {
+              setRefreshBlocks((prev) => prev + 1);
+              fetchProjectBlocks(selectedProject.id);
+            }}
+          />
+        </div>
+
+        {selectedProject.description && (
+          <Card>
+            <CardContent className="p-4">
+              <p className="text-sm text-muted-foreground">{selectedProject.description}</p>
+            </CardContent>
+          </Card>
+        )}
+
+        {selectedProject.location && (
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 text-sm">
+                <MapPin className="h-4 w-4 text-muted-foreground" />
+                <span className="text-muted-foreground">{selectedProject.location}</span>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {selectedProject.blocks && selectedProject.blocks.length > 0 ? (
+          <div className="space-y-3">
+            <h3 className="font-medium">{t('project.blocks')}</h3>
+            {selectedProject.blocks.map((block) => (
+              <Card
+                key={block.id}
+                className="hover:shadow-md transition-shadow cursor-pointer"
+                onClick={() => setSelectedBlock(block)}
+              >
+                <CardContent className="p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-primary/10">
+                        <Building2 className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="font-medium">{block.name}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {block.numberOfFloors} {t('project.numberOfFloors')}
+                        </p>
+                      </div>
+                    </div>
+                    <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                  </div>
+
+                  <ProgressCard
+                    grosOeuvre={block.grosOeuvreProgress}
+                    ces={block.cesProgress}
+                    cet={block.cetProgress}
+                    global={block.globalProgress}
+                  />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <Card>
+            <CardContent className="p-8 text-center">
+              <Building2 className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+              <p className="text-muted-foreground mb-4">
+                لا توجد عمارات في هذا المشروع بعد
+              </p>
+              <AddBlockDialog
+                projectId={selectedProject.id}
+                onBlockAdded={() => {
+                  setRefreshBlocks((prev) => prev + 1);
+                  fetchProjectBlocks(selectedProject.id);
+                }}
+              />
             </CardContent>
           </Card>
         )}
@@ -166,7 +391,7 @@ export function ProjectList() {
         <Card
           key={project.id}
           className="hover:shadow-md transition-shadow cursor-pointer"
-          onClick={() => setSelectedProject(project)}
+          onClick={() => handleProjectClick(project)}
         >
           <CardHeader>
             <div className="flex items-start justify-between">
@@ -187,20 +412,17 @@ export function ProjectList() {
               </div>
             )}
 
-            <ProgressCard
-              grosOeuvre={project.grosOeuvreProgress}
-              ces={project.cesProgress}
-              cet={project.cetProgress}
-              global={project.globalProgress}
-            />
-
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">
-                {project._count?.blocks || project.blocks?.length || 0} {t('project.blocks')}
-              </span>
-              <span className="font-medium text-primary">
-                {t('dashboard.totalProgress')}: {project.globalProgress}%
-              </span>
+              <div className="flex gap-4">
+                {project.totalApartments && (
+                  <span className="text-muted-foreground">
+                    {project.totalApartments} {t('project.apartmentsCount')}
+                  </span>
+                )}
+                <span className="text-muted-foreground">
+                  {project._count?.blocks || project.blocks?.length || 0} {t('project.blocks')}
+                </span>
+              </div>
             </div>
           </CardContent>
         </Card>

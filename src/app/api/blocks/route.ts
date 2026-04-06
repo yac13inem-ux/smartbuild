@@ -52,11 +52,11 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/blocks - Create a new block
+// POST /api/blocks - Create a new block with floors
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, description, projectId } = body;
+    const { name, description, projectId, numberOfFloors, floorsData, grosOeuvreProgress, cesProgress, cetProgress, globalProgress } = body;
 
     if (!name || !projectId) {
       return NextResponse.json(
@@ -65,23 +65,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Calculate initial global progress using weighted system
-    const grosOeuvreProgress = body.grosOeuvreProgress || 0;
-    const cesProgress = body.cesProgress || 0;
-    const cetProgress = body.cetProgress || 0;
-    const globalProgress = Math.round(
-      (grosOeuvreProgress * 0.5) + (cesProgress * 0.3) + (cetProgress * 0.2)
-    );
-
     const block = await db.block.create({
       data: {
         name,
         description,
         projectId,
-        grosOeuvreProgress,
-        cesProgress,
-        cetProgress,
-        globalProgress,
+        numberOfFloors: numberOfFloors || null,
+        floorsData: floorsData ? JSON.stringify(floorsData) : null,
+        grosOeuvreProgress: grosOeuvreProgress || 0,
+        cesProgress: cesProgress || 0,
+        cetProgress: cetProgress || 0,
+        globalProgress: globalProgress || 0,
       },
     });
 

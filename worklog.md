@@ -104,4 +104,54 @@ Stage Summary:
 - All generated blocks have proper floor structures ready for progress tracking
 - Perfect for large-scale construction projects with multiple building types
 
+---
+Task ID: 4
+Agent: Z.ai Code
+Task: Simplify workflow - Create project first, then add blocks separately
+
+Work Log:
+- Simplified SimpleAddProjectDialog component to basic project info only:
+  - Project name (required)
+  - Total apartments
+  - Number of blocks
+  - Location
+  - Description
+  - Removed automatic block generation features
+- Created new AddBlockDialog component for adding blocks to existing projects:
+  - Block name (required)
+  - Number of floors (required)
+  - Description
+  - Dynamic floor tracking form that generates inputs for each floor
+  - For each floor:
+    - Number of apartments
+    - Gros Œuvre progress (%)
+    - CES progress (%)
+    - CET progress (%)
+    - Concrete pour date
+    - Reinforcement inspection date
+- Updated API endpoint (src/app/api/blocks/route.ts) POST method:
+  - Now accepts: projectId, name, description, numberOfFloors, floorsData, progress values
+  - Saves floorsData as JSON string in database
+- Completely rewrote ProjectList component to support the new simplified workflow:
+  - Shows all projects with basic info (name, description, location, apartments count, blocks count)
+  - When clicking on a project, shows its blocks
+  - Added "Add Block" button in project view
+  - When clicking on a block, shows detailed floor information
+  - Block detail view shows:
+    - Block name and progress summary (Gros Œuvre, CES, CET)
+    - Each floor with:
+      - Floor number and apartments count
+      - Progress bars for Gros Œuvre, CES, CET
+      - Concrete pour date
+      - Reinforcement inspection date
+  - Navigation: Projects List → Project Details → Block Details
+- Verified dev server is running without errors
+
+Stage Summary:
+- Simplified user workflow as requested: create project first, then add blocks one by one
+- Clean separation of concerns: project-level info vs block/floor-level details
+- Intuitive navigation with clear back buttons at each level
+- Detailed floor tracking with visual progress bars
+- All construction tracking features preserved (Gros Œuvre, CES, CET, dates)
+- Perfect for users who prefer manual control over block creation
 
