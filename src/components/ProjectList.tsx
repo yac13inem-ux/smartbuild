@@ -39,41 +39,6 @@ export function ProjectList({
   const { t } = useLanguage();
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
-  // Mock data for demo
-  const mockProjects: Project[] = [
-    {
-      id: '1',
-      name: 'Residential Complex Alpha',
-      description: 'Modern residential complex with 4 blocks',
-      location: 'Algiers, Algeria',
-      globalProgress: 68,
-      grosOeuvreProgress: 85,
-      cesProgress: 50,
-      cetProgress: 60,
-      blocks: [
-        { id: '1-1', name: 'Block A', globalProgress: 75 },
-        { id: '1-2', name: 'Block B', globalProgress: 60 },
-        { id: '1-3', name: 'Block C', globalProgress: 70 },
-        { id: '1-4', name: 'Block D', globalProgress: 65 },
-      ],
-    },
-    {
-      id: '2',
-      name: 'Commercial Tower Beta',
-      description: 'Office building with mixed-use facilities',
-      location: 'Oran, Algeria',
-      globalProgress: 42,
-      grosOeuvreProgress: 60,
-      cesProgress: 20,
-      cetProgress: 40,
-      blocks: [
-        { id: '2-1', name: 'Tower A', globalProgress: 42 },
-      ],
-    },
-  ];
-
-  const displayProjects = projects.length > 0 ? projects : mockProjects;
-
   if (selectedProject && onSelectProject) {
     // Show blocks view
     return (
@@ -137,7 +102,7 @@ export function ProjectList({
         )}
       </div>
 
-      {displayProjects.map((project) => (
+      {projects.map((project) => (
         <Card
           key={project.id}
           className="hover:shadow-md transition-shadow"

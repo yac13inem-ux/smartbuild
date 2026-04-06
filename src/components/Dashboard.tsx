@@ -1,12 +1,15 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { CircularProgress } from './CircularProgress';
 import { KPICard } from './KPICard';
 import { RecentActivity } from './RecentActivity';
-import { Building2, FileText, AlertTriangle, Blocks } from 'lucide-react';
+import { Building2, FileText, AlertTriangle, Blocks, ChevronDown, ChevronRight, HardHat } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 interface DashboardProps {
   projects?: any[];
@@ -16,122 +19,409 @@ interface DashboardProps {
 }
 
 export function Dashboard({
-  projects = [],
-  blocks = [],
-  reports = [],
-  problems = [],
+  projects: externalProjects,
+  blocks: externalBlocks,
+  reports: externalReports,
+  problems: externalProblems,
 }: DashboardProps) {
   const { t } = useLanguage();
+  const [projects, setProjects] = useState<any[]>([]);
+  const [blocks, setBlocks] = useState<any[]>([]);
+  const [reports, setReports] = useState<any[]>([]);
+  const [problems, setProblems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set());
 
-  // Calculate overall progress (mock data for now)
-  const totalProgress = 68;
-  const grosOeuvreProgress = 75;
-  const cesProgress = 60;
-  const cetProgress = 70;
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
 
-  // Calculate KPIs
-  const openProblems = problems.filter((p) => p.status !== 'RESOLVED').length || 3;
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+
+      // Use external data if provided, otherwise fetch from API
+      if (externalProjects && externalProjects.length > 0) {
+        setProjects(externalProjects);
+      } else {
+        const projectsResponse = await fetch('/api/projects');
+        const projectsResult = await projectsResponse.json();
+        if (projectsResult.success) {
+          setProjects(projectsResult.data);
+        }
+      }
+
+      if (externalBlocks && externalBlocks.length > 0) {
+        setBlocks(externalBlocks);
+      } else {
+        const blocksResponse = await fetch('/api/blocks');
+        const blocksResult = await blocksResponse.json();
+        if (blocksResult.success) {
+          setBlocks(blocksResult.data);
+        }
+      }
+
+      if (externalReports && externalReports.length > 0) {
+        setReports(externalReports);
+      } else {
+        const reportsResponse = await fetch('/api/reports');
+        const reportsResult = await reportsResponse.json();
+        if (reportsResult.success) {
+          setReports(reportsResult.data);
+        }
+      }
+
+      if (externalProblems && externalProblems.length > 0) {
+        setProblems(externalProblems);
+      } else {
+        const problemsResponse = await fetch('/api/problems');
+        const problemsResult = await problemsResponse.json();
+        if (problemsResult.success) {
+          setProblems(problemsResult.data);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Calculate overall progress from blocks data
+  const calculateOverallProgress = () => {
+    if (blocks.length === 0) return 0;
+    const totalProgress = blocks.reduce((sum, block) => sum + (block.globalProgress || 0), 0);
+    return Math.round(totalProgress / blocks.length);
+  };
+
+  const calculateGrosOeuvreProgress = () => {
+    if (blocks.length === 0) return 0;
+    const totalProgress = blocks.reduce((sum, block) => sum + (block.grosOeuvreProgress || 0), 0);
+    return Math.round(totalProgress / blocks.length);
+  };
+
+  const calculateCESProgress = () => {
+    if (blocks.length === 0) return 0;
+    const totalProgress = blocks.reduce((sum, block) => sum + (block.cesProgress || 0), 0);
+    return Math.round(totalProgress / blocks.length);
+  };
+
+  const calculateCETProgress = () => {
+    if (blocks.length === 0) return 0;
+    const totalProgress = blocks.reduce((sum, block) => sum + (block.cetProgress || 0), 0);
+    return Math.round(totalProgress / blocks.length);
+  };
+
+  const totalProgress = calculateOverallProgress();
+  const grosOeuvreProgress = calculateGrosOeuvreProgress();
+  const cesProgress = calculateCESProgress();
+  const cetProgress = calculateCETProgress();
+
+  // Toggle project expansion
+  const toggleProject = (projectId: string) => {
+    const newExpanded = new Set(expandedProjects);
+    if (newExpanded.has(projectId)) {
+      newExpanded.delete(projectId);
+    } else {
+      newExpanded.add(projectId);
+    }
+    setExpandedProjects(newExpanded);
+  };
+
+  // Group blocks by project
+  const blocksByProject = blocks.reduce((acc, block) => {
+    if (!acc[block.projectId]) {
+      acc[block.projectId] = [];
+    }
+    acc[block.projectId].push(block);
+    return acc;
+  }, {} as Record<string, any[]>);
+
+  // Calculate KPIs from real data
+  const openProblems = problems.filter((p) => p.status !== 'RESOLVED').length;
   const weeklyReports = reports.filter(
     (r) => new Date(r.date) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-  ).length || 12;
-  const totalBlocks = blocks.length || 8;
+  ).length;
 
-  // Mock recent activities
+  // Count total blocks from all projects
+  const totalBlocks = blocks.length;
+
+  // Get recent activities from reports and problems
   const recentActivities = [
-    {
-      id: '1',
-      type: 'pv_constat' as const,
-      title: 'PV Constat - Block A',
-      description: 'Wall crack detected in R+2, needs immediate attention',
-      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
-      status: 'pending' as const,
-    },
-    {
-      id: '2',
-      type: 'pv_visite' as const,
-      title: 'PV de Visite - Block B',
-      description: 'Weekly site inspection completed, all systems operational',
-      timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000),
-    },
-    {
-      id: '3',
+    ...reports.slice(0, 2).map((report) => ({
+      id: `report-${report.id}`,
+      type: report.type === 'PV_VISITE' ? 'pv_visite' as const :
+            report.type === 'PV_CONSTAT' ? 'pv_constat' as const : 'update' as const,
+      title: report.title,
+      description: report.description || report.type,
+      timestamp: new Date(report.date),
+    })),
+    ...problems.slice(0, 2).map((problem) => ({
+      id: `problem-${problem.id}`,
       type: 'problem' as const,
-      title: 'Electrical Issue - Unit 101',
-      description: 'Power outage in main panel, electrician dispatched',
-      timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
-      status: 'in_progress' as const,
-    },
-    {
-      id: '4',
-      type: 'update' as const,
-      title: 'Progress Update - Block C',
-      description: 'Gros Œuvre phase completed at 85%',
-      timestamp: new Date(Date.now() - 48 * 60 * 60 * 1000),
-    },
-  ];
+      title: t('problems.addProblem'),
+      description: problem.description,
+      timestamp: new Date(problem.createdAt),
+      status: problem.status.toLowerCase() as any,
+    })),
+  ]
+    .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+    .slice(0, 4);
+
+  if (loading) {
+    return (
+      <div className="space-y-6 pb-20">
+        <Card>
+          <CardContent className="p-6 text-center">
+            <p className="text-muted-foreground">{t('common.loading')}</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Show welcome state if no projects
+  if (projects.length === 0) {
+    return (
+      <div className="space-y-6 pb-20">
+        <Card>
+          <CardContent className="p-8 text-center">
+            <div className="flex justify-center mb-4">
+              <div className="p-4 bg-primary/10 rounded-full">
+                <HardHat className="h-12 w-12 text-primary" />
+              </div>
+            </div>
+            <h2 className="text-xl font-bold mb-2">{t('project.title')}</h2>
+            <p className="text-muted-foreground mb-4">
+              ابدأ بإضافة مشروع جديد لتتبع التقدم وإدارة الفريق
+            </p>
+            <p className="text-sm text-muted-foreground">
+              اذهب إلى صفحة المشاريع لإضافة مشروع جديد
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 pb-20">
-      {/* Circular Progress Section */}
-      <Card>
-        <CardContent className="p-4">
-          <h2 className="text-lg font-semibold mb-4">{t('dashboard.title')}</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <CircularProgress
-              value={totalProgress}
-              label={t('dashboard.totalProgress')}
-              size={100}
-              strokeWidth={6}
-            />
-            <div className="space-y-3">
-              <div>
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-muted-foreground">{t('dashboard.grosOeuvre')}</span>
-                  <span className="font-medium">{grosOeuvreProgress}%</span>
+      {/* Progress Sections */}
+      <div className="grid grid-cols-1 gap-4">
+        {/* Gros Œuvre Progress */}
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-4">
+              <CircularProgress
+                value={grosOeuvreProgress}
+                label="Gros Œuvre"
+                size={80}
+                strokeWidth={6}
+              />
+              <div className="flex-1">
+                <h3 className="font-semibold mb-1">{t('dashboard.grosOeuvre')}</h3>
+                <p className="text-sm text-muted-foreground mb-2">
+                  {t('dashboard.grosOeuvreDescription')}
+                </p>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">{t('dashboard.totalProgressLabel')}:</span>
+                  <span className="font-bold text-primary">{grosOeuvreProgress}%</span>
                 </div>
-                <Progress value={grosOeuvreProgress} className="h-2" />
-              </div>
-              <div>
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-muted-foreground">{t('dashboard.ces')}</span>
-                  <span className="font-medium">{cesProgress}%</span>
-                </div>
-                <Progress value={cesProgress} className="h-2" />
-              </div>
-              <div>
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-muted-foreground">{t('dashboard.cet')}</span>
-                  <span className="font-medium">{cetProgress}%</span>
-                </div>
-                <Progress value={cetProgress} className="h-2" />
               </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-3 gap-3">
-        <KPICard
-          title={t('dashboard.openProblems')}
-          value={openProblems}
-          icon={AlertTriangle}
-          trend="2 urgent"
-        />
-        <KPICard
-          title={t('dashboard.weeklyReports')}
-          value={weeklyReports}
-          icon={FileText}
-        />
-        <KPICard
-          title={t('dashboard.blocks')}
-          value={totalBlocks}
-          icon={Building2}
-        />
+        {/* CES Progress */}
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-4">
+              <CircularProgress
+                value={cesProgress}
+                label="CES"
+                size={80}
+                strokeWidth={6}
+              />
+              <div className="flex-1">
+                <h3 className="font-semibold mb-1">{t('dashboard.ces')}</h3>
+                <p className="text-sm text-muted-foreground mb-2">
+                  {t('dashboard.cesDescription')}
+                </p>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">{t('dashboard.totalProgressLabel')}:</span>
+                  <span className="font-bold text-primary">{cesProgress}%</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* CET Progress */}
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-4">
+              <CircularProgress
+                value={cetProgress}
+                label="CET"
+                size={80}
+                strokeWidth={6}
+              />
+              <div className="flex-1">
+                <h3 className="font-semibold mb-1">{t('dashboard.cet')}</h3>
+                <p className="text-sm text-muted-foreground mb-2">
+                  {t('dashboard.cetDescription')}
+                </p>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">{t('dashboard.totalProgressLabel')}:</span>
+                  <span className="font-bold text-primary">{cetProgress}%</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Total Progress */}
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-4">
+              <CircularProgress
+                value={totalProgress}
+                label={t('common.percent')}
+                size={80}
+                strokeWidth={6}
+              />
+              <div className="flex-1">
+                <h3 className="font-semibold mb-1">{t('dashboard.overallProgress')}</h3>
+                <p className="text-sm text-muted-foreground mb-2">
+                  {t('dashboard.overallProgressDesc')}
+                </p>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">{t('dashboard.totalCompletion')}:</span>
+                  <span className="font-bold text-primary">{totalProgress}%</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
+      {/* KPI Cards */}
+      {projects.length > 0 && (
+        <div className="grid grid-cols-3 gap-3">
+          <KPICard
+            title={t('dashboard.openProblems')}
+            value={openProblems}
+            icon={AlertTriangle}
+            trend={openProblems > 0 ? `${openProblems} ${t('problems.openProblem')}` : null}
+          />
+          <KPICard
+            title={t('dashboard.weeklyReports')}
+            value={weeklyReports}
+            icon={FileText}
+          />
+          <KPICard
+            title={t('dashboard.blocks')}
+            value={totalBlocks}
+            icon={Building2}
+          />
+        </div>
+      )}
+
+      {/* Projects and Blocks Progress */}
+      {projects.length > 0 && (
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold">{t('dashboard.projectsAndBlocksProgress')}</h2>
+          {projects.map((project) => {
+            const projectBlocks = blocksByProject[project.id] || [];
+            const isExpanded = expandedProjects.has(project.id);
+
+            return (
+              <Card key={project.id}>
+                <CardHeader
+                  className="cursor-pointer hover:bg-muted/50 transition-colors py-3"
+                  onClick={() => toggleProject(project.id)}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      {isExpanded ? (
+                        <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                      ) : (
+                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                      )}
+                      <CardTitle className="text-base">{project.name}</CardTitle>
+                      <Badge variant="secondary" className="text-xs">
+                        {projectBlocks.length} {t('common.blocksCount')}
+                      </Badge>
+                    </div>
+                    {projectBlocks.length > 0 && (
+                      <div className="text-sm font-medium">
+                        {Math.round(projectBlocks.reduce((sum: number, b: any) => sum + (b.globalProgress || 0), 0) / projectBlocks.length)}%
+                      </div>
+                    )}
+                  </div>
+                </CardHeader>
+                {isExpanded && (
+                  <CardContent className="pt-0 pb-4 px-4">
+                    <div className="space-y-3 mt-3">
+                      {projectBlocks.length === 0 ? (
+                        <p className="text-sm text-muted-foreground text-center py-4">
+                          {t('dashboard.noBlocksYet')}
+                        </p>
+                      ) : (
+                        projectBlocks.map((block) => (
+                          <div
+                            key={block.id}
+                            className="border rounded-lg p-3 bg-muted/20"
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                <Blocks className="h-4 w-4 text-muted-foreground" />
+                                <span className="font-medium text-sm">
+                                  {block.name}
+                                  {block.blockNumber && ` (${block.blockNumber})`}
+                                </span>
+                              </div>
+                              <Badge variant="outline" className="text-xs">
+                                {block.globalProgress || 0}%
+                              </Badge>
+                            </div>
+                            <div className="space-y-2">
+                              <div>
+                                <div className="flex justify-between text-xs mb-1">
+                                  <span className="text-muted-foreground">Gros Œuvre</span>
+                                  <span className="font-medium text-xs">{block.grosOeuvreProgress || 0}%</span>
+                                </div>
+                                <Progress value={block.grosOeuvreProgress || 0} className="h-1.5" />
+                              </div>
+                              <div>
+                                <div className="flex justify-between text-xs mb-1">
+                                  <span className="text-muted-foreground">CES</span>
+                                  <span className="font-medium text-xs">{block.cesProgress || 0}%</span>
+                                </div>
+                                <Progress value={block.cesProgress || 0} className="h-1.5" />
+                              </div>
+                              <div>
+                                <div className="flex justify-between text-xs mb-1">
+                                  <span className="text-muted-foreground">CET</span>
+                                  <span className="font-medium text-xs">{block.cetProgress || 0}%</span>
+                                </div>
+                                <Progress value={block.cetProgress || 0} className="h-1.5" />
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </CardContent>
+                )}
+              </Card>
+            );
+          })}
+        </div>
+      )}
+
       {/* Recent Activity */}
-      <RecentActivity activities={recentActivities} />
+      {recentActivities.length > 0 && <RecentActivity activities={recentActivities} />}
     </div>
   );
 }
