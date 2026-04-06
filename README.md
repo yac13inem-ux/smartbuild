@@ -136,6 +136,58 @@ bun run db:generate  # توليد Prisma Client
 bun run lint         # فحص الكود
 ```
 
+## 🚀 النشر على Vercel
+
+### طريقة 1: النشر التلقائي عبر GitHub (موصى به)
+
+1. **تأكد من إعداد قاعدة البيانات للإنتاج:**
+   ```bash
+   # استخدم PostgreSQL أو MySQL للإنتاج
+   # أضف DATABASE_URL إلى Environment Variables
+   ```
+
+2. **اتصل بمستودع GitHub الخاص بك:**
+   - قم بزيارة [vercel.com](https://vercel.com)
+   - انقر على "Add New" → "Project"
+   - اختر مستودع `BuildTrack` من GitHub
+
+3. **إعدادات النشر:**
+   - **Framework Preset**: Next.js
+   - **Build Command**: `bun run build`
+   - **Install Command**: `bun install && bun run db:generate`
+
+4. **Environment Variables:**
+   ```
+   DATABASE_URL=<your-production-database-url>
+   ```
+
+5. **انقر على Deploy**
+
+### طريقة 2: النشر عبر Vercel CLI
+
+```bash
+# تثبيت Vercel CLI
+bun install -g vercel
+
+# تسجيل الدخول
+vercel login
+
+# النشر
+cd BuildTrack
+vercel
+
+# للنشر في بيئة الإنتاج
+vercel --prod
+```
+
+### ملاحظات هامة للنشر:
+
+- ✅ المشروع يستخدم Next.js 16 مع `output: standalone` للإنتاج
+- ✅ تم إعداد `vercel.json` للنشر التلقائي
+- ✅ جميع API routes تستخدم `await params` للتوافق مع Next.js 16
+- ⚠️ يجب استخدام قاعدة بيانات PostgreSQL أو MySQL للإنتاج (وليس SQLite)
+- ⚠️ لا تنسى إضافة `DATABASE_URL` في Environment Variables
+
 ## 📱 التصميم
 
 - **مكتبة UI**: shadcn/ui
