@@ -1,13 +1,17 @@
 'use client';
 
-import { Building2, MapPin, ChevronRight, Calendar, Home, HardHat, Hammer, Settings, FileText, Edit } from 'lucide-react';
+import { Building2, MapPin, ChevronRight, Calendar, Home, HardHat, Hammer, Settings, FileText, Edit, Eye, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { ProgressCard } from './ProgressCard';
 import { SimpleAddProjectDialog } from './SimpleAddProjectDialog';
 import { AddBlockDialog } from './AddBlockDialog';
 import { EditFloorDialog } from './EditFloorDialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
@@ -59,7 +63,8 @@ export function ProjectList() {
   const [selectedBlock, setSelectedBlock] = useState<Block | null>(null);
   const [refreshBlocks, setRefreshBlocks] = useState(0);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [editingFloor, setEditingFloor] = useState<number | null>(null);
+  const [editingFloor, setEditingFloor] = useState<number | string | null>(null);
+  const [blockToDelete, setBlockToDelete] = useState<Block | null>(null);
 
   const fetchProjects = async () => {
     try {
@@ -122,6 +127,7 @@ export function ProjectList() {
   const handleFloorUpdate = async (floorIndex: number, updatedFloor: FloorData) => {
     if (!selectedBlock) return;
 
+    const floorsData = parseFloorsData(selectedBlock.floorsData);
     const updatedFloors = [...floorsData];
     updatedFloors[floorIndex] = updatedFloor;
 
@@ -177,445 +183,500 @@ export function ProjectList() {
     }
   };
 
+  const handleDeleteBlock = async () => {
+    if (!blockToDelete || !selectedProject) return;
+
+    try {
+      const response = await fetch(`/api/blocks/${blockToDelete.id}`, {
+        method: 'DELETE',
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        toast.success('تم حذف العمارة بنجاح');
+        setBlockToDelete(null);
+        setSelectedBlock(null);
+        await fetchProjectBlocks(selectedProject.id);
+      } else {
+        toast.error('فشل حذف العمارة');
+      }
+    } catch (error) {
+      console.error('Error deleting block:', error);
+      toast.error('حدث خطأ أثناء الحذف');
+    }
+  };
+
   // Show block details view
   if (selectedBlock && selectedProject) {
     const floorsData = parseFloorsData(selectedBlock.floorsData);
 
     return (
-      <div className="space-y-4 pb-20">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSelectedBlock(null)}
-            >
-              ← {t('common.back')}
-            </Button>
-            <h2 className="text-lg font-semibold">{selectedBlock.name}</h2>
+      <>
+        <div className="space-y-4 pb-20">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSelectedBlock(null)}
+              >
+                ← {t('common.back')}
+              </Button>
+              <h2 className="text-lg font-semibold">{selectedBlock.name}</h2>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  toast.info(`عرض تفاصيل: ${selectedBlock.name}`);
+                }}
+              >
+                <Eye className="h-4 w-4" />
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  console.log('Edit button clicked');
+                  console.log('Selected block:', selectedBlock);
+                  console.log('Floors data:', floorsData);
+                  toast.info(`فتح تعديل العمارة: ${selectedBlock.name}`);
+                  setEditDialogOpen(true);
+                  console.log('setEditDialogOpen called');
+                }}
+              >
+                <Edit className="h-4 w-4 mr-1" />
+                {t('common.edit')}
+              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => setBlockToDelete(selectedBlock)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      هل أنت متأكد من حذف العمارة "{blockToDelete?.name}"؟
+                      لا يمكن التراجع عن هذا الإجراء.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel onClick={() => setBlockToDelete(null)}>إلغاء</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDeleteBlock}>حذف</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
           </div>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => {
-              console.log('Edit button clicked');
-              console.log('Selected block:', selectedBlock);
-              console.log('Floors data:', floorsData);
-              toast.info(`فتح تعديل العمارة: ${selectedBlock.name}`);
-              setEditDialogOpen(true);
-              console.log('setEditDialogOpen called');
-            }}
-          >
-            <Edit className="h-4 w-4 mr-1" />
-            {t('common.edit')}
-          </Button>
-        </div>
 
-        <Card>
-          <CardContent className="p-4">
-            <ProgressCard
-              grosOeuvre={selectedBlock.grosOeuvreProgress}
-              ces={selectedBlock.cesProgress}
-              cet={selectedBlock.cetProgress}
-              global={selectedBlock.globalProgress}
-            />
-          </CardContent>
-        </Card>
-
-        {floorsData.length > 0 ? (
-          <Tabs defaultValue="grosOeuvre" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="grosOeuvre">
-                {t('project.grosOeuvreSection')}
-              </TabsTrigger>
-              <TabsTrigger value="cesCet">
-                {t('project.cesCetSection')}
-              </TabsTrigger>
-            </TabsList>
-
-            {/* Gros Œuvre Tab */}
-            <TabsContent value="grosOeuvre" className="space-y-3 mt-4">
-              {floorsData.map((floor, floorIndex) => (
-                <Card key={floor.floorNumber} className="border-l-4 border-l-primary">
-                  <CardContent className="p-4 space-y-3">
-                    {/* Floor Header */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Building2 className="h-4 w-4 text-primary" />
-                        <span className="font-semibold">{t('project.floorNumber')} {floor.floorNumber}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setEditingFloor(editingFloor === floorIndex ? null : floorIndex)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                          <Home className="h-4 w-4" />
-                          <span>{floor.apartments} {t('project.apartmentsCount')}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Edit Form */}
-                    {editingFloor === floorIndex ? (
-                      <div className="space-y-3 p-3 bg-muted/50 rounded-lg border">
-                        <div className="grid grid-cols-2 gap-2">
-                          <div className="space-y-1">
-                            <Label className="text-xs">نسبة التقدم (%)</Label>
-                            <Input
-                              type="number"
-                              min="0"
-                              max="100"
-                              value={floor.grosOeuvreProgress}
-                              onChange={(e) => {
-                                const updated = [...floorsData];
-                                updated[floorIndex] = {
-                                  ...floor,
-                                  grosOeuvreProgress: Math.min(100, Math.max(0, parseInt(e.target.value) || 0))
-                                };
-                                setSelectedBlock({
-                                  ...selectedBlock,
-                                  floorsData: JSON.stringify(updated)
-                                });
-                              }}
-                              className="h-8 text-sm"
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <Label className="text-xs">عدد الشقق</Label>
-                            <Input
-                              type="number"
-                              min="0"
-                              value={floor.apartments}
-                              onChange={(e) => {
-                                const updated = [...floorsData];
-                                updated[floorIndex] = {
-                                  ...floor,
-                                  apartments: parseInt(e.target.value) || 0
-                                };
-                                setSelectedBlock({
-                                  ...selectedBlock,
-                                  floorsData: JSON.stringify(updated)
-                                });
-                              }}
-                              className="h-8 text-sm"
-                            />
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2">
-                          <div className="space-y-1">
-                            <Label className="text-xs">تاريخ الصب</Label>
-                            <Input
-                              type="date"
-                              value={floor.concretePourDate || ''}
-                              onChange={(e) => {
-                                const updated = [...floorsData];
-                                updated[floorIndex] = {
-                                  ...floor,
-                                  concretePourDate: e.target.value || null
-                                };
-                                setSelectedBlock({
-                                  ...selectedBlock,
-                                  floorsData: JSON.stringify(updated)
-                                });
-                              }}
-                              className="h-8 text-sm"
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <Label className="text-xs">تاريخ فحص التسليح</Label>
-                            <Input
-                              type="date"
-                              value={floor.reinforcementInspectionDate || ''}
-                              onChange={(e) => {
-                                const updated = [...floorsData];
-                                updated[floorIndex] = {
-                                  ...floor,
-                                  reinforcementInspectionDate: e.target.value || null
-                                };
-                                setSelectedBlock({
-                                  ...selectedBlock,
-                                  floorsData: JSON.stringify(updated)
-                                });
-                              }}
-                              className="h-8 text-sm"
-                            />
-                          </div>
-                        </div>
-                        <div className="space-y-1">
-                          <Label className="text-xs">ملاحظات</Label>
-                          <Textarea
-                            value={floor.grosOeuvreNotes}
-                            onChange={(e) => {
-                              const updated = [...floorsData];
-                              updated[floorIndex] = {
-                                ...floor,
-                                grosOeuvreNotes: e.target.value
-                              };
-                              setSelectedBlock({
-                                ...selectedBlock,
-                                floorsData: JSON.stringify(updated)
-                              });
-                            }}
-                            rows={2}
-                            className="text-sm"
-                          />
-                        </div>
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            onClick={() => handleFloorUpdate(floorIndex, floorsData[floorIndex])}
-                            className="flex-1"
-                          >
-                            حفظ
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setEditingFloor(null)}
-                          >
-                            إلغاء
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <>
-                        {/* Progress */}
-                        <div className="space-y-1">
-                          <div className="flex items-center justify-between text-xs">
-                            <div className="flex items-center gap-1">
-                              <HardHat className="h-3 w-3" />
-                              <span>{t('project.grosOeuvreProgress')}</span>
-                            </div>
-                            <span className="font-medium">{floor.grosOeuvreProgress}%</span>
-                          </div>
-                          <div className="h-2 bg-muted rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-primary transition-all"
-                              style={{ width: `${floor.grosOeuvreProgress}%` }}
-                            />
-                          </div>
-                        </div>
-
-                    {/* Dates */}
-                    <div className="grid grid-cols-2 gap-3 text-sm">
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Calendar className="h-4 w-4" />
-                        <div>
-                          <p className="text-xs">{t('project.concretePourDate')}</p>
-                          <p className="font-medium">{formatDate(floor.concretePourDate)}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Calendar className="h-4 w-4" />
-                        <div>
-                          <p className="text-xs">{t('project.reinforcementInspection')}</p>
-                          <p className="font-medium">{formatDate(floor.reinforcementInspectionDate)}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Notes */}
-                    {floor.grosOeuvreNotes && (
-                      <div className="bg-muted/50 rounded-lg p-3 space-y-1">
-                        <div className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
-                          <FileText className="h-3 w-3" />
-                          <span>{t('project.grosOeuvreNotes')}</span>
-                        </div>
-                        <p className="text-sm">{floor.grosOeuvreNotes}</p>
-                      </div>
-                    )}
-                  </>
-                  )}
-                  </CardContent>
-                </Card>
-              ))}
-            </TabsContent>
-
-            {/* CES & CET Tab */}
-            <TabsContent value="cesCet" className="space-y-3 mt-4">
-              {floorsData.map((floor, floorIndex) => (
-                <Card key={floor.floorNumber} className="border-l-4 border-l-blue-500">
-                  <CardContent className="p-4 space-y-3">
-                    {/* Floor Header */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Building2 className="h-4 w-4 text-blue-500" />
-                        <span className="font-semibold">{t('project.floorNumber')} {floor.floorNumber}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setEditingFloor(editingFloor === `ces-${floorIndex}` ? null : `ces-${floorIndex}`)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                          <Home className="h-4 w-4" />
-                          <span>{floor.apartments} {t('project.apartmentsCount')}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Edit Form */}
-                    {editingFloor === `ces-${floorIndex}` ? (
-                      <div className="space-y-3 p-3 bg-muted/50 rounded-lg border">
-                        <div className="grid grid-cols-2 gap-2">
-                          <div className="space-y-1">
-                            <Label className="text-xs">تقدم CES (%)</Label>
-                            <Input
-                              type="number"
-                              min="0"
-                              max="100"
-                              value={floor.cesProgress}
-                              onChange={(e) => {
-                                const updated = [...floorsData];
-                                updated[floorIndex] = {
-                                  ...floor,
-                                  cesProgress: Math.min(100, Math.max(0, parseInt(e.target.value) || 0))
-                                };
-                                setSelectedBlock({
-                                  ...selectedBlock,
-                                  floorsData: JSON.stringify(updated)
-                                });
-                              }}
-                              className="h-8 text-sm"
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <Label className="text-xs">تقدم CET (%)</Label>
-                            <Input
-                              type="number"
-                              min="0"
-                              max="100"
-                              value={floor.cetProgress}
-                              onChange={(e) => {
-                                const updated = [...floorsData];
-                                updated[floorIndex] = {
-                                  ...floor,
-                                  cetProgress: Math.min(100, Math.max(0, parseInt(e.target.value) || 0))
-                                };
-                                setSelectedBlock({
-                                  ...selectedBlock,
-                                  floorsData: JSON.stringify(updated)
-                                });
-                              }}
-                              className="h-8 text-sm"
-                            />
-                          </div>
-                        </div>
-                        <div className="space-y-1">
-                          <Label className="text-xs">ملاحظات</Label>
-                          <Textarea
-                            value={floor.cesCetNotes}
-                            onChange={(e) => {
-                              const updated = [...floorsData];
-                              updated[floorIndex] = {
-                                ...floor,
-                                cesCetNotes: e.target.value
-                              };
-                              setSelectedBlock({
-                                ...selectedBlock,
-                                floorsData: JSON.stringify(updated)
-                              });
-                            }}
-                            rows={2}
-                            className="text-sm"
-                          />
-                        </div>
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            onClick={() => handleFloorUpdate(floorIndex, floorsData[floorIndex])}
-                            className="flex-1"
-                          >
-                            حفظ
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setEditingFloor(null)}
-                          >
-                            إلغاء
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <>
-                        {/* Progress Bars */}
-                        <div className="grid grid-cols-2 gap-3">
-                          {/* CES */}
-                          <div className="space-y-1">
-                            <div className="flex items-center justify-between text-xs">
-                              <div className="flex items-center gap-1">
-                                <Hammer className="h-3 w-3" />
-                                <span>{t('project.cesProgress')}</span>
-                              </div>
-                              <span className="font-medium">{floor.cesProgress}%</span>
-                            </div>
-                            <div className="h-2 bg-muted rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-blue-500 transition-all"
-                                style={{ width: `${floor.cesProgress}%` }}
-                              />
-                            </div>
-                          </div>
-
-                          {/* CET */}
-                          <div className="space-y-1">
-                            <div className="flex items-center justify-between text-xs">
-                              <div className="flex items-center gap-1">
-                                <Settings className="h-3 w-3" />
-                                <span>{t('project.cetProgress')}</span>
-                              </div>
-                              <span className="font-medium">{floor.cetProgress}%</span>
-                            </div>
-                            <div className="h-2 bg-muted rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-green-500 transition-all"
-                                style={{ width: `${floor.cetProgress}%` }}
-                              />
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Notes */}
-                        {floor.cesCetNotes && (
-                          <div className="bg-muted/50 rounded-lg p-3 space-y-1">
-                            <div className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
-                              <FileText className="h-3 w-3" />
-                              <span>{t('project.cesCetNotes')}</span>
-                            </div>
-                            <p className="text-sm">{floor.cesCetNotes}</p>
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </TabsContent>
-          </Tabs>
-        ) : (
           <Card>
-            <CardContent className="p-8 text-center">
-              <Building2 className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-              <p className="text-muted-foreground">
-                لا توجد بيانات للطوابق بعد
-              </p>
+            <CardContent className="p-4">
+              <ProgressCard
+                grosOeuvre={selectedBlock.grosOeuvreProgress}
+                ces={selectedBlock.cesProgress}
+                cet={selectedBlock.cetProgress}
+                global={selectedBlock.globalProgress}
+              />
             </CardContent>
           </Card>
-        )}
-      </div>
-    );
 
-    return (
-      <>
-        {blockDetails}
+          {floorsData.length > 0 ? (
+            <Tabs defaultValue="grosOeuvre" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="grosOeuvre">
+                  {t('project.grosOeuvreSection')}
+                </TabsTrigger>
+                <TabsTrigger value="cesCet">
+                  {t('project.cesCetSection')}
+                </TabsTrigger>
+              </TabsList>
+
+              {/* Gros Œuvre Tab */}
+              <TabsContent value="grosOeuvre" className="space-y-3 mt-4">
+                {floorsData.map((floor, floorIndex) => (
+                  <Card key={floor.floorNumber} className="border-l-4 border-l-primary">
+                    <CardContent className="p-4 space-y-3">
+                      {/* Floor Header */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Building2 className="h-4 w-4 text-primary" />
+                          <span className="font-semibold">{t('project.floorNumber')} {floor.floorNumber}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => setEditingFloor(editingFloor === floorIndex ? null : floorIndex)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                            <Home className="h-4 w-4" />
+                            <span>{floor.apartments} {t('project.apartmentsCount')}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Edit Form */}
+                      {editingFloor === floorIndex ? (
+                        <div className="space-y-3 p-3 bg-muted/50 rounded-lg border">
+                          <div className="grid grid-cols-2 gap-2">
+                            <div className="space-y-1">
+                              <Label className="text-xs">نسبة التقدم (%)</Label>
+                              <Input
+                                type="number"
+                                min="0"
+                                max="100"
+                                value={floor.grosOeuvreProgress}
+                                onChange={(e) => {
+                                  const updated = [...floorsData];
+                                  updated[floorIndex] = {
+                                    ...floor,
+                                    grosOeuvreProgress: Math.min(100, Math.max(0, parseInt(e.target.value) || 0))
+                                  };
+                                  setSelectedBlock({
+                                    ...selectedBlock,
+                                    floorsData: JSON.stringify(updated)
+                                  });
+                                }}
+                                className="h-8 text-sm"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs">عدد الشقق</Label>
+                              <Input
+                                type="number"
+                                min="0"
+                                value={floor.apartments}
+                                onChange={(e) => {
+                                  const updated = [...floorsData];
+                                  updated[floorIndex] = {
+                                    ...floor,
+                                    apartments: parseInt(e.target.value) || 0
+                                  };
+                                  setSelectedBlock({
+                                    ...selectedBlock,
+                                    floorsData: JSON.stringify(updated)
+                                  });
+                                }}
+                                className="h-8 text-sm"
+                              />
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div className="space-y-1">
+                              <Label className="text-xs">تاريخ الصب</Label>
+                              <Input
+                                type="date"
+                                value={floor.concretePourDate || ''}
+                                onChange={(e) => {
+                                  const updated = [...floorsData];
+                                  updated[floorIndex] = {
+                                    ...floor,
+                                    concretePourDate: e.target.value || null
+                                  };
+                                  setSelectedBlock({
+                                    ...selectedBlock,
+                                    floorsData: JSON.stringify(updated)
+                                  });
+                                }}
+                                className="h-8 text-sm"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs">تاريخ فحص التسليح</Label>
+                              <Input
+                                type="date"
+                                value={floor.reinforcementInspectionDate || ''}
+                                onChange={(e) => {
+                                  const updated = [...floorsData];
+                                  updated[floorIndex] = {
+                                    ...floor,
+                                    reinforcementInspectionDate: e.target.value || null
+                                  };
+                                  setSelectedBlock({
+                                    ...selectedBlock,
+                                    floorsData: JSON.stringify(updated)
+                                  });
+                                }}
+                                className="h-8 text-sm"
+                              />
+                            </div>
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs">ملاحظات</Label>
+                            <Textarea
+                              value={floor.grosOeuvreNotes}
+                              onChange={(e) => {
+                                const updated = [...floorsData];
+                                updated[floorIndex] = {
+                                  ...floor,
+                                  grosOeuvreNotes: e.target.value
+                                };
+                                setSelectedBlock({
+                                  ...selectedBlock,
+                                  floorsData: JSON.stringify(updated)
+                                });
+                              }}
+                              rows={2}
+                              className="text-sm"
+                            />
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              onClick={() => handleFloorUpdate(floorIndex, floorsData[floorIndex])}
+                              className="flex-1"
+                            >
+                              حفظ
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setEditingFloor(null)}
+                            >
+                              إلغاء
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          {/* Progress */}
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between text-xs">
+                              <div className="flex items-center gap-1">
+                                <HardHat className="h-3 w-3" />
+                                <span>{t('project.grosOeuvreProgress')}</span>
+                              </div>
+                              <span className="font-medium">{floor.grosOeuvreProgress}%</span>
+                            </div>
+                            <div className="h-2 bg-muted rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-primary transition-all"
+                                style={{ width: `${floor.grosOeuvreProgress}%` }}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Dates */}
+                          <div className="grid grid-cols-2 gap-3 text-sm">
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <Calendar className="h-4 w-4" />
+                              <div>
+                                <p className="text-xs">{t('project.concretePourDate')}</p>
+                                <p className="font-medium">{formatDate(floor.concretePourDate)}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <Calendar className="h-4 w-4" />
+                              <div>
+                                <p className="text-xs">{t('project.reinforcementInspection')}</p>
+                                <p className="font-medium">{formatDate(floor.reinforcementInspectionDate)}</p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Notes */}
+                          {floor.grosOeuvreNotes && (
+                            <div className="bg-muted/50 rounded-lg p-3 space-y-1">
+                              <div className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+                                <FileText className="h-3 w-3" />
+                                <span>{t('project.grosOeuvreNotes')}</span>
+                              </div>
+                              <p className="text-sm">{floor.grosOeuvreNotes}</p>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </TabsContent>
+
+              {/* CES & CET Tab */}
+              <TabsContent value="cesCet" className="space-y-3 mt-4">
+                {floorsData.map((floor, floorIndex) => (
+                  <Card key={floor.floorNumber} className="border-l-4 border-l-blue-500">
+                    <CardContent className="p-4 space-y-3">
+                      {/* Floor Header */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Building2 className="h-4 w-4 text-blue-500" />
+                          <span className="font-semibold">{t('project.floorNumber')} {floor.floorNumber}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => setEditingFloor(editingFloor === `ces-${floorIndex}` ? null : `ces-${floorIndex}`)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                            <Home className="h-4 w-4" />
+                            <span>{floor.apartments} {t('project.apartmentsCount')}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Edit Form */}
+                      {editingFloor === `ces-${floorIndex}` ? (
+                        <div className="space-y-3 p-3 bg-muted/50 rounded-lg border">
+                          <div className="grid grid-cols-2 gap-2">
+                            <div className="space-y-1">
+                              <Label className="text-xs">تقدم CES (%)</Label>
+                              <Input
+                                type="number"
+                                min="0"
+                                max="100"
+                                value={floor.cesProgress}
+                                onChange={(e) => {
+                                  const updated = [...floorsData];
+                                  updated[floorIndex] = {
+                                    ...floor,
+                                    cesProgress: Math.min(100, Math.max(0, parseInt(e.target.value) || 0))
+                                  };
+                                  setSelectedBlock({
+                                    ...selectedBlock,
+                                    floorsData: JSON.stringify(updated)
+                                  });
+                                }}
+                                className="h-8 text-sm"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs">تقدم CET (%)</Label>
+                              <Input
+                                type="number"
+                                min="0"
+                                max="100"
+                                value={floor.cetProgress}
+                                onChange={(e) => {
+                                  const updated = [...floorsData];
+                                  updated[floorIndex] = {
+                                    ...floor,
+                                    cetProgress: Math.min(100, Math.max(0, parseInt(e.target.value) || 0))
+                                  };
+                                  setSelectedBlock({
+                                    ...selectedBlock,
+                                    floorsData: JSON.stringify(updated)
+                                  });
+                                }}
+                                className="h-8 text-sm"
+                              />
+                            </div>
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs">ملاحظات</Label>
+                            <Textarea
+                              value={floor.cesCetNotes}
+                              onChange={(e) => {
+                                const updated = [...floorsData];
+                                updated[floorIndex] = {
+                                  ...floor,
+                                  cesCetNotes: e.target.value
+                                };
+                                setSelectedBlock({
+                                  ...selectedBlock,
+                                  floorsData: JSON.stringify(updated)
+                                });
+                              }}
+                              rows={2}
+                              className="text-sm"
+                            />
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              onClick={() => handleFloorUpdate(floorIndex, floorsData[floorIndex])}
+                              className="flex-1"
+                            >
+                              حفظ
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setEditingFloor(null)}
+                            >
+                              إلغاء
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          {/* Progress Bars */}
+                          <div className="grid grid-cols-2 gap-3">
+                            {/* CES */}
+                            <div className="space-y-1">
+                              <div className="flex items-center justify-between text-xs">
+                                <div className="flex items-center gap-1">
+                                  <Hammer className="h-3 w-3" />
+                                  <span>{t('project.cesProgress')}</span>
+                                </div>
+                                <span className="font-medium">{floor.cesProgress}%</span>
+                              </div>
+                              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                                <div
+                                  className="h-full bg-blue-500 transition-all"
+                                  style={{ width: `${floor.cesProgress}%` }}
+                                />
+                              </div>
+                            </div>
+
+                            {/* CET */}
+                            <div className="space-y-1">
+                              <div className="flex items-center justify-between text-xs">
+                                <div className="flex items-center gap-1">
+                                  <Settings className="h-3 w-3" />
+                                  <span>{t('project.cetProgress')}</span>
+                                </div>
+                                <span className="font-medium">{floor.cetProgress}%</span>
+                              </div>
+                              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                                <div
+                                  className="h-full bg-green-500 transition-all"
+                                  style={{ width: `${floor.cetProgress}%` }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Notes */}
+                          {floor.cesCetNotes && (
+                            <div className="bg-muted/50 rounded-lg p-3 space-y-1">
+                              <div className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+                                <FileText className="h-3 w-3" />
+                                <span>{t('project.cesCetNotes')}</span>
+                              </div>
+                              <p className="text-sm">{floor.cesCetNotes}</p>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </TabsContent>
+            </Tabs>
+          ) : (
+            <Card>
+              <CardContent className="p-8 text-center">
+                <Building2 className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+                <p className="text-muted-foreground">
+                  لا توجد بيانات للطوابق بعد
+                </p>
+              </CardContent>
+            </Card>
+          )}
+        </div>
         <EditFloorDialog
           blockId={selectedBlock.id}
           blockName={selectedBlock.name}
