@@ -1,11 +1,12 @@
 'use client';
 
-import { Building2, MapPin, ChevronRight, Calendar, Home, HardHat, Hammer, Settings } from 'lucide-react';
+import { Building2, MapPin, ChevronRight, Calendar, Home, HardHat, Hammer, Settings, FileText } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ProgressCard } from './ProgressCard';
 import { SimpleAddProjectDialog } from './SimpleAddProjectDialog';
 import { AddBlockDialog } from './AddBlockDialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
@@ -13,11 +14,15 @@ import { toast } from 'sonner';
 interface FloorData {
   floorNumber: number;
   apartments: number;
-  grosOeuvre: number;
-  ces: number;
-  cet: number;
+  // Gros Œuvre data
+  grosOeuvreProgress: number;
   concretePourDate: string | null;
   reinforcementInspectionDate: string | null;
+  grosOeuvreNotes: string;
+  // CES & CET data
+  cesProgress: number;
+  cetProgress: number;
+  cesCetNotes: string;
 }
 
 interface Project {
@@ -140,98 +145,152 @@ export function ProjectList() {
         </Card>
 
         {floorsData.length > 0 ? (
-          <div className="space-y-3">
-            <h3 className="font-medium">{t('project.trackPerFloor')}</h3>
-            {floorsData.map((floor) => (
-              <Card key={floor.floorNumber} className="border-l-4 border-l-primary">
-                <CardContent className="p-4 space-y-3">
-                  {/* Floor Header */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Building2 className="h-4 w-4 text-primary" />
-                      <span className="font-semibold">{t('project.floorNumber')} {floor.floorNumber}</span>
-                    </div>
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                      <Home className="h-4 w-4" />
-                      <span>{floor.apartments} {t('project.apartmentsCount')}</span>
-                    </div>
-                  </div>
+          <Tabs defaultValue="grosOeuvre" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="grosOeuvre">
+                {t('project.grosOeuvreSection')}
+              </TabsTrigger>
+              <TabsTrigger value="cesCet">
+                {t('project.cesCetSection')}
+              </TabsTrigger>
+            </TabsList>
 
-                  {/* Progress Bars */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    {/* Gros Oeuvre */}
+            {/* Gros Œuvre Tab */}
+            <TabsContent value="grosOeuvre" className="space-y-3 mt-4">
+              {floorsData.map((floor) => (
+                <Card key={floor.floorNumber} className="border-l-4 border-l-primary">
+                  <CardContent className="p-4 space-y-3">
+                    {/* Floor Header */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Building2 className="h-4 w-4 text-primary" />
+                        <span className="font-semibold">{t('project.floorNumber')} {floor.floorNumber}</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                        <Home className="h-4 w-4" />
+                        <span>{floor.apartments} {t('project.apartmentsCount')}</span>
+                      </div>
+                    </div>
+
+                    {/* Progress */}
                     <div className="space-y-1">
                       <div className="flex items-center justify-between text-xs">
                         <div className="flex items-center gap-1">
                           <HardHat className="h-3 w-3" />
                           <span>{t('project.grosOeuvreProgress')}</span>
                         </div>
-                        <span className="font-medium">{floor.grosOeuvre}%</span>
+                        <span className="font-medium">{floor.grosOeuvreProgress}%</span>
                       </div>
                       <div className="h-2 bg-muted rounded-full overflow-hidden">
                         <div
                           className="h-full bg-primary transition-all"
-                          style={{ width: `${floor.grosOeuvre}%` }}
+                          style={{ width: `${floor.grosOeuvreProgress}%` }}
                         />
                       </div>
                     </div>
 
-                    {/* CES */}
-                    <div className="space-y-1">
-                      <div className="flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-1">
-                          <Hammer className="h-3 w-3" />
-                          <span>{t('project.cesProgress')}</span>
+                    {/* Dates */}
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Calendar className="h-4 w-4" />
+                        <div>
+                          <p className="text-xs">{t('project.concretePourDate')}</p>
+                          <p className="font-medium">{formatDate(floor.concretePourDate)}</p>
                         </div>
-                        <span className="font-medium">{floor.ces}%</span>
                       </div>
-                      <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-blue-500 transition-all"
-                          style={{ width: `${floor.ces}%` }}
-                        />
-                      </div>
-                    </div>
-
-                    {/* CET */}
-                    <div className="space-y-1">
-                      <div className="flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-1">
-                          <Settings className="h-3 w-3" />
-                          <span>{t('project.cetProgress')}</span>
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Calendar className="h-4 w-4" />
+                        <div>
+                          <p className="text-xs">{t('project.reinforcementInspection')}</p>
+                          <p className="font-medium">{formatDate(floor.reinforcementInspectionDate)}</p>
                         </div>
-                        <span className="font-medium">{floor.cet}%</span>
-                      </div>
-                      <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-green-500 transition-all"
-                          style={{ width: `${floor.cet}%` }}
-                        />
                       </div>
                     </div>
-                  </div>
 
-                  {/* Dates */}
-                  <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Calendar className="h-4 w-4" />
-                      <div>
-                        <p className="text-xs">{t('project.concretePourDate')}</p>
-                        <p className="font-medium">{formatDate(floor.concretePourDate)}</p>
+                    {/* Notes */}
+                    {floor.grosOeuvreNotes && (
+                      <div className="bg-muted/50 rounded-lg p-3 space-y-1">
+                        <div className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+                          <FileText className="h-3 w-3" />
+                          <span>{t('project.grosOeuvreNotes')}</span>
+                        </div>
+                        <p className="text-sm">{floor.grosOeuvreNotes}</p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </TabsContent>
+
+            {/* CES & CET Tab */}
+            <TabsContent value="cesCet" className="space-y-3 mt-4">
+              {floorsData.map((floor) => (
+                <Card key={floor.floorNumber} className="border-l-4 border-l-blue-500">
+                  <CardContent className="p-4 space-y-3">
+                    {/* Floor Header */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Building2 className="h-4 w-4 text-blue-500" />
+                        <span className="font-semibold">{t('project.floorNumber')} {floor.floorNumber}</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                        <Home className="h-4 w-4" />
+                        <span>{floor.apartments} {t('project.apartmentsCount')}</span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Calendar className="h-4 w-4" />
-                      <div>
-                        <p className="text-xs">{t('project.reinforcementInspectionDate')}</p>
-                        <p className="font-medium">{formatDate(floor.reinforcementInspectionDate)}</p>
+
+                    {/* Progress Bars */}
+                    <div className="grid grid-cols-2 gap-3">
+                      {/* CES */}
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between text-xs">
+                          <div className="flex items-center gap-1">
+                            <Hammer className="h-3 w-3" />
+                            <span>{t('project.cesProgress')}</span>
+                          </div>
+                          <span className="font-medium">{floor.cesProgress}%</span>
+                        </div>
+                        <div className="h-2 bg-muted rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-blue-500 transition-all"
+                            style={{ width: `${floor.cesProgress}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* CET */}
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between text-xs">
+                          <div className="flex items-center gap-1">
+                            <Settings className="h-3 w-3" />
+                            <span>{t('project.cetProgress')}</span>
+                          </div>
+                          <span className="font-medium">{floor.cetProgress}%</span>
+                        </div>
+                        <div className="h-2 bg-muted rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-green-500 transition-all"
+                            style={{ width: `${floor.cetProgress}%` }}
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+
+                    {/* Notes */}
+                    {floor.cesCetNotes && (
+                      <div className="bg-muted/50 rounded-lg p-3 space-y-1">
+                        <div className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+                          <FileText className="h-3 w-3" />
+                          <span>{t('project.cesCetNotes')}</span>
+                        </div>
+                        <p className="text-sm">{floor.cesCetNotes}</p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </TabsContent>
+          </Tabs>
         ) : (
           <Card>
             <CardContent className="p-8 text-center">

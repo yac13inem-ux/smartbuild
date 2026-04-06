@@ -71,7 +71,15 @@
     "blockTypeCustom": "Custom Type",
     "createBlocks": "Create Blocks Automatically",
     "totalBlocks": "Total Blocks",
-    "blocksSummary": "Blocks Summary"
+    "blocksSummary": "Blocks Summary",
+    "grosOeuvreSection": "Gros Œuvre Section",
+    "cesCetSection": "CES & CET Section",
+    "notes": "Notes",
+    "floorDetailsGrosOeuvre": "Floor Details - Gros Œuvre",
+    "floorDetailsCesCet": "Floor Details - Finishing & Technical",
+    "grosOeuvreNotes": "Gros Œuvre Notes",
+    "cesCetNotes": "Finishing & Technical Notes",
+    "reinforcementInspection": "Reinforcement Inspection"
   },
   "block": {
     "title": "Blocks",

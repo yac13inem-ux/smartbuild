@@ -71,7 +71,15 @@
     "blockTypeCustom": "نوع مخصص",
     "createBlocks": "إنشاء العمارات تلقائياً",
     "totalBlocks": "إجمالي العمارات",
-    "blocksSummary": "ملخص العمارات"
+    "blocksSummary": "ملخص العمارات",
+    "grosOeuvreSection": "قسم الأشغال الكبرى (Gros Œuvre)",
+    "cesCetSection": "قسم الأشغال التشطيبية والتقنية (CES & CET)",
+    "notes": "ملاحظات",
+    "floorDetailsGrosOeuvre": "تفاصيل الطابق - الأشغال الكبرى",
+    "floorDetailsCesCet": "تفاصيل الطابق - التشطيبات والتقنيات",
+    "grosOeuvreNotes": "ملاحظات الأشغال الكبرى",
+    "cesCetNotes": "ملاحظات التشطيبات والتقنيات",
+    "reinforcementInspection": "فحص التسليح"
   },
   "block": {
     "title": "المباني",

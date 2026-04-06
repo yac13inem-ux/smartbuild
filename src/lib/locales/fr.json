@@ -71,7 +71,15 @@
     "blockTypeCustom": "Type personnalisé",
     "createBlocks": "Créer les blocs automatiquement",
     "totalBlocks": "Total des blocs",
-    "blocksSummary": "Résumé des blocs"
+    "blocksSummary": "Résumé des blocs",
+    "grosOeuvreSection": "Section Gros Œuvre",
+    "cesCetSection": "Section CES & CET",
+    "notes": "Notes",
+    "floorDetailsGrosOeuvre": "Détails de l'étage - Gros Œuvre",
+    "floorDetailsCesCet": "Détails de l'étage - Finitions & Techniques",
+    "grosOeuvreNotes": "Notes Gros Œuvre",
+    "cesCetNotes": "Notes Finitions & Techniques",
+    "reinforcementInspection": "Inspection du ferraillage"
   },
   "block": {
     "title": "Blocs",

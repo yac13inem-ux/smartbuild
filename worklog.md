@@ -155,3 +155,44 @@ Stage Summary:
 - All construction tracking features preserved (Gros Œuvre, CES, CET, dates)
 - Perfect for users who prefer manual control over block creation
 
+---
+Task ID: 5
+Agent: Z.ai Code
+Task: Separate Gros Œuvre and CES/CET into distinct sections with notes
+
+Work Log:
+- Updated translation files (ar.json, en.json, fr.json) with new keys:
+  - grosOeuvreSection, cesCetSection for section titles
+  - floorDetailsGrosOeuvre, floorDetailsCesCet for floor detail headers
+  - grosOeuvreNotes, cesCetNotes for notes fields
+  - reinforcementInspection for reinforcement inspection label
+- Updated FloorData interface to support separated structure:
+  - Gros Œuvre data: grosOeuvreProgress, concretePourDate, reinforcementInspectionDate, grosOeuvreNotes
+  - CES & CET data: cesProgress, cetProgress, cesCetNotes
+  - Shared: floorNumber, apartments
+- Completely rewrote AddBlockDialog component with tabs:
+  - Tab 1: Gros Œuvre Section
+    - For each floor: progress (%), apartments count, concrete pour date, reinforcement inspection date, notes
+  - Tab 2: CES & CET Section
+    - For each floor: CES progress (%), CET progress (%), notes
+  - Clean separation of concerns with visual tabs
+- Updated ProjectList block detail view with tabs:
+  - Tab 1: Gros Œuvre Section display
+    - Shows floor number and apartments count
+    - Progress bar for Gros Œuvre
+    - Concrete pour date and reinforcement inspection date
+    - Notes section (shown only if notes exist)
+  - Tab 2: CES & CET Section display
+    - Shows floor number and apartments count
+    - Progress bars for CES and CET
+    - Notes section (shown only if notes exist)
+  - Visual distinction with different border colors (primary for Gros Œuvre, blue for CES/CET)
+- Verified dev server is running without errors
+
+Stage Summary:
+- Successfully separated Gros Œuvre and CES/CET into distinct, user-friendly sections
+- Each section has its own notes field for detailed documentation
+- Tabs provide clean visual separation and better organization
+- Floor-by-floor tracking with complete information for each phase
+- Perfect for construction teams who need to track structural work separately from finishing work
+
