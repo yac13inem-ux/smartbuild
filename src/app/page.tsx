@@ -32,8 +32,9 @@ export default function Home() {
         return <ProjectList />;
       case 'documents':
         return (
-          <DocumentHub 
+          <DocumentHub
             key={documentUpdateKey}
+            documentUpdateKey={documentUpdateKey}
             onDocumentsChange={handleDocumentChange}
           />
         );

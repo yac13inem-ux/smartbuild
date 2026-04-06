@@ -27,6 +27,7 @@ interface Document {
 interface DocumentHubProps {
   documents?: Document[];
   onDocumentsChange?: () => void;
+  documentUpdateKey?: number;
 }
 
 const documentTypeConfig = {
@@ -56,7 +57,7 @@ function formatDate(date: Date): string {
   return `${year}/${month}/${day}`;
 }
 
-export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubProps) {
+export function DocumentHub({ documents = [], onDocumentsChange, documentUpdateKey }: DocumentHubProps) {
   const { t } = useLanguage();
   const [localDocuments, setLocalDocuments] = useState<Document[]>(documents);
   const [viewingDoc, setViewingDoc] = useState<Document | null>(null);
@@ -76,6 +77,43 @@ export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubPr
   const [blocks, setBlocks] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const documentsRef = useRef<Document[]>(documents);
+
+  // Fetch documents from API
+  useEffect(() => {
+    fetchDocuments();
+  }, []);
+
+  // Fetch documents when key changes (component remounts)
+  useEffect(() => {
+    fetchDocuments();
+  }, [documentUpdateKey]);
+
+  const fetchDocuments = async () => {
+    console.log('Fetching documents...');
+    try {
+      const response = await fetch('/api/reports?limit=100');
+      const result = await response.json();
+      console.log('Documents response:', result);
+      if (result.success) {
+        // Transform reports to documents format
+        const transformedDocs = result.data.map((report: any) => ({
+          id: report.id,
+          title: report.title,
+          type: report.type,
+          date: new Date(report.date),
+          projectName: report.project?.name || 'Unknown',
+          blockName: report.block?.name,
+          unitName: report.unit?.name,
+          pdfPath: report.pdfPath,
+          description: report.description,
+        }));
+        console.log('Transformed documents:', transformedDocs);
+        setLocalDocuments(transformedDocs);
+      }
+    } catch (error) {
+      console.error('Error fetching documents:', error);
+    }
+  };
 
   // Update local documents when prop changes
   useEffect(() => {
@@ -173,6 +211,7 @@ export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubPr
   };
 
   const handleCreateDocument = async () => {
+    console.log('Creating document:', createForm);
     if (!createForm.title || !createForm.type) {
       return;
     }
@@ -195,6 +234,7 @@ export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubPr
       });
 
       const result = await response.json();
+      console.log('Create result:', result);
       if (result.success) {
         setIsCreateDialogOpen(false);
         setCreateForm({
@@ -205,6 +245,10 @@ export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubPr
           date: '',
           description: ''
         });
+        console.log('About to fetch documents...');
+        // Fetch documents to refresh the list
+        await fetchDocuments();
+        console.log('Documents fetched after create');
         if (onDocumentsChange) onDocumentsChange();
       }
     } catch (error) {
