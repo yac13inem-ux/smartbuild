@@ -42,7 +42,21 @@
     "location": "Location",
     "blocks": "Blocks",
     "units": "Units",
-    "progress": "Progress"
+    "progress": "Progress",
+    "grosOeuvre": "Gros Œuvre",
+    "numberOfFloors": "Number of Floors",
+    "concretePourFloor": "Current Concrete Pour Floor",
+    "reinforcementInspectionDate": "Reinforcement Inspection Date",
+    "apartmentsPerFloor": "Apartments per Floor",
+    "floorNumber": "Floor Number",
+    "apartmentsCount": "Number of Apartments",
+    "cesProgress": "CES Progress",
+    "cetProgress": "CET Progress",
+    "yes": "Yes",
+    "no": "No",
+    "selectFloor": "Select Floor",
+    "trackPerFloor": "Track Progress per Floor",
+    "floorDetails": "Floor Details"
   },
   "block": {
     "title": "Blocks",

@@ -42,7 +42,21 @@
     "location": "Lieu",
     "blocks": "Blocs",
     "units": "Unités",
-    "progress": "Progression"
+    "progress": "Progression",
+    "grosOeuvre": "Gros Œuvre",
+    "numberOfFloors": "Nombre d'étages",
+    "concretePourFloor": "Étage de coulage actuel",
+    "reinforcementInspectionDate": "Date d'inspection du ferraillage",
+    "apartmentsPerFloor": "Appartements par étage",
+    "floorNumber": "Numéro d'étage",
+    "apartmentsCount": "Nombre d'appartements",
+    "cesProgress": "Progression CES",
+    "cetProgress": "Progression CET",
+    "yes": "Oui",
+    "no": "Non",
+    "selectFloor": "Sélectionner l'étage",
+    "trackPerFloor": "Suivre la progression par étage",
+    "floorDetails": "Détails de l'étage"
   },
   "block": {
     "title": "Blocs",

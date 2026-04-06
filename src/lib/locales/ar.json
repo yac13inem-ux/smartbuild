@@ -42,7 +42,21 @@
     "location": "الموقع",
     "blocks": "المباني",
     "units": "الوحدات",
-    "progress": "التقدم"
+    "progress": "التقدم",
+    "grosOeuvre": "الأشغال الكبرى",
+    "numberOfFloors": "عدد الطوابق",
+    "concretePourFloor": "طابق الصب الحالي",
+    "reinforcementInspectionDate": "تاريخ مراقبة التسليح",
+    "apartmentsPerFloor": "عدد الشقق في كل طابق",
+    "floorNumber": "رقم الطابق",
+    "apartmentsCount": "عدد الشقق",
+    "cesProgress": "تقدم الأشغال التشطيبية",
+    "cetProgress": "تقدم الأشغال التقنية",
+    "yes": "نعم",
+    "no": "لا",
+    "selectFloor": "اختر الطابق",
+    "trackPerFloor": "تتبع التقدم لكل طابق",
+    "floorDetails": "تفاصيل الطابق"
   },
   "block": {
     "title": "المباني",
