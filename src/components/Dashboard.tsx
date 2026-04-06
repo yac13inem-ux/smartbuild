@@ -207,104 +207,72 @@ export function Dashboard({
 
   return (
     <div className="space-y-6 pb-20">
-      {/* Progress Sections */}
-      <div className="grid grid-cols-1 gap-4">
-        {/* Gros Œuvre Progress */}
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-4">
+      {/* Progress Sections - All circles in one row */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {/* Gros Œuvre Progress */}
+            <div className="flex flex-col items-center text-center">
               <CircularProgress
                 value={grosOeuvreProgress}
                 label="Gros Œuvre"
-                size={80}
+                size={70}
                 strokeWidth={6}
+                color="primary"
               />
-              <div className="flex-1">
-                <h3 className="font-semibold mb-1">{t('dashboard.grosOeuvre')}</h3>
-                <p className="text-sm text-muted-foreground mb-2">
-                  {t('dashboard.grosOeuvreDescription')}
-                </p>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{t('dashboard.totalProgressLabel')}:</span>
-                  <span className="font-bold text-primary">{grosOeuvreProgress}%</span>
-                </div>
+              <div className="mt-2">
+                <p className="text-xs text-muted-foreground mb-1">{t('dashboard.grosOeuvre')}</p>
+                <span className="font-bold text-primary text-sm">{grosOeuvreProgress}%</span>
               </div>
             </div>
-          </CardContent>
-        </Card>
 
-        {/* CES Progress */}
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-4">
+            {/* CES Progress */}
+            <div className="flex flex-col items-center text-center">
               <CircularProgress
                 value={cesProgress}
                 label="CES"
-                size={80}
+                size={70}
                 strokeWidth={6}
+                color="blue"
               />
-              <div className="flex-1">
-                <h3 className="font-semibold mb-1">{t('dashboard.ces')}</h3>
-                <p className="text-sm text-muted-foreground mb-2">
-                  {t('dashboard.cesDescription')}
-                </p>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{t('dashboard.totalProgressLabel')}:</span>
-                  <span className="font-bold text-primary">{cesProgress}%</span>
-                </div>
+              <div className="mt-2">
+                <p className="text-xs text-muted-foreground mb-1">{t('dashboard.ces')}</p>
+                <span className="font-bold text-blue-500 text-sm">{cesProgress}%</span>
               </div>
             </div>
-          </CardContent>
-        </Card>
 
-        {/* CET Progress */}
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-4">
+            {/* CET Progress */}
+            <div className="flex flex-col items-center text-center">
               <CircularProgress
                 value={cetProgress}
                 label="CET"
-                size={80}
+                size={70}
                 strokeWidth={6}
+                color="green"
               />
-              <div className="flex-1">
-                <h3 className="font-semibold mb-1">{t('dashboard.cet')}</h3>
-                <p className="text-sm text-muted-foreground mb-2">
-                  {t('dashboard.cetDescription')}
-                </p>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{t('dashboard.totalProgressLabel')}:</span>
-                  <span className="font-bold text-primary">{cetProgress}%</span>
-                </div>
+              <div className="mt-2">
+                <p className="text-xs text-muted-foreground mb-1">{t('dashboard.cet')}</p>
+                <span className="font-bold text-green-500 text-sm">{cetProgress}%</span>
               </div>
             </div>
-          </CardContent>
-        </Card>
 
-        {/* Total Progress */}
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-4">
+            {/* Total Progress */}
+            <div className="flex flex-col items-center text-center">
               <CircularProgress
                 value={totalProgress}
                 label={t('common.percent')}
-                size={80}
+                size={70}
                 strokeWidth={6}
+                color="orange"
               />
-              <div className="flex-1">
-                <h3 className="font-semibold mb-1">{t('dashboard.overallProgress')}</h3>
-                <p className="text-sm text-muted-foreground mb-2">
-                  {t('dashboard.overallProgressDesc')}
-                </p>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{t('dashboard.totalCompletion')}:</span>
-                  <span className="font-bold text-primary">{totalProgress}%</span>
-                </div>
+              <div className="mt-2">
+                <p className="text-xs text-muted-foreground mb-1">{t('dashboard.overallProgress')}</p>
+                <span className="font-bold text-orange-500 text-sm">{totalProgress}%</span>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* KPI Cards */}
       {projects.length > 0 && (

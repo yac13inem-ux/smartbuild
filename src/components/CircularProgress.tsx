@@ -9,6 +9,7 @@ interface CircularProgressProps {
   className?: string;
   label?: string;
   showPercentage?: boolean;
+  color?: 'primary' | 'blue' | 'green' | 'orange';
 }
 
 export function CircularProgress({
@@ -18,10 +19,25 @@ export function CircularProgress({
   className,
   label,
   showPercentage = true,
+  color = 'primary',
 }: CircularProgressProps) {
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
   const offset = circumference - (value / 100) * circumference;
+
+  const colorClasses = {
+    primary: 'text-primary',
+    blue: 'text-blue-500',
+    green: 'text-green-500',
+    orange: 'text-orange-500',
+  };
+
+  const percentageColorClasses = {
+    primary: 'text-primary',
+    blue: 'text-blue-500',
+    green: 'text-green-500',
+    orange: 'text-orange-500',
+  };
 
   return (
     <div className={cn('flex flex-col items-center justify-center', className)}>
@@ -43,7 +59,7 @@ export function CircularProgress({
           />
           {/* Progress circle */}
           <circle
-            className="text-primary stroke-current transition-all duration-500 ease-in-out"
+            className={cn('stroke-current transition-all duration-500 ease-in-out', colorClasses[color])}
             strokeWidth={strokeWidth}
             strokeDasharray={circumference}
             strokeDashoffset={offset}
@@ -56,7 +72,7 @@ export function CircularProgress({
         </svg>
         {showPercentage && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-2xl font-bold text-foreground">
+            <span className={cn('text-2xl font-bold', percentageColorClasses[color])}>
               {value}%
             </span>
           </div>
