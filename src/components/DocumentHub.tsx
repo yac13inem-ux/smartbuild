@@ -1,9 +1,15 @@
 'use client';
 
-import { FileText, Calendar, Download, Plus } from 'lucide-react';
+import { useState } from 'react';
+import { FileText, Calendar, Download, Plus, Eye, Pencil, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Document {
@@ -19,6 +25,7 @@ interface Document {
 
 interface DocumentHubProps {
   documents?: Document[];
+  onDocumentsChange?: () => void;
 }
 
 const documentTypeConfig = {
@@ -48,8 +55,12 @@ function formatDate(date: Date): string {
   return `${year}/${month}/${day}`;
 }
 
-export function DocumentHub({ documents = [] }: DocumentHubProps) {
+export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubProps) {
   const { t } = useLanguage();
+  const [viewingDoc, setViewingDoc] = useState<Document | null>(null);
+  const [editingDoc, setEditingDoc] = useState<Document | null>(null);
+  const [deletingDoc, setDeletingDoc] = useState<Document | null>(null);
+  const [editForm, setEditForm] = useState({ title: '', description: '' });
 
   // Mock data
   const mockDocuments: Document[] = [
@@ -87,6 +98,60 @@ export function DocumentHub({ documents = [] }: DocumentHubProps) {
   ];
 
   const displayDocuments = documents.length > 0 ? documents : mockDocuments;
+
+  const handleView = (doc: Document) => {
+    setViewingDoc(doc);
+  };
+
+  const handleEdit = (doc: Document) => {
+    setEditingDoc(doc);
+    setEditForm({ title: doc.title, description: (doc as any).description || '' });
+  };
+
+  const handleDelete = (doc: Document) => {
+    setDeletingDoc(doc);
+  };
+
+  const confirmDelete = async () => {
+    if (!deletingDoc) return;
+    
+    try {
+      // In production, this would call the API to delete the document
+      console.log('Deleting document:', deletingDoc.id);
+      
+      // Remove from mock data (for demo purposes)
+      const index = mockDocuments.findIndex(d => d.id === deletingDoc.id);
+      if (index > -1) {
+        mockDocuments.splice(index, 1);
+      }
+      
+      setDeletingDoc(null);
+      if (onDocumentsChange) onDocumentsChange();
+    } catch (error) {
+      console.error('Error deleting document:', error);
+    }
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingDoc) return;
+    
+    try {
+      // In production, this would call the API to update the document
+      console.log('Updating document:', editingDoc.id, editForm);
+      
+      // Update mock data (for demo purposes)
+      const doc = mockDocuments.find(d => d.id === editingDoc.id);
+      if (doc) {
+        doc.title = editForm.title;
+        (doc as any).description = editForm.description;
+      }
+      
+      setEditingDoc(null);
+      if (onDocumentsChange) onDocumentsChange();
+    } catch (error) {
+      console.error('Error updating document:', error);
+    }
+  };
 
   return (
     <div className="space-y-4 pb-20">
@@ -154,17 +219,154 @@ export function DocumentHub({ documents = [] }: DocumentHubProps) {
                       </p>
                     </div>
                   </div>
-                  {doc.pdfPath && (
-                    <Button variant="ghost" size="icon">
-                      <Download className="h-4 w-4" />
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleView(doc)}
+                      className="h-8 w-8"
+                    >
+                      <Eye className="h-4 w-4" />
                     </Button>
-                  )}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleEdit(doc)}
+                      className="h-8 w-8"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDelete(doc)}
+                      className="h-8 w-8 text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                    {doc.pdfPath && (
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <Download className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </CardContent>
             </Card>
           );
         })}
       </div>
+
+      {/* View Document Dialog */}
+      <Dialog open={!!viewingDoc} onOpenChange={(open) => !open && setViewingDoc(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{t('documents.viewDocument') || 'View Document'}</DialogTitle>
+          </DialogHeader>
+          {viewingDoc && (
+            <div className="space-y-4">
+              <div>
+                <Label className="text-sm text-muted-foreground">{t('documents.documentTitle') || 'Title'}</Label>
+                <p className="text-lg font-semibold mt-1">{viewingDoc.title}</p>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm text-muted-foreground">{t('documents.date') || 'Date'}</Label>
+                  <p className="mt-1">{formatDate(viewingDoc.date)}</p>
+                </div>
+                <div>
+                  <Label className="text-sm text-muted-foreground">{t('documents.selectType') || 'Type'}</Label>
+                  <p className="mt-1">{t(documentTypeConfig[viewingDoc.type].label)}</p>
+                </div>
+              </div>
+              <div>
+                <Label className="text-sm text-muted-foreground">{t('project.projectName') || 'Project'}</Label>
+                <p className="mt-1">{viewingDoc.projectName}</p>
+              </div>
+              {viewingDoc.blockName && (
+                <div>
+                  <Label className="text-sm text-muted-foreground">{t('block.blockName') || 'Block'}</Label>
+                  <p className="mt-1">{viewingDoc.blockName}</p>
+                </div>
+              )}
+              {viewingDoc.unitName && (
+                <div>
+                  <Label className="text-sm text-muted-foreground">{t('unit.unitName') || 'Unit'}</Label>
+                  <p className="mt-1">{viewingDoc.unitName}</p>
+                </div>
+              )}
+              {(viewingDoc as any).description && (
+                <div>
+                  <Label className="text-sm text-muted-foreground">{t('documents.description') || 'Description'}</Label>
+                  <p className="mt-1">{(viewingDoc as any).description}</p>
+                </div>
+              )}
+              {viewingDoc.pdfPath && (
+                <Button variant="outline" className="w-full gap-2">
+                  <Download className="h-4 w-4" />
+                  {t('documents.downloadPDF') || 'Download PDF'}
+                </Button>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Document Dialog */}
+      <Dialog open={!!editingDoc} onOpenChange={(open) => !open && setEditingDoc(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('documents.editDocument') || 'Edit Document'}</DialogTitle>
+          </DialogHeader>
+          {editingDoc && (
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="edit-title">{t('documents.documentTitle')}</Label>
+                <Input
+                  id="edit-title"
+                  value={editForm.title}
+                  onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-description">{t('documents.description')}</Label>
+                <Textarea
+                  id="edit-description"
+                  value={editForm.description}
+                  onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                  rows={4}
+                />
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setEditingDoc(null)}>
+                  {t('common.cancel')}
+                </Button>
+                <Button onClick={handleSaveEdit}>
+                  {t('common.save')}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deletingDoc} onOpenChange={(open) => !open && setDeletingDoc(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('common.delete') || 'Delete'}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('documents.deleteConfirm') || 'Are you sure you want to delete this document? This action cannot be undone.'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {t('common.delete')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
