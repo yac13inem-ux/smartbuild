@@ -69,12 +69,10 @@ export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubPr
     type: 'PV_VISITE' as 'PV_VISITE' | 'PV_CONSTAT' | 'RAPPORT_MENSUEL',
     projectId: '',
     blockId: '',
-    unitId: '',
     description: ''
   });
   const [projects, setProjects] = useState<any[]>([]);
   const [blocks, setBlocks] = useState<any[]>([]);
-  const [units, setUnits] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const documentsRef = useRef<Document[]>(documents);
 
@@ -101,18 +99,8 @@ export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubPr
       fetchBlocks(createForm.projectId);
     } else {
       setBlocks([]);
-      setUnits([]);
     }
   }, [createForm.projectId]);
-
-  // Fetch units when block is selected
-  useEffect(() => {
-    if (createForm.blockId) {
-      fetchUnits(createForm.blockId);
-    } else {
-      setUnits([]);
-    }
-  }, [createForm.blockId]);
 
   const fetchProjects = async () => {
     try {
@@ -135,21 +123,6 @@ export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubPr
       }
     } catch (error) {
       console.error('Error fetching blocks:', error);
-    }
-  };
-
-  const fetchUnits = async (blockId: string) => {
-    try {
-      const response = await fetch(`/api/units?blockId=${blockId}`);
-      const result = await response.json();
-      if (result.success) {
-        setUnits(result.data);
-      } else {
-        setUnits([]);
-      }
-    } catch (error) {
-      console.error('Error fetching units:', error);
-      setUnits([]);
     }
   };
 
@@ -216,7 +189,6 @@ export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubPr
           type: createForm.type,
           projectId: createForm.projectId || undefined,
           blockId: createForm.blockId || undefined,
-          unitId: createForm.unitId || undefined,
         }),
       });
 
@@ -228,7 +200,6 @@ export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubPr
           type: 'PV_VISITE',
           projectId: '',
           blockId: '',
-          unitId: '',
           description: ''
         });
         if (onDocumentsChange) onDocumentsChange();
@@ -500,7 +471,7 @@ export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubPr
               <select
                 id="create-project"
                 value={createForm.projectId}
-                onChange={(e) => setCreateForm({ ...createForm, projectId: e.target.value, blockId: '', unitId: '' })}
+                onChange={(e) => setCreateForm({ ...createForm, projectId: e.target.value, blockId: '' })}
                 className="w-full p-2 border rounded-md bg-background"
               >
                 <option value="">{t('documents.selectProject')}</option>
@@ -514,28 +485,13 @@ export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubPr
               <select
                 id="create-block"
                 value={createForm.blockId}
-                onChange={(e) => setCreateForm({ ...createForm, blockId: e.target.value, unitId: '' })}
+                onChange={(e) => setCreateForm({ ...createForm, blockId: e.target.value })}
                 disabled={!createForm.projectId}
                 className="w-full p-2 border rounded-md bg-background disabled:opacity-50"
               >
                 <option value="">{t('documents.selectBlock')}</option>
                 {blocks.map((block) => (
                   <option key={block.id} value={block.id}>{block.name}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <Label htmlFor="create-unit">{t('documents.selectUnit')}</Label>
-              <select
-                id="create-unit"
-                value={createForm.unitId}
-                onChange={(e) => setCreateForm({ ...createForm, unitId: e.target.value })}
-                disabled={!createForm.blockId}
-                className="w-full p-2 border rounded-md bg-background disabled:opacity-50"
-              >
-                <option value="">{t('documents.selectUnit')}</option>
-                {units.map((unit) => (
-                  <option key={unit.id} value={unit.id}>{unit.name}</option>
                 ))}
               </select>
             </div>
