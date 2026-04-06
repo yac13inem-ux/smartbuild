@@ -58,7 +58,20 @@
     "trackPerFloor": "Suivre la progression par étage",
     "floorDetails": "Détails de l'étage",
     "yes": "Oui",
-    "no": "Non"
+    "no": "Non",
+    "blockTypes": "Types de blocs",
+    "blockTypeR5": "Bloc R+5 (RDC + 5 étages)",
+    "blockTypeR9": "Bloc R+9 (RDC + 9 étages)",
+    "blockTypeR+3": "Bloc R+3 (RDC + 3 étages)",
+    "blockTypeR+4": "Bloc R+4 (RDC + 4 étages)",
+    "blockTypeR+6": "Bloc R+6 (RDC + 6 étages)",
+    "blockTypeR+7": "Bloc R+7 (RDC + 7 étages)",
+    "blockTypeR+8": "Bloc R+8 (RDC + 8 étages)",
+    "blockTypeR+10": "Bloc R+10 (RDC + 10 étages)",
+    "blockTypeCustom": "Type personnalisé",
+    "createBlocks": "Créer les blocs automatiquement",
+    "totalBlocks": "Total des blocs",
+    "blocksSummary": "Résumé des blocs"
   },
   "block": {
     "title": "Blocs",

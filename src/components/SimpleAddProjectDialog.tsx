@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Plus, Minus, Building2, Trash2 } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Plus, Building2, Check } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -17,6 +17,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { Card, CardContent } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -38,6 +39,13 @@ interface BlockData {
   floorsData: FloorData[];
 }
 
+interface BlockType {
+  type: string;
+  label: string;
+  floors: number;
+  count: number;
+}
+
 interface SimpleAddProjectDialogProps {
   onProjectAdded?: () => void;
 }
@@ -52,90 +60,75 @@ export function SimpleAddProjectDialog({ onProjectAdded }: SimpleAddProjectDialo
     description: '',
     location: '',
     totalApartments: '',
-    numberOfBlocks: '',
   });
 
-  const [blocks, setBlocks] = useState<BlockData[]>([]);
+  const [blockTypes, setBlockTypes] = useState<BlockType[]>([
+    { type: 'R+3', label: t('project.blockTypeR+3'), floors: 4, count: 0 },
+    { type: 'R+4', label: t('project.blockTypeR+4'), floors: 5, count: 0 },
+    { type: 'R+5', label: t('project.blockTypeR5'), floors: 6, count: 0 },
+    { type: 'R+6', label: t('project.blockTypeR+6'), floors: 7, count: 0 },
+    { type: 'R+7', label: t('project.blockTypeR+7'), floors: 8, count: 0 },
+    { type: 'R+8', label: t('project.blockTypeR+8'), floors: 9, count: 0 },
+    { type: 'R+9', label: t('project.blockTypeR9'), floors: 10, count: 0 },
+    { type: 'R+10', label: t('project.blockTypeR+10'), floors: 11, count: 0 },
+  ]);
 
-  // Update blocks when numberOfBlocks changes
-  const handleNumberOfBlocksChange = (value: string) => {
-    const numBlocks = parseInt(value) || 0;
-    setProjectData({ ...projectData, numberOfBlocks: value });
+  const [showSummary, setShowSummary] = useState(false);
 
-    setBlocks((prev) => {
-      const newBlocks: BlockData[] = [];
-      for (let i = 0; i < numBlocks; i++) {
-        if (prev[i]) {
-          newBlocks.push(prev[i]);
-        } else {
-          newBlocks.push({
-            id: `block-${i}-${Date.now()}`,
-            name: `${t('project.blocks')} ${i + 1}`,
-            description: '',
-            numberOfFloors: '',
-            floorsData: [],
-          });
-        }
-      }
-      return newBlocks;
-    });
-  };
+  // Calculate total blocks
+  const totalBlocks = useMemo(() => {
+    return blockTypes.reduce((sum, bt) => sum + bt.count, 0);
+  }, [blockTypes]);
 
-  // Update block data
-  const handleBlockChange = (blockIndex: number, field: keyof BlockData, value: string) => {
-    setBlocks((prev) => {
-      const updated = [...prev];
-      updated[blockIndex] = { ...updated[blockIndex], [field]: value };
-      return updated;
-    });
-  };
+  // Generate blocks automatically based on types
+  const generatedBlocks = useMemo(() => {
+    const blocks: BlockData[] = [];
+    let blockCounter = 1;
 
-  // Update floors when numberOfFloors changes for a block
-  const handleBlockFloorsChange = (blockIndex: number, numberOfFloors: string) => {
-    const numFloors = parseInt(numberOfFloors) || 0;
-
-    setBlocks((prev) => {
-      const updated = [...prev];
-      const block = { ...updated[blockIndex] };
-      block.numberOfFloors = numberOfFloors;
-
-      // Update or create floors
-      const newFloors: FloorData[] = [];
-      for (let i = 0; i < numFloors; i++) {
-        newFloors.push(
-          block.floorsData[i] || {
-            floorNumber: i + 1,
+    blockTypes.forEach((blockType) => {
+      for (let i = 0; i < blockType.count; i++) {
+        const floorsData: FloorData[] = [];
+        for (let f = 0; f < blockType.floors; f++) {
+          floorsData.push({
+            floorNumber: f + 1,
             apartments: 0,
             grosOeuvre: 0,
             ces: 0,
             cet: 0,
             concretePourDate: null,
             reinforcementInspectionDate: null,
-          }
-        );
+          });
+        }
+
+        blocks.push({
+          id: `block-${blockType.type}-${i}-${Date.now()}`,
+          name: `${t('project.blocks')} ${blockType.type} #${blockCounter}`,
+          description: `${t('project.blocks')} ${blockType.type}`,
+          numberOfFloors: blockType.floors.toString(),
+          floorsData,
+        });
+        blockCounter++;
       }
-      block.floorsData = newFloors;
-      updated[blockIndex] = block;
+    });
+
+    return blocks;
+  }, [blockTypes, t]);
+
+  const handleBlockTypeChange = (index: number, count: number) => {
+    setBlockTypes((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], count: Math.max(0, count) };
       return updated;
     });
+    setShowSummary(false);
   };
 
-  // Update floor data
-  const handleFloorChange = (
-    blockIndex: number,
-    floorIndex: number,
-    field: keyof FloorData,
-    value: number | string | null
-  ) => {
-    setBlocks((prev) => {
-      const updated = [...prev];
-      const block = { ...updated[blockIndex] };
-      const floors = [...block.floorsData];
-      floors[floorIndex] = { ...floors[floorIndex], [field]: value };
-      block.floorsData = floors;
-      updated[blockIndex] = block;
-      return updated;
-    });
+  const handleGenerateBlocks = () => {
+    if (totalBlocks === 0) {
+      toast.error('يرجى تحديد عدد العمارات على الأقل');
+      return;
+    }
+    setShowSummary(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -146,11 +139,16 @@ export function SimpleAddProjectDialog({ onProjectAdded }: SimpleAddProjectDialo
       return;
     }
 
+    if (totalBlocks === 0) {
+      toast.error('يرجى تحديد عدد العمارات');
+      return;
+    }
+
     // Prepare blocks data
-    const blocksPayload = blocks.map((block) => ({
+    const blocksPayload = generatedBlocks.map((block) => ({
       name: block.name,
       description: block.description,
-      numberOfFloors: block.numberOfFloors ? parseInt(block.numberOfFloors) : null,
+      numberOfFloors: parseInt(block.numberOfFloors),
       floorsData: block.floorsData,
     }));
 
@@ -174,15 +172,15 @@ export function SimpleAddProjectDialog({ onProjectAdded }: SimpleAddProjectDialo
       const result = await response.json();
 
       if (result.success) {
-        toast.success('تم إضافة المشروع بنجاح');
+        toast.success('تم إضافة المشروع بنجاح مع ' + totalBlocks + ' عمارة');
         setProjectData({
           name: '',
           description: '',
           location: '',
           totalApartments: '',
-          numberOfBlocks: '',
         });
-        setBlocks([]);
+        setBlockTypes((prev) => prev.map((bt) => ({ ...bt, count: 0 })));
+        setShowSummary(false);
         setOpen(false);
         onProjectAdded?.();
       } else {
@@ -204,7 +202,7 @@ export function SimpleAddProjectDialog({ onProjectAdded }: SimpleAddProjectDialo
           {t('project.addProject')}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[800px] max-h-[90vh]">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -212,7 +210,7 @@ export function SimpleAddProjectDialog({ onProjectAdded }: SimpleAddProjectDialo
               {t('project.addProject')}
             </DialogTitle>
             <DialogDescription>
-              أدخل معلومات المشروع الجديد والعمارات
+              أدخل معلومات المشروع وسيتم إنشاء العمارات تلقائياً
             </DialogDescription>
           </DialogHeader>
 
@@ -275,231 +273,83 @@ export function SimpleAddProjectDialog({ onProjectAdded }: SimpleAddProjectDialo
 
               <Separator />
 
-              {/* Blocks Section */}
+              {/* Block Types Section */}
               <div className="space-y-4">
-                <div className="flex items-center gap-4">
-                  <h3 className="text-lg font-semibold">{t('project.blocks')}</h3>
-                  <div className="flex-1 max-w-[150px]">
-                    <Input
-                      type="number"
-                      min="0"
-                      placeholder={t('project.numberOfBlocks')}
-                      value={projectData.numberOfBlocks}
-                      onChange={(e) => handleNumberOfBlocksChange(e.target.value)}
-                    />
-                  </div>
+                <h3 className="text-lg font-semibold">{t('project.blockTypes')}</h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {blockTypes.map((blockType, index) => (
+                    <div key={blockType.type} className="flex items-center gap-3 p-3 border rounded-lg">
+                      <div className="flex-1">
+                        <Label htmlFor={`blocktype-${index}`} className="text-sm font-medium">
+                          {blockType.label}
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          {blockType.floors} {t('project.numberOfFloors')}
+                        </p>
+                      </div>
+                      <Input
+                        id={`blocktype-${index}`}
+                        type="number"
+                        min="0"
+                        placeholder="0"
+                        value={blockType.count || ''}
+                        onChange={(e) => handleBlockTypeChange(index, parseInt(e.target.value) || 0)}
+                        className="w-24 h-10"
+                      />
+                    </div>
+                  ))}
                 </div>
 
-                {blocks.map((block, blockIndex) => (
-                  <div key={block.id} className="border rounded-lg p-4 space-y-4 bg-muted/20">
-                    {/* Block Header */}
-                    <div className="flex items-center gap-3">
-                      <Building2 className="h-5 w-5 text-primary" />
-                      <div className="flex-1">
-                        <Label htmlFor={`block-${blockIndex}-name`} className="text-sm font-medium">
-                          {t('project.blockName')}
-                        </Label>
-                        <Input
-                          id={`block-${blockIndex}-name`}
-                          value={block.name}
-                          onChange={(e) =>
-                            handleBlockChange(blockIndex, 'name', e.target.value)
-                          }
-                          className="h-8"
-                        />
-                      </div>
-                      <div className="w-32">
-                        <Label htmlFor={`block-${blockIndex}-floors`} className="text-sm">
-                          {t('project.numberOfFloors')}
-                        </Label>
-                        <Input
-                          id={`block-${blockIndex}-floors`}
-                          type="number"
-                          min="0"
-                          value={block.numberOfFloors}
-                          onChange={(e) =>
-                            handleBlockFloorsChange(blockIndex, e.target.value)
-                          }
-                          className="h-8"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Floors Section */}
-                    {block.numberOfFloors && parseInt(block.numberOfFloors) > 0 && (
-                      <div className="space-y-3 pt-3 border-t">
-                        <Label className="text-sm font-medium">
-                          {t('project.trackPerFloor')} - {block.name}
-                        </Label>
-
-                        {block.floorsData.map((floor, floorIndex) => (
-                          <div
-                            key={floor.floorNumber}
-                            className="p-4 border rounded-lg bg-background space-y-3"
-                          >
-                            {/* Floor Header */}
-                            <div className="flex items-center justify-between">
-                              <h4 className="font-medium text-sm">
-                                {t('project.floorNumber')} {floor.floorNumber}
-                              </h4>
-                            </div>
-
-                            {/* Floor Inputs */}
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                              <div className="space-y-1">
-                                <Label
-                                  htmlFor={`block-${blockIndex}-floor-${floorIndex}-apartments`}
-                                  className="text-xs"
-                                >
-                                  {t('project.apartmentsCount')}
-                                </Label>
-                                <Input
-                                  id={`block-${blockIndex}-floor-${floorIndex}-apartments`}
-                                  type="number"
-                                  min="0"
-                                  value={floor.apartments}
-                                  onChange={(e) =>
-                                    handleFloorChange(
-                                      blockIndex,
-                                      floorIndex,
-                                      'apartments',
-                                      parseInt(e.target.value) || 0
-                                    )
-                                  }
-                                  className="h-8"
-                                />
-                              </div>
-
-                              <div className="space-y-1">
-                                <Label
-                                  htmlFor={`block-${blockIndex}-floor-${floorIndex}-grosOeuvre`}
-                                  className="text-xs"
-                                >
-                                  {t('project.grosOeuvreProgress')} (%)
-                                </Label>
-                                <Input
-                                  id={`block-${blockIndex}-floor-${floorIndex}-grosOeuvre`}
-                                  type="number"
-                                  min="0"
-                                  max="100"
-                                  value={floor.grosOeuvre}
-                                  onChange={(e) =>
-                                    handleFloorChange(
-                                      blockIndex,
-                                      floorIndex,
-                                      'grosOeuvre',
-                                      Math.min(100, Math.max(0, parseInt(e.target.value) || 0))
-                                    )
-                                  }
-                                  className="h-8"
-                                />
-                              </div>
-
-                              <div className="space-y-1">
-                                <Label
-                                  htmlFor={`block-${blockIndex}-floor-${floorIndex}-ces`}
-                                  className="text-xs"
-                                >
-                                  {t('project.cesProgress')} (%)
-                                </Label>
-                                <Input
-                                  id={`block-${blockIndex}-floor-${floorIndex}-ces`}
-                                  type="number"
-                                  min="0"
-                                  max="100"
-                                  value={floor.ces}
-                                  onChange={(e) =>
-                                    handleFloorChange(
-                                      blockIndex,
-                                      floorIndex,
-                                      'ces',
-                                      Math.min(100, Math.max(0, parseInt(e.target.value) || 0))
-                                    )
-                                  }
-                                  className="h-8"
-                                />
-                              </div>
-
-                              <div className="space-y-1">
-                                <Label
-                                  htmlFor={`block-${blockIndex}-floor-${floorIndex}-cet`}
-                                  className="text-xs"
-                                >
-                                  {t('project.cetProgress')} (%)
-                                </Label>
-                                <Input
-                                  id={`block-${blockIndex}-floor-${floorIndex}-cet`}
-                                  type="number"
-                                  min="0"
-                                  max="100"
-                                  value={floor.cet}
-                                  onChange={(e) =>
-                                    handleFloorChange(
-                                      blockIndex,
-                                      floorIndex,
-                                      'cet',
-                                      Math.min(100, Math.max(0, parseInt(e.target.value) || 0))
-                                    )
-                                  }
-                                  className="h-8"
-                                />
-                              </div>
-                            </div>
-
-                            {/* Date Inputs */}
-                            <div className="grid grid-cols-2 gap-3">
-                              <div className="space-y-1">
-                                <Label
-                                  htmlFor={`block-${blockIndex}-floor-${floorIndex}-concrete`}
-                                  className="text-xs"
-                                >
-                                  {t('project.concretePourDate')}
-                                </Label>
-                                <Input
-                                  id={`block-${blockIndex}-floor-${floorIndex}-concrete`}
-                                  type="date"
-                                  value={floor.concretePourDate || ''}
-                                  onChange={(e) =>
-                                    handleFloorChange(
-                                      blockIndex,
-                                      floorIndex,
-                                      'concretePourDate',
-                                      e.target.value || null
-                                    )
-                                  }
-                                  className="h-8"
-                                />
-                              </div>
-
-                              <div className="space-y-1">
-                                <Label
-                                  htmlFor={`block-${blockIndex}-floor-${floorIndex}-reinforcement`}
-                                  className="text-xs"
-                                >
-                                  {t('project.reinforcementInspectionDate')}
-                                </Label>
-                                <Input
-                                  id={`block-${blockIndex}-floor-${floorIndex}-reinforcement`}
-                                  type="date"
-                                  value={floor.reinforcementInspectionDate || ''}
-                                  onChange={(e) =>
-                                    handleFloorChange(
-                                      blockIndex,
-                                      floorIndex,
-                                      'reinforcementInspectionDate',
-                                      e.target.value || null
-                                    )
-                                  }
-                                  className="h-8"
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                  <div>
+                    <p className="font-semibold">{t('project.totalBlocks')}: {totalBlocks}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {blockTypes.filter((bt) => bt.count > 0).length} نوع من العمارات
+                    </p>
                   </div>
-                ))}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleGenerateBlocks}
+                    disabled={totalBlocks === 0}
+                    className="gap-2"
+                  >
+                    <Building2 className="h-4 w-4" />
+                    {t('project.createBlocks')}
+                  </Button>
+                </div>
+
+                {/* Blocks Summary */}
+                {showSummary && generatedBlocks.length > 0 && (
+                  <Card className="bg-primary/5 border-primary/20">
+                    <CardContent className="pt-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Check className="h-5 w-5 text-primary" />
+                        <h4 className="font-semibold text-primary">{t('project.blocksSummary')}</h4>
+                      </div>
+
+                      <ScrollArea className="h-[200px] pr-4">
+                        <div className="space-y-2">
+                          {generatedBlocks.map((block) => (
+                            <div
+                              key={block.id}
+                              className="flex items-center justify-between p-2 bg-background rounded border"
+                            >
+                              <div className="flex items-center gap-2">
+                                <Building2 className="h-4 w-4 text-primary" />
+                                <span className="text-sm font-medium">{block.name}</span>
+                              </div>
+                              <span className="text-sm text-muted-foreground">
+                                {block.numberOfFloors} {t('project.numberOfFloors')}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                    </CardContent>
+                  </Card>
+                )}
               </div>
             </div>
           </ScrollArea>
@@ -513,7 +363,7 @@ export function SimpleAddProjectDialog({ onProjectAdded }: SimpleAddProjectDialo
             >
               {t('common.cancel')}
             </Button>
-            <Button type="submit" disabled={loading || !projectData.name.trim()}>
+            <Button type="submit" disabled={loading || !projectData.name.trim() || totalBlocks === 0}>
               {loading ? t('common.loading') : t('common.save')}
             </Button>
           </DialogFooter>

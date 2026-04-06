@@ -58,7 +58,20 @@
     "trackPerFloor": "Track Progress per Floor",
     "floorDetails": "Floor Details",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "blockTypes": "Block Types",
+    "blockTypeR5": "Block R+5 (Ground + 5 floors)",
+    "blockTypeR9": "Block R+9 (Ground + 9 floors)",
+    "blockTypeR+3": "Block R+3 (Ground + 3 floors)",
+    "blockTypeR+4": "Block R+4 (Ground + 4 floors)",
+    "blockTypeR+6": "Block R+6 (Ground + 6 floors)",
+    "blockTypeR+7": "Block R+7 (Ground + 7 floors)",
+    "blockTypeR+8": "Block R+8 (Ground + 8 floors)",
+    "blockTypeR+10": "Block R+10 (Ground + 10 floors)",
+    "blockTypeCustom": "Custom Type",
+    "createBlocks": "Create Blocks Automatically",
+    "totalBlocks": "Total Blocks",
+    "blocksSummary": "Blocks Summary"
   },
   "block": {
     "title": "Blocks",
