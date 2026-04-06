@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FileText, Calendar, Download, Plus, Eye, Pencil, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,7 @@ interface Document {
   blockName?: string;
   unitName?: string;
   pdfPath?: string;
+  description?: string;
 }
 
 interface DocumentHubProps {
@@ -46,6 +47,41 @@ const documentTypeConfig = {
   },
 };
 
+// Initial mock data
+const initialDocuments: Document[] = [
+  {
+    id: '1',
+    title: 'Weekly Site Visit - Block A',
+    type: 'PV_VISITE',
+    date: new Date(Date.now() - 2 * 60 * 60 * 1000),
+    projectName: 'Residential Complex Alpha',
+    blockName: 'Block A',
+  },
+  {
+    id: '2',
+    title: 'Wall Crack Constat',
+    type: 'PV_CONSTAT',
+    date: new Date(Date.now() - 24 * 60 * 60 * 1000),
+    projectName: 'Residential Complex Alpha',
+    blockName: 'Block A',
+  },
+  {
+    id: '3',
+    title: 'Monthly Progress Report',
+    type: 'RAPPORT_MENSUEL',
+    date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+    projectName: 'Residential Complex Alpha',
+  },
+  {
+    id: '4',
+    title: 'Structural Inspection - Block B',
+    type: 'PV_VISITE',
+    date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+    projectName: 'Residential Complex Alpha',
+    blockName: 'Block B',
+  },
+];
+
 // Helper function to format date consistently
 function formatDate(date: Date): string {
   const d = new Date(date);
@@ -57,47 +93,18 @@ function formatDate(date: Date): string {
 
 export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubProps) {
   const { t } = useLanguage();
+  const [localDocuments, setLocalDocuments] = useState<Document[]>(documents.length > 0 ? documents : initialDocuments);
   const [viewingDoc, setViewingDoc] = useState<Document | null>(null);
   const [editingDoc, setEditingDoc] = useState<Document | null>(null);
   const [deletingDoc, setDeletingDoc] = useState<Document | null>(null);
   const [editForm, setEditForm] = useState({ title: '', description: '' });
 
-  // Mock data
-  const mockDocuments: Document[] = [
-    {
-      id: '1',
-      title: 'Weekly Site Visit - Block A',
-      type: 'PV_VISITE',
-      date: new Date(Date.now() - 2 * 60 * 60 * 1000),
-      projectName: 'Residential Complex Alpha',
-      blockName: 'Block A',
-    },
-    {
-      id: '2',
-      title: 'Wall Crack Constat',
-      type: 'PV_CONSTAT',
-      date: new Date(Date.now() - 24 * 60 * 60 * 1000),
-      projectName: 'Residential Complex Alpha',
-      blockName: 'Block A',
-    },
-    {
-      id: '3',
-      title: 'Monthly Progress Report',
-      type: 'RAPPORT_MENSUEL',
-      date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-      projectName: 'Residential Complex Alpha',
-    },
-    {
-      id: '4',
-      title: 'Structural Inspection - Block B',
-      type: 'PV_VISITE',
-      date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-      projectName: 'Residential Complex Alpha',
-      blockName: 'Block B',
-    },
-  ];
-
-  const displayDocuments = documents.length > 0 ? documents : mockDocuments;
+  // Update local documents when prop changes
+  useEffect(() => {
+    if (documents.length > 0) {
+      setLocalDocuments(documents);
+    }
+  }, [documents]);
 
   const handleView = (doc: Document) => {
     setViewingDoc(doc);
@@ -105,7 +112,7 @@ export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubPr
 
   const handleEdit = (doc: Document) => {
     setEditingDoc(doc);
-    setEditForm({ title: doc.title, description: (doc as any).description || '' });
+    setEditForm({ title: doc.title, description: doc.description || '' });
   };
 
   const handleDelete = (doc: Document) => {
@@ -119,11 +126,8 @@ export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubPr
       // In production, this would call the API to delete the document
       console.log('Deleting document:', deletingDoc.id);
       
-      // Remove from mock data (for demo purposes)
-      const index = mockDocuments.findIndex(d => d.id === deletingDoc.id);
-      if (index > -1) {
-        mockDocuments.splice(index, 1);
-      }
+      // Remove from local state
+      setLocalDocuments(prev => prev.filter(d => d.id !== deletingDoc.id));
       
       setDeletingDoc(null);
       if (onDocumentsChange) onDocumentsChange();
@@ -139,12 +143,14 @@ export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubPr
       // In production, this would call the API to update the document
       console.log('Updating document:', editingDoc.id, editForm);
       
-      // Update mock data (for demo purposes)
-      const doc = mockDocuments.find(d => d.id === editingDoc.id);
-      if (doc) {
-        doc.title = editForm.title;
-        (doc as any).description = editForm.description;
-      }
+      // Update local state
+      setLocalDocuments(prev => 
+        prev.map(doc => 
+          doc.id === editingDoc.id 
+            ? { ...doc, title: editForm.title, description: editForm.description }
+            : doc
+        )
+      );
       
       setEditingDoc(null);
       if (onDocumentsChange) onDocumentsChange();
@@ -167,7 +173,7 @@ export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubPr
       <div className="grid grid-cols-3 gap-3">
         {Object.entries(documentTypeConfig).map(([type, config]) => {
           const Icon = config.icon;
-          const count = displayDocuments.filter((d) => d.type === type).length;
+          const count = localDocuments.filter((d) => d.type === type).length;
 
           return (
             <Card
@@ -191,7 +197,7 @@ export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubPr
       {/* Document List */}
       <div className="space-y-3">
         <h3 className="font-medium">{t('common.recentActivity') || 'Recent'}</h3>
-        {displayDocuments.map((doc) => {
+        {localDocuments.map((doc) => {
           const config = documentTypeConfig[doc.type];
           const Icon = config.icon;
 
@@ -295,10 +301,10 @@ export function DocumentHub({ documents = [], onDocumentsChange }: DocumentHubPr
                   <p className="mt-1">{viewingDoc.unitName}</p>
                 </div>
               )}
-              {(viewingDoc as any).description && (
+              {(viewingDoc.description) && (
                 <div>
                   <Label className="text-sm text-muted-foreground">{t('documents.description') || 'Description'}</Label>
-                  <p className="mt-1">{(viewingDoc as any).description}</p>
+                  <p className="mt-1">{viewingDoc.description}</p>
                 </div>
               )}
               {viewingDoc.pdfPath && (

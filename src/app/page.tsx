@@ -13,6 +13,16 @@ type Tab = 'dashboard' | 'projects' | 'documents' | 'problems' | 'settings';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<Tab>('dashboard');
+  const [documentUpdateKey, setDocumentUpdateKey] = useState(0);
+  const [problemUpdateKey, setProblemUpdateKey] = useState(0);
+
+  const handleDocumentChange = () => {
+    setDocumentUpdateKey(prev => prev + 1);
+  };
+
+  const handleProblemChange = () => {
+    setProblemUpdateKey(prev => prev + 1);
+  };
 
   const renderContent = () => {
     switch (activeTab) {
@@ -21,9 +31,19 @@ export default function Home() {
       case 'projects':
         return <ProjectList />;
       case 'documents':
-        return <DocumentHub />;
+        return (
+          <DocumentHub 
+            key={documentUpdateKey}
+            onDocumentsChange={handleDocumentChange}
+          />
+        );
       case 'problems':
-        return <ProblemList />;
+        return (
+          <ProblemList 
+            key={problemUpdateKey}
+            onProblemsChange={handleProblemChange}
+          />
+        );
       case 'settings':
         return <Settings />;
       default:

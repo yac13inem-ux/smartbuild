@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AlertTriangle, Clock, MapPin, MessageCircle, Filter, Plus, Eye, Pencil, Trash2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -50,6 +50,43 @@ const statusConfig = {
   },
 };
 
+// Initial mock data
+const initialProblems: Problem[] = [
+  {
+    id: '1',
+    description: 'Wall crack detected in R+2 corridor, needs immediate structural assessment',
+    status: 'PENDING',
+    projectName: 'Residential Complex Alpha',
+    blockName: 'Block A',
+    unitName: 'Unit 201',
+    createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
+    images: ['/uploads/image1.jpg', '/uploads/image2.jpg'],
+  },
+  {
+    id: '2',
+    description: 'Electrical panel showing irregular voltage readings',
+    status: 'IN_PROGRESS',
+    projectName: 'Residential Complex Alpha',
+    blockName: 'Block B',
+    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
+  },
+  {
+    id: '3',
+    description: 'Water leakage in basement parking area',
+    status: 'PENDING',
+    projectName: 'Residential Complex Alpha',
+    blockName: 'Block A',
+    createdAt: new Date(Date.now() - 48 * 60 * 60 * 1000),
+  },
+  {
+    id: '4',
+    description: 'HVAC system malfunction in common areas',
+    status: 'RESOLVED',
+    projectName: 'Commercial Tower Beta',
+    createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+  },
+];
+
 // Helper function to format date consistently
 function formatDate(date: Date): string {
   const d = new Date(date);
@@ -61,54 +98,23 @@ function formatDate(date: Date): string {
 
 export function ProblemList({ problems = [], onProblemsChange }: ProblemListProps) {
   const { t } = useLanguage();
+  const [localProblems, setLocalProblems] = useState<Problem[]>(problems.length > 0 ? problems : initialProblems);
   const [filter, setFilter] = useState<'all' | 'PENDING' | 'IN_PROGRESS' | 'RESOLVED'>('all');
   const [viewingProblem, setViewingProblem] = useState<Problem | null>(null);
   const [editingProblem, setEditingProblem] = useState<Problem | null>(null);
   const [deletingProblem, setDeletingProblem] = useState<Problem | null>(null);
   const [editForm, setEditForm] = useState({ description: '', status: 'PENDING' as 'PENDING' | 'IN_PROGRESS' | 'RESOLVED' });
 
-  // Mock data
-  const mockProblems: Problem[] = [
-    {
-      id: '1',
-      description: 'Wall crack detected in R+2 corridor, needs immediate structural assessment',
-      status: 'PENDING',
-      projectName: 'Residential Complex Alpha',
-      blockName: 'Block A',
-      unitName: 'Unit 201',
-      createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
-      images: ['/uploads/image1.jpg', '/uploads/image2.jpg'],
-    },
-    {
-      id: '2',
-      description: 'Electrical panel showing irregular voltage readings',
-      status: 'IN_PROGRESS',
-      projectName: 'Residential Complex Alpha',
-      blockName: 'Block B',
-      createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
-    },
-    {
-      id: '3',
-      description: 'Water leakage in basement parking area',
-      status: 'PENDING',
-      projectName: 'Residential Complex Alpha',
-      blockName: 'Block A',
-      createdAt: new Date(Date.now() - 48 * 60 * 60 * 1000),
-    },
-    {
-      id: '4',
-      description: 'HVAC system malfunction in common areas',
-      status: 'RESOLVED',
-      projectName: 'Commercial Tower Beta',
-      createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-    },
-  ];
-
-  const displayProblems = problems.length > 0 ? problems : mockProblems;
+  // Update local problems when prop changes
+  useEffect(() => {
+    if (problems.length > 0) {
+      setLocalProblems(problems);
+    }
+  }, [problems]);
 
   const filteredProblems = filter === 'all'
-    ? displayProblems
-    : displayProblems.filter((p) => p.status === filter);
+    ? localProblems
+    : localProblems.filter((p) => p.status === filter);
 
   const handleView = (problem: Problem) => {
     setViewingProblem(problem);
@@ -130,11 +136,8 @@ export function ProblemList({ problems = [], onProblemsChange }: ProblemListProp
       // In production, this would call the API to delete the problem
       console.log('Deleting problem:', deletingProblem.id);
       
-      // Remove from mock data (for demo purposes)
-      const index = mockProblems.findIndex(p => p.id === deletingProblem.id);
-      if (index > -1) {
-        mockProblems.splice(index, 1);
-      }
+      // Remove from local state
+      setLocalProblems(prev => prev.filter(p => p.id !== deletingProblem.id));
       
       setDeletingProblem(null);
       if (onProblemsChange) onProblemsChange();
@@ -150,12 +153,14 @@ export function ProblemList({ problems = [], onProblemsChange }: ProblemListProp
       // In production, this would call the API to update the problem
       console.log('Updating problem:', editingProblem.id, editForm);
       
-      // Update mock data (for demo purposes)
-      const problem = mockProblems.find(p => p.id === editingProblem.id);
-      if (problem) {
-        problem.description = editForm.description;
-        problem.status = editForm.status;
-      }
+      // Update local state
+      setLocalProblems(prev => 
+        prev.map(problem => 
+          problem.id === editingProblem.id 
+            ? { ...problem, description: editForm.description, status: editForm.status }
+            : problem
+        )
+      );
       
       setEditingProblem(null);
       if (onProblemsChange) onProblemsChange();
@@ -212,7 +217,7 @@ export function ProblemList({ problems = [], onProblemsChange }: ProblemListProp
       {/* Problem Stats */}
       <div className="grid grid-cols-3 gap-3">
         {Object.entries(statusConfig).map(([status, config]) => {
-          const count = displayProblems.filter((p) => p.status === status).length;
+          const count = localProblems.filter((p) => p.status === status).length;
 
           return (
             <Card key={status} className="hover:shadow-md transition-shadow">
