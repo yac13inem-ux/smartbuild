@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { FileText, Calendar, Download, Plus, Eye, Pencil, Trash2 } from 'lucide-react';
+import { FileText, Calendar, Download, Plus, Eye, Pencil, Trash2, MessageCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -269,6 +269,19 @@ export function DocumentHub({ documents = [], onDocumentsChange, documentUpdateK
     }
   };
 
+  const handleWhatsAppShare = (doc: Document) => {
+    const message = `📄 ${t(documentTypeConfig[doc.type].label)}\n\n` +
+      `📍 ${doc.projectName}${doc.blockName ? ` > ${doc.blockName}` : ''}${doc.unitName ? ` > ${doc.unitName}` : ''}\n\n` +
+      `Title: ${doc.title}\n` +
+      `Date: ${formatDate(doc.date)}\n` +
+      (doc.description ? `Description: ${doc.description}\n\n` : '') +
+      `Please review this document.`;
+
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
   return (
     <div className="space-y-4 pb-20">
       <div className="flex items-center justify-between">
@@ -345,7 +358,17 @@ export function DocumentHub({ documents = [], onDocumentsChange, documentUpdateK
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1">
+                  <div className="flex items-center justify-between mt-3">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 gap-2 mr-2"
+                      onClick={() => handleWhatsAppShare(doc)}
+                    >
+                      <MessageCircle className="h-4 w-4 text-green-500" />
+                      {t('problems.whatsapp') || 'WhatsApp'}
+                    </Button>
+                    <div className="flex gap-1">
                       <Button
                         variant="ghost"
                         size="icon"
