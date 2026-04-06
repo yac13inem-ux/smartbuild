@@ -138,7 +138,14 @@ export function ProjectList() {
           <Button
             size="sm"
             variant="outline"
-            onClick={() => setEditDialogOpen(true)}
+            onClick={() => {
+              console.log('Edit button clicked');
+              console.log('Selected block:', selectedBlock);
+              console.log('Floors data:', floorsData);
+              toast.info(`فتح تعديل العمارة: ${selectedBlock.name}`);
+              setEditDialogOpen(true);
+              console.log('setEditDialogOpen called');
+            }}
           >
             <Edit className="h-4 w-4 mr-1" />
             {t('common.edit')}

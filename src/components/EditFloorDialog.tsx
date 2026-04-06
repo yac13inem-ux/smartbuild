@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -58,6 +58,7 @@ export function EditFloorDialog({
 
   // Create empty floors data if empty when dialog opens
   useEffect(() => {
+    console.log('EditFloorDialog useEffect:', { open, floorsData, numberOfFloors });
     if (open && floorsData.length === 0 && numberOfFloors) {
       const newFloors: FloorData[] = [];
       for (let i = 1; i <= numberOfFloors; i++) {
@@ -73,8 +74,10 @@ export function EditFloorDialog({
           cesCetNotes: '',
         });
       }
+      console.log('Creating new floors:', newFloors);
       setEditFloors(newFloors);
     } else if (open) {
+      console.log('Setting existing floors:', floorsData);
       setEditFloors(floorsData);
     }
   }, [open, floorsData, numberOfFloors]);
@@ -144,14 +147,17 @@ export function EditFloorDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[800px] max-h-[90vh]">
-        <DialogHeader>
-          <DialogTitle>تعديل بيانات الطوابق - {blockName}</DialogTitle>
-          <DialogDescription>
+    <Sheet open={open} onOpenChange={(isOpen) => {
+      console.log('Sheet openChange:', isOpen);
+      onOpenChange(isOpen);
+    }}>
+      <SheetContent className="sm:max-w-[800px] overflow-y-auto" side="right">
+        <SheetHeader>
+          <SheetTitle>تعديل بيانات الطوابق - {blockName}</SheetTitle>
+          <SheetDescription>
             قم بتعديل تفاصيل الطوابق وحقوق التتبع
-          </DialogDescription>
-        </DialogHeader>
+          </SheetDescription>
+        </SheetHeader>
 
         <ScrollArea className="h-[calc(90vh-180px)] px-1">
           {editFloors.length === 0 ? (
@@ -381,15 +387,15 @@ export function EditFloorDialog({
           )}
         </ScrollArea>
 
-        <DialogFooter className="pt-4">
+        <SheetFooter className="pt-4">
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
             {t('common.cancel')}
           </Button>
           <Button type="button" onClick={handleSave} disabled={loading}>
             {loading ? t('common.loading') : t('common.save')}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   );
 }
