@@ -326,5 +326,21 @@
     "timingStatus": "Timing Status",
     "viewTiming": "View Timing",
     "editTiming": "Edit Timing"
+  },
+  "grosOeuvre": {
+    "date": "Date",
+    "time": "Time",
+    "timing": "Timing",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "estimatedDays": "Estimated Duration (days)",
+    "actualDays": "Actual Duration (days)",
+    "progress": "Progress Percentage",
+    "ironReviewDate": "Iron Review Date",
+    "ironReviewTime": "Iron Review Time",
+    "ironReviewDateTime": "Review Date and Time",
+    "concretePourDate": "Concrete Pour Date",
+    "concretePourTime": "Concrete Pour Time",
+    "concretePourDateTime": "Pour Date and Time"
   }
 }

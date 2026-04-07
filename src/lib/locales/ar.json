@@ -326,5 +326,21 @@
     "timingStatus": "حالة التوقييت",
     "viewTiming": "عرض التوقييت",
     "editTiming": "تعديل التوقييت"
+  },
+  "grosOeuvre": {
+    "date": "التاريخ",
+    "time": "الوقت",
+    "timing": "التوقييت",
+    "startDate": "تاريخ البدء",
+    "endDate": "تاريخ الانتهاء",
+    "estimatedDays": "المدة المقدرة (أيام)",
+    "actualDays": "المدة الفعلية (أيام)",
+    "progress": "نسبة الإنجاز",
+    "ironReviewDate": "تاريخ مراجعة الحديد",
+    "ironReviewTime": "وقت مراجعة الحديد",
+    "ironReviewDateTime": "تاريخ ووقت المراجعة",
+    "concretePourDate": "تاريخ الصب",
+    "concretePourTime": "وقت الصب",
+    "concretePourDateTime": "تاريخ ووقت الصب"
   }
 }

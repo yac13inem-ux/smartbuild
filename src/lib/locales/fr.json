@@ -326,5 +326,21 @@
     "timingStatus": "Statut de la planification",
     "viewTiming": "Voir la planification",
     "editTiming": "Modifier la planification"
+  },
+  "grosOeuvre": {
+    "date": "Date",
+    "time": "Heure",
+    "timing": "Planification",
+    "startDate": "Date de début",
+    "endDate": "Date de fin",
+    "estimatedDays": "Durée estimée (jours)",
+    "actualDays": "Durée réelle (jours)",
+    "progress": "Pourcentage d'avancement",
+    "ironReviewDate": "Date d'inspection du ferraillage",
+    "ironReviewTime": "Heure d'inspection du ferraillage",
+    "ironReviewDateTime": "Date et heure d'inspection",
+    "concretePourDate": "Date de coulage",
+    "concretePourTime": "Heure de coulage",
+    "concretePourDateTime": "Date et heure de coulage"
   }
 }

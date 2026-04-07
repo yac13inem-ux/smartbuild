@@ -22,7 +22,9 @@ interface FloorData {
   // Gros Œuvre data
   grosOeuvreProgress: number;
   concretePourDate: string | null;
+  concretePourTime: string | null;
   reinforcementInspectionDate: string | null;
+  reinforcementInspectionTime: string | null;
   grosOeuvreNotes: string;
   // CES & CET data
   cesProgress: number;
@@ -399,44 +401,97 @@ export function ProjectList() {
                               />
                             </div>
                           </div>
-                          <div className="grid grid-cols-2 gap-2">
-                            <div className="space-y-1">
-                              <Label className="text-xs">{t('messages.concretePourDate')}</Label>
-                              <Input
-                                type="date"
-                                value={floor.concretePourDate || ''}
-                                onChange={(e) => {
-                                  const updated = [...floorsData];
-                                  updated[floorIndex] = {
-                                    ...floor,
-                                    concretePourDate: e.target.value || null
-                                  };
-                                  setSelectedBlock({
-                                    ...selectedBlock,
-                                    floorsData: JSON.stringify(updated)
-                                  });
-                                }}
-                                className="h-8 text-sm"
-                              />
+                          {/* Concrete Pour Section */}
+                          <div className="space-y-3 p-4 bg-white dark:bg-gray-800 rounded-lg border">
+                            <Label className="text-sm font-semibold text-muted-foreground block mb-2">
+                              {t('messages.concretePourDate')}
+                            </Label>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-1">
+                                <Label className="text-xs">{t('grosOeuvre.date')}</Label>
+                                <Input
+                                  type="date"
+                                  value={floor.concretePourDate || ''}
+                                  onChange={(e) => {
+                                    const updated = [...floorsData];
+                                    updated[floorIndex] = {
+                                      ...floor,
+                                      concretePourDate: e.target.value || null
+                                    };
+                                    setSelectedBlock({
+                                      ...selectedBlock,
+                                      floorsData: JSON.stringify(updated)
+                                    });
+                                  }}
+                                  className="h-8 text-sm"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-xs">{t('grosOeuvre.time')}</Label>
+                                <Input
+                                  type="time"
+                                  value={floor.concretePourTime || ''}
+                                  onChange={(e) => {
+                                    const updated = [...floorsData];
+                                    updated[floorIndex] = {
+                                      ...floor,
+                                      concretePourTime: e.target.value || null
+                                    };
+                                    setSelectedBlock({
+                                      ...selectedBlock,
+                                      floorsData: JSON.stringify(updated)
+                                    });
+                                  }}
+                                  className="h-8 text-sm"
+                                />
+                              </div>
                             </div>
-                            <div className="space-y-1">
-                              <Label className="text-xs">{t('messages.reinforcementInspectionDate')}</Label>
-                              <Input
-                                type="date"
-                                value={floor.reinforcementInspectionDate || ''}
-                                onChange={(e) => {
-                                  const updated = [...floorsData];
-                                  updated[floorIndex] = {
-                                    ...floor,
-                                    reinforcementInspectionDate: e.target.value || null
-                                  };
-                                  setSelectedBlock({
-                                    ...selectedBlock,
-                                    floorsData: JSON.stringify(updated)
-                                  });
-                                }}
-                                className="h-8 text-sm"
-                              />
+                          </div>
+
+                          {/* Iron Review Section */}
+                          <div className="space-y-3 p-4 bg-white dark:bg-gray-800 rounded-lg border">
+                            <Label className="text-sm font-semibold text-muted-foreground block mb-2">
+                              {t('messages.reinforcementInspectionDate')}
+                            </Label>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-1">
+                                <Label className="text-xs">{t('grosOeuvre.date')}</Label>
+                                <Input
+                                  type="date"
+                                  value={floor.reinforcementInspectionDate || ''}
+                                  onChange={(e) => {
+                                    const updated = [...floorsData];
+                                    updated[floorIndex] = {
+                                      ...floor,
+                                      reinforcementInspectionDate: e.target.value || null
+                                    };
+                                    setSelectedBlock({
+                                      ...selectedBlock,
+                                      floorsData: JSON.stringify(updated)
+                                    });
+                                  }}
+                                  className="h-8 text-sm"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-xs">{t('grosOeuvre.time')}</Label>
+                                <Input
+                                  type="time"
+                                  value={floor.reinforcementInspectionTime || ''}
+                                  onChange={(e) => {
+                                    const updated = [...floorsData];
+                                    updated[floorIndex] = {
+                                      ...floor,
+                                      reinforcementInspectionTime: e.target.value || null
+                                    };
+                                    setSelectedBlock({
+                                      ...selectedBlock,
+                                      floorsData: JSON.stringify(updated)
+                                    });
+                                  }}
+                                  className="h-8 text-sm"
+                                />
+                              </div>
                             </div>
                           </div>
                           <div className="space-y-1">
@@ -494,20 +549,34 @@ export function ProjectList() {
                             </div>
                           </div>
 
-                          {/* Dates */}
+                          {/* Dates with Times */}
                           <div className="grid grid-cols-2 gap-3 text-sm">
-                            <div className="flex items-center gap-2 text-muted-foreground">
-                              <Calendar className="h-4 w-4" />
+                            <div className="flex items-start gap-2 text-muted-foreground">
+                              <Calendar className="h-4 w-4 mt-0.5" />
                               <div>
                                 <p className="text-xs">{t('project.concretePourDate')}</p>
-                                <p className="font-medium">{formatDate(floor.concretePourDate)}</p>
+                                <p className="font-medium">
+                                  {formatDate(floor.concretePourDate)}
+                                  {floor.concretePourTime && (
+                                    <span className="text-xs text-muted-foreground ml-1">
+                                      - {floor.concretePourTime}
+                                    </span>
+                                  )}
+                                </p>
                               </div>
                             </div>
-                            <div className="flex items-center gap-2 text-muted-foreground">
-                              <Calendar className="h-4 w-4" />
+                            <div className="flex items-start gap-2 text-muted-foreground">
+                              <Calendar className="h-4 w-4 mt-0.5" />
                               <div>
                                 <p className="text-xs">{t('project.reinforcementInspection')}</p>
-                                <p className="font-medium">{formatDate(floor.reinforcementInspectionDate)}</p>
+                                <p className="font-medium">
+                                  {formatDate(floor.reinforcementInspectionDate)}
+                                  {floor.reinforcementInspectionTime && (
+                                    <span className="text-xs text-muted-foreground ml-1">
+                                      - {floor.reinforcementInspectionTime}
+                                    </span>
+                                  )}
+                                </p>
                               </div>
                             </div>
                           </div>
