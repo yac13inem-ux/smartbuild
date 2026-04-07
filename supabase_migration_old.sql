@@ -1,4 +1,4 @@
--- BuildTrack Database Migration Script for Supabase (FIXED)
+-- BuildTrack Database Migration Script for Supabase
 -- Run this script in Supabase SQL Editor: https://supabase.com/dashboard/project/fziikvgrnwkqfzfnebjw/sql/new
 
 -- Enable UUID extension if not already enabled
@@ -64,16 +64,8 @@ CREATE TABLE IF NOT EXISTS "Block" (
 );
 
 -- Create foreign key for Block
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_constraint
-        WHERE conname = 'Block_projectId_fkey'
-    ) THEN
-        ALTER TABLE "Block" ADD CONSTRAINT "Block_projectId_fkey"
-        FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-    END IF;
-END $$;
+ALTER TABLE "Block" ADD CONSTRAINT "Block_projectId_fkey"
+FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- Create Units table
 CREATE TABLE IF NOT EXISTS "Unit" (
@@ -92,16 +84,8 @@ CREATE TABLE IF NOT EXISTS "Unit" (
 );
 
 -- Create foreign key for Unit
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_constraint
-        WHERE conname = 'Unit_blockId_fkey'
-    ) THEN
-        ALTER TABLE "Unit" ADD CONSTRAINT "Unit_blockId_fkey"
-        FOREIGN KEY ("blockId") REFERENCES "Block"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-    END IF;
-END $$;
+ALTER TABLE "Unit" ADD CONSTRAINT "Unit_blockId_fkey"
+FOREIGN KEY ("blockId") REFERENCES "Block"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- Create Reports table
 CREATE TABLE IF NOT EXISTS "Report" (
@@ -135,38 +119,14 @@ BEGIN
     END IF;
 END $$;
 
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_constraint
-        WHERE conname = 'Report_projectId_fkey'
-    ) THEN
-        ALTER TABLE "Report" ADD CONSTRAINT "Report_projectId_fkey"
-        FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-    END IF;
-END $$;
+ALTER TABLE "Report" ADD CONSTRAINT "Report_projectId_fkey"
+FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_constraint
-        WHERE conname = 'Report_blockId_fkey'
-    ) THEN
-        ALTER TABLE "Report" ADD CONSTRAINT "Report_blockId_fkey"
-        FOREIGN KEY ("blockId") REFERENCES "Block"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-    END IF;
-END $$;
+ALTER TABLE "Report" ADD CONSTRAINT "Report_blockId_fkey"
+FOREIGN KEY ("blockId") REFERENCES "Block"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_constraint
-        WHERE conname = 'Report_unitId_fkey'
-    ) THEN
-        ALTER TABLE "Report" ADD CONSTRAINT "Report_unitId_fkey"
-        FOREIGN KEY ("unitId") REFERENCES "Unit"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-    END IF;
-END $$;
+ALTER TABLE "Report" ADD CONSTRAINT "Report_unitId_fkey"
+FOREIGN KEY ("unitId") REFERENCES "Unit"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- Create Problems table
 CREATE TABLE IF NOT EXISTS "Problem" (
@@ -185,38 +145,14 @@ CREATE TABLE IF NOT EXISTS "Problem" (
 );
 
 -- Create foreign keys for Problem
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_constraint
-        WHERE conname = 'Problem_projectId_fkey'
-    ) THEN
-        ALTER TABLE "Problem" ADD CONSTRAINT "Problem_projectId_fkey"
-        FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-    END IF;
-END $$;
+ALTER TABLE "Problem" ADD CONSTRAINT "Problem_projectId_fkey"
+FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_constraint
-        WHERE conname = 'Problem_blockId_fkey'
-    ) THEN
-        ALTER TABLE "Problem" ADD CONSTRAINT "Problem_blockId_fkey"
-        FOREIGN KEY ("blockId") REFERENCES "Block"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-    END IF;
-END $$;
+ALTER TABLE "Problem" ADD CONSTRAINT "Problem_blockId_fkey"
+FOREIGN KEY ("blockId") REFERENCES "Block"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_constraint
-        WHERE conname = 'Problem_unitId_fkey'
-    ) THEN
-        ALTER TABLE "Problem" ADD CONSTRAINT "Problem_unitId_fkey"
-        FOREIGN KEY ("unitId") REFERENCES "Unit"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-    END IF;
-END $$;
+ALTER TABLE "Problem" ADD CONSTRAINT "Problem_unitId_fkey"
+FOREIGN KEY ("unitId") REFERENCES "Unit"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 DO $$
 BEGIN
@@ -253,16 +189,8 @@ CREATE TABLE IF NOT EXISTS "GrosOeuvreFloor" (
 );
 
 -- Create foreign key for GrosOeuvreFloor
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_constraint
-        WHERE conname = 'GrosOeuvreFloor_blockId_fkey'
-    ) THEN
-        ALTER TABLE "GrosOeuvreFloor" ADD CONSTRAINT "GrosOeuvreFloor_blockId_fkey"
-        FOREIGN KEY ("blockId") REFERENCES "Block"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-    END IF;
-END $$;
+ALTER TABLE "GrosOeuvreFloor" ADD CONSTRAINT "GrosOeuvreFloor_blockId_fkey"
+FOREIGN KEY ("blockId") REFERENCES "Block"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- Create unique constraint for GrosOeuvreFloor (blockId, floorNumber)
 DO $$
@@ -288,7 +216,7 @@ CREATE INDEX IF NOT EXISTS "Problem_blockId_idx" ON "Problem"("blockId");
 CREATE INDEX IF NOT EXISTS "Problem_unitId_idx" ON "Problem"("unitId");
 CREATE INDEX IF NOT EXISTS "GrosOeuvreFloor_blockId_idx" ON "GrosOeuvreFloor"("blockId");
 
--- Create trigger function to update updatedAt timestamp
+-- Create trigger to update updatedAt timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -296,15 +224,6 @@ BEGIN
     RETURN NEW;
 END;
 $$ language 'plpgsql';
-
--- Drop triggers if they exist (to avoid errors on re-run)
-DROP TRIGGER IF EXISTS update_User_updated_at ON "User";
-DROP TRIGGER IF EXISTS update_Project_updated_at ON "Project";
-DROP TRIGGER IF EXISTS update_Block_updated_at ON "Block";
-DROP TRIGGER IF EXISTS update_Unit_updated_at ON "Unit";
-DROP TRIGGER IF EXISTS update_Report_updated_at ON "Report";
-DROP TRIGGER IF EXISTS update_Problem_updated_at ON "Problem";
-DROP TRIGGER IF EXISTS update_GrosOeuvreFloor_updated_at ON "GrosOeuvreFloor";
 
 -- Create triggers for all tables
 CREATE TRIGGER update_User_updated_at BEFORE UPDATE ON "User" FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
