@@ -93,12 +93,12 @@ export function AddBlockDialog({ projectId, onBlockAdded }: AddBlockDialogProps)
     e.preventDefault();
 
     if (!blockData.name.trim()) {
-      toast.error('اسم العمارة مطلوب');
+      toast.error(t('addBlockDialog.validation.blockNameRequired'));
       return;
     }
 
     if (!blockData.numberOfFloors || parseInt(blockData.numberOfFloors) <= 0) {
-      toast.error('عدد الطوابق مطلوب');
+      toast.error(t('addBlockDialog.validation.numberOfFloorsRequired'));
       return;
     }
 
@@ -143,7 +143,7 @@ export function AddBlockDialog({ projectId, onBlockAdded }: AddBlockDialogProps)
       const result = await response.json();
 
       if (result.success) {
-        toast.success('تم إضافة العمارة بنجاح');
+        toast.success(t('addBlockDialog.success.blockCreated'));
         setBlockData({
           name: '',
           description: '',
@@ -153,11 +153,11 @@ export function AddBlockDialog({ projectId, onBlockAdded }: AddBlockDialogProps)
         setOpen(false);
         onBlockAdded?.();
       } else {
-        toast.error(result.error || 'فشل العملية');
+        toast.error(result.error || 'Operation failed');
       }
     } catch (error) {
       console.error('Error creating block:', error);
-      toast.error('حدث خطأ أثناء الحفظ');
+      toast.error('An error occurred while saving');
     } finally {
       setLoading(false);
     }
@@ -176,10 +176,10 @@ export function AddBlockDialog({ projectId, onBlockAdded }: AddBlockDialogProps)
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Plus className="h-4 w-4" />
-              {t('block.addBlock')}
+              {t('addBlockDialog.title')}
             </DialogTitle>
             <DialogDescription>
-              أدخل معلومات العمارة الجديدة وتفاصيل طوابقها
+              {t('addBlockDialog.configureFloors')}
             </DialogDescription>
           </DialogHeader>
 
@@ -189,11 +189,11 @@ export function AddBlockDialog({ projectId, onBlockAdded }: AddBlockDialogProps)
               <div className="space-y-3">
                 <div className="space-y-2">
                   <Label htmlFor="blockName">
-                    {t('project.blockName')} <span className="text-destructive">*</span>
+                    {t('addBlockDialog.blockName')} <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     id="blockName"
-                    placeholder="مثال: عمارة A"
+                    placeholder={t('addBlockDialog.blockNamePlaceholder')}
                     value={blockData.name}
                     onChange={(e) => setBlockData({ ...blockData, name: e.target.value })}
                     required
@@ -202,13 +202,13 @@ export function AddBlockDialog({ projectId, onBlockAdded }: AddBlockDialogProps)
 
                 <div className="space-y-2">
                   <Label htmlFor="numberOfFloors">
-                    {t('project.numberOfFloors')} <span className="text-destructive">*</span>
+                    {t('addBlockDialog.numberOfFloors')} <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     id="numberOfFloors"
                     type="number"
                     min="1"
-                    placeholder="مثال: 10"
+                    placeholder="10"
                     value={blockData.numberOfFloors}
                     onChange={(e) =>
                       setBlockData({ ...blockData, numberOfFloors: e.target.value })
@@ -218,10 +218,10 @@ export function AddBlockDialog({ projectId, onBlockAdded }: AddBlockDialogProps)
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="blockDescription">{t('project.description')}</Label>
+                  <Label htmlFor="blockDescription">{t('addBlockDialog.description')}</Label>
                   <Textarea
                     id="blockDescription"
-                    placeholder="وصف العمارة..."
+                    placeholder={t('addBlockDialog.descriptionPlaceholder')}
                     value={blockData.description}
                     onChange={(e) =>
                       setBlockData({ ...blockData, description: e.target.value })
@@ -234,15 +234,15 @@ export function AddBlockDialog({ projectId, onBlockAdded }: AddBlockDialogProps)
               {/* Floors Section */}
               {blockData.numberOfFloors && parseInt(blockData.numberOfFloors) > 0 && (
                 <div className="space-y-3 pt-3 border-t">
-                  <Label className="text-sm font-semibold">{t('project.trackPerFloor')}</Label>
+                  <Label className="text-sm font-semibold">{t('addBlockDialog.floorsConfiguration')}</Label>
 
                   <Tabs defaultValue="grosOeuvre" className="w-full">
                     <TabsList className="grid w-full grid-cols-2">
                       <TabsTrigger value="grosOeuvre">
-                        {t('project.grosOeuvreSection')}
+                        {t('addBlockDialog.grosOeuvre')}
                       </TabsTrigger>
                       <TabsTrigger value="cesCet">
-                        {t('project.cesCetSection')}
+                        {t('addBlockDialog.ces')} & {t('addBlockDialog.cet')}
                       </TabsTrigger>
                     </TabsList>
 
@@ -251,7 +251,7 @@ export function AddBlockDialog({ projectId, onBlockAdded }: AddBlockDialogProps)
                       <Card>
                         <CardHeader className="pb-3">
                           <CardTitle className="text-base">
-                            {t('project.grosOeuvreSection')}
+                            {t('project.floorDetailsGrosOeuvre')}
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
@@ -259,7 +259,7 @@ export function AddBlockDialog({ projectId, onBlockAdded }: AddBlockDialogProps)
                             <Card key={floor.floorNumber} className="border-l-4 border-l-primary">
                               <CardContent className="p-4 space-y-3">
                                 <h4 className="font-medium text-sm">
-                                  {t('project.floorNumber')} {floor.floorNumber}
+                                  {t('addBlockDialog.floorNumber')} {floor.floorNumber}
                                 </h4>
 
                                 <div className="grid grid-cols-2 gap-3">
@@ -286,7 +286,7 @@ export function AddBlockDialog({ projectId, onBlockAdded }: AddBlockDialogProps)
 
                                   <div className="space-y-1">
                                     <Label htmlFor={`go-${floorIndex}-apartments`} className="text-xs">
-                                      {t('project.apartmentsCount')}
+                                      {t('addBlockDialog.apartmentsPerFloor')}
                                     </Label>
                                     <Input
                                       id={`go-${floorIndex}-apartments`}
@@ -351,7 +351,7 @@ export function AddBlockDialog({ projectId, onBlockAdded }: AddBlockDialogProps)
                                   </Label>
                                   <Textarea
                                     id={`go-${floorIndex}-notes`}
-                                    placeholder="أضف ملاحظات عن الأشغال الكبرى..."
+                                    placeholder={t('project.grosOeuvreNotes')}
                                     value={floor.grosOeuvreNotes}
                                     onChange={(e) =>
                                       handleFloorChange(floorIndex, 'grosOeuvreNotes', e.target.value)
@@ -372,7 +372,7 @@ export function AddBlockDialog({ projectId, onBlockAdded }: AddBlockDialogProps)
                       <Card>
                         <CardHeader className="pb-3">
                           <CardTitle className="text-base">
-                            {t('project.cesCetSection')}
+                            {t('project.floorDetailsCesCet')}
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
@@ -380,7 +380,7 @@ export function AddBlockDialog({ projectId, onBlockAdded }: AddBlockDialogProps)
                             <Card key={floor.floorNumber} className="border-l-4 border-l-blue-500">
                               <CardContent className="p-4 space-y-3">
                                 <h4 className="font-medium text-sm">
-                                  {t('project.floorNumber')} {floor.floorNumber}
+                                  {t('addBlockDialog.floorNumber')} {floor.floorNumber}
                                 </h4>
 
                                 <div className="grid grid-cols-2 gap-3">
@@ -433,7 +433,7 @@ export function AddBlockDialog({ projectId, onBlockAdded }: AddBlockDialogProps)
                                   </Label>
                                   <Textarea
                                     id={`ces-${floorIndex}-notes`}
-                                    placeholder="أضف ملاحظات عن الأشغال التشطيبية والتقنية..."
+                                    placeholder={t('project.cesCetNotes')}
                                     value={floor.cesCetNotes}
                                     onChange={(e) =>
                                       handleFloorChange(floorIndex, 'cesCetNotes', e.target.value)
@@ -467,7 +467,7 @@ export function AddBlockDialog({ projectId, onBlockAdded }: AddBlockDialogProps)
                 parseInt(blockData.numberOfFloors) <= 0
               }
             >
-              {loading ? t('common.loading') : t('common.save')}
+              {loading ? t('common.loading') : t('addBlockDialog.createBlock')}
             </Button>
           </DialogFooter>
         </form>

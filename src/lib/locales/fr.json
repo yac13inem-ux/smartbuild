@@ -12,7 +12,10 @@
     "confirm": "Confirmer",
     "back": "Retour",
     "next": "Suivant",
-    "submit": "Soumettre"
+    "submit": "Soumettre",
+    "all": "Tout",
+    "yes": "Oui",
+    "no": "Non"
   },
   "nav": {
     "dashboard": "Tableau de bord",
@@ -79,14 +82,18 @@
     "floorDetailsCesCet": "Détails de l'étage - Finitions & Techniques",
     "grosOeuvreNotes": "Notes Gros Œuvre",
     "cesCetNotes": "Notes Finitions & Techniques",
-    "reinforcementInspection": "Inspection du ferraillage"
+    "reinforcementInspection": "Inspection du ferraillage",
+    "deleteProjectConfirm": "Êtes-vous sûr de vouloir supprimer ce projet ? Tous les blocs, unités, problèmes et rapports associés à ce projet seront supprimés. Cette action ne peut pas être annulée."
   },
   "block": {
     "title": "Blocs",
     "addBlock": "Ajouter un bloc",
     "editBlock": "Modifier le bloc",
     "blockName": "Nom du bloc",
-    "selectProject": "Sélectionner un projet"
+    "selectProject": "Sélectionner un projet",
+    "deleteBlockConfirm": "Êtes-vous sûr de vouloir supprimer ce bloc ? Toutes les unités, problèmes et rapports associés à ce bloc seront supprimés. Cette action ne peut pas être annulée.",
+    "viewUnits": "Voir les unités",
+    "trackGrosOeuvre": "Suivre Gros Œuvre"
   },
   "unit": {
     "title": "Unités",
@@ -141,5 +148,78 @@
     "light": "Clair",
     "dark": "Sombre",
     "about": "À propos"
+  },
+  "addBlockDialog": {
+    "title": "Ajouter un nouveau bloc",
+    "blockInfo": "Informations du bloc",
+    "blockName": "Nom du bloc",
+    "blockNamePlaceholder": "ex: Bloc A",
+    "description": "Description",
+    "descriptionPlaceholder": "Description optionnelle du bloc",
+    "numberOfFloors": "Nombre d'étages",
+    "floorsConfiguration": "Configuration des étages",
+    "configureFloors": "Configurer les détails des étages",
+    "floorNumber": "Numéro d'étage",
+    "floorType": "Type d'étage",
+    "groundFloor": "Rez-de-chaussée",
+    "regularFloor": "Étage ordinaire",
+    "apartmentsPerFloor": "Appartements par étage",
+    "totalApartments": "Total des appartements",
+    "progressTracking": "Suivi de la progression",
+    "grosOeuvre": "Gros Œuvre",
+    "ces": "CES",
+    "cet": "CET",
+    "addFloor": "Ajouter un étage",
+    "removeFloor": "Supprimer l'étage",
+    "createBlock": "Créer le bloc",
+    "creating": "Création en cours...",
+    "validation": {
+      "blockNameRequired": "Le nom du bloc est requis",
+      "numberOfFloorsRequired": "Le nombre d'étages est requis",
+      "floorsConfigRequired": "La configuration des étages est requise",
+      "apartmentsCountRequired": "Le nombre d'appartements est requis"
+    },
+    "success": {
+      "blockCreated": "Bloc créé avec succès"
+    }
+  },
+  "floorDetails": {
+    "title": "Détails de l'étage",
+    "floor": "Étage",
+    "apartments": "Appartements",
+    "grosOeuvre": "Gros Œuvre",
+    "ces": "CES",
+    "cet": "CET",
+    "concretePourDate": "Date de coulage",
+    "reinforcementInspectionDate": "Date d'inspection du ferraillage",
+    "notes": "Notes",
+    "progress": "Progression",
+    "completed": "Terminé",
+    "inProgress": "En cours",
+    "notStarted": "Non commencé",
+    "markComplete": "Marquer comme terminé",
+    "viewDetails": "Voir les détails"
+  },
+  "blockWizard": {
+    "title": "Assistant de création de bloc",
+    "step1": "Informations de base",
+    "step2": "Détails des étages",
+    "step3": "Révision et création",
+    "blockInformation": "Informations du bloc",
+    "floorsConfiguration": "Configuration des étages",
+    "reviewAndCreate": "Révision et création",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "finish": "Terminer",
+    "summary": {
+      "blockName": "Nom du bloc",
+      "totalFloors": "Total des étages",
+      "totalApartments": "Total des appartements",
+      "groundFloor": "Rez-de-chaussée",
+      "floors": "Étages ordinaires",
+      "grosOeuvre": "Gros Œuvre",
+      "ces": "CES",
+      "cet": "CET"
+    }
   }
 }

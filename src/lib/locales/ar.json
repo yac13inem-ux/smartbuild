@@ -12,7 +12,10 @@
     "confirm": "تأكيد",
     "back": "رجوع",
     "next": "التالي",
-    "submit": "إرسال"
+    "submit": "إرسال",
+    "all": "الكل",
+    "yes": "نعم",
+    "no": "لا"
   },
   "nav": {
     "dashboard": "لوحة التحكم",
@@ -79,14 +82,18 @@
     "floorDetailsCesCet": "تفاصيل الطابق - التشطيبات والتقنيات",
     "grosOeuvreNotes": "ملاحظات الأشغال الكبرى",
     "cesCetNotes": "ملاحظات التشطيبات والتقنيات",
-    "reinforcementInspection": "فحص التسليح"
+    "reinforcementInspection": "فحص التسليح",
+    "deleteProjectConfirm": "هل أنت متأكد من حذف المشروع؟ سيتم حذف جميع العمارات والوحدات والمشاكل والتقارير المرتبطة بهذا المشروع. هذا الإجراء لا يمكن التراجع عنه."
   },
   "block": {
     "title": "المباني",
     "addBlock": "إضافة مبنى",
     "editBlock": "تعديل المبنى",
     "blockName": "اسم المبنى",
-    "selectProject": "اختر المشروع"
+    "selectProject": "اختر المشروع",
+    "deleteBlockConfirm": "هل أنت متأكد من حذف المبنى؟ سيتم حذف جميع الوحدات والمشاكل والتقارير المرتبطة بهذا المبنى. هذا الإجراء لا يمكن التراجع عنه.",
+    "viewUnits": "عرض الوحدات",
+    "trackGrosOeuvre": "تتبع Gros Œuvre"
   },
   "unit": {
     "title": "الوحدات",
@@ -141,5 +148,78 @@
     "light": "فاتح",
     "dark": "داكن",
     "about": "حول التطبيق"
+  },
+  "addBlockDialog": {
+    "title": "إضافة عمارة جديدة",
+    "blockInfo": "معلومات العمارة",
+    "blockName": "اسم العمارة",
+    "blockNamePlaceholder": "مثال: العمارة A",
+    "description": "الوصف",
+    "descriptionPlaceholder": "وصف اختياري للعمارة",
+    "numberOfFloors": "عدد الطوابق",
+    "floorsConfiguration": "إعدادات الطوابق",
+    "configureFloors": "تكوين تفاصيل الطوابق",
+    "floorNumber": "رقم الطابق",
+    "floorType": "نوع الطابق",
+    "groundFloor": "الطابق الأرضي",
+    "regularFloor": "طابق عادي",
+    "apartmentsPerFloor": "عدد الشقق في الطابق",
+    "totalApartments": "إجمالي الشقق",
+    "progressTracking": "تتبع التقدم",
+    "grosOeuvre": "الأشغال الكبرى",
+    "ces": "الأشغال التشطيبية",
+    "cet": "الأشغال التقنية",
+    "addFloor": "إضافة طابق",
+    "removeFloor": "حذف طابق",
+    "createBlock": "إنشاء العمارة",
+    "creating": "جاري الإنشاء...",
+    "validation": {
+      "blockNameRequired": "اسم العمارة مطلوب",
+      "numberOfFloorsRequired": "عدد الطوابق مطلوب",
+      "floorsConfigRequired": "يجب تكوين تفاصيل الطوابق",
+      "apartmentsCountRequired": "عدد الشقق مطلوب"
+    },
+    "success": {
+      "blockCreated": "تم إنشاء العمارة بنجاح"
+    }
+  },
+  "floorDetails": {
+    "title": "تفاصيل الطابق",
+    "floor": "الطابق",
+    "apartments": "الشقق",
+    "grosOeuvre": "الأشغال الكبرى",
+    "ces": "الأشغال التشطيبية",
+    "cet": "الأشغال التقنية",
+    "concretePourDate": "تاريخ الصب",
+    "reinforcementInspectionDate": "تاريخ فحص التسليح",
+    "notes": "ملاحظات",
+    "progress": "التقدم",
+    "completed": "مكتمل",
+    "inProgress": "جاري العمل",
+    "notStarted": "لم يبدأ",
+    "markComplete": "تحديد كمكتمل",
+    "viewDetails": "عرض التفاصيل"
+  },
+  "blockWizard": {
+    "title": "معالج إنشاء العمارة",
+    "step1": "المعلومات الأساسية",
+    "step2": "تفاصيل الطوابق",
+    "step3": "مراجعة وإنشاء",
+    "blockInformation": "معلومات العمارة",
+    "floorsConfiguration": "تكوين الطوابق",
+    "reviewAndCreate": "مراجعة وإنشاء",
+    "next": "التالي",
+    "previous": "السابق",
+    "finish": "إنهاء",
+    "summary": {
+      "blockName": "اسم العمارة",
+      "totalFloors": "إجمالي الطوابق",
+      "totalApartments": "إجمالي الشقق",
+      "groundFloor": "الطابق الأرضي",
+      "floors": "الطوابق العادية",
+      "grosOeuvre": "الأشغال الكبرى",
+      "ces": "الأشغال التشطيبية",
+      "cet": "الأشغال التقنية"
+    }
   }
 }

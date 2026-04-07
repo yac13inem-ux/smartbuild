@@ -117,7 +117,7 @@ export function BlockActions({ block, onBlockUpdate, onNavigateToUnits, onNaviga
             className="text-destructive focus:text-destructive"
           >
             <Trash2 className="h-4 w-4 mr-2" />
-            حذف المبنى
+            {t('common.delete')} {t('block.title')}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -125,19 +125,19 @@ export function BlockActions({ block, onBlockUpdate, onNavigateToUnits, onNaviga
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+            <AlertDialogTitle>{t('common.confirm')} {t('common.delete')}</AlertDialogTitle>
             <AlertDialogDescription>
-              هل أنت متأكد من حذف المبنى "{block.name}"؟ سيتم حذف جميع الوحدات والمشاكل والتقارير المرتبطة بهذا المبنى. هذا الإجراء لا يمكن التراجع عنه.
+              {t('block.deleteBlockConfirm')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleting}>إلغاء</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleting}>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={deleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {deleting ? 'جاري الحذف...' : 'نعم، احذف المبنى'}
+              {deleting ? t('common.loading') : `${t('common.yes')}, ${t('common.delete')}`}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -49,16 +49,16 @@ export function ProjectActions({ project, onProjectUpdate, onNavigateToBlocks }:
       console.log('📥 Delete response:', result);
 
       if (result.success) {
-        toast.success('تم حذف المشروع بنجاح');
+        toast.success('Project deleted successfully');
         setDeleteDialogOpen(false);
         onProjectUpdate();
       } else {
         console.error('❌ Delete failed:', result);
-        toast.error(result.error || 'فشل حذف المشروع');
+        toast.error(result.error || 'Failed to delete project');
       }
     } catch (error) {
       console.error('❌ Delete error:', error);
-      toast.error('حدث خطأ أثناء الحذف');
+      toast.error('An error occurred while deleting');
     } finally {
       setDeleting(false);
     }
@@ -117,19 +117,19 @@ export function ProjectActions({ project, onProjectUpdate, onNavigateToBlocks }:
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+            <AlertDialogTitle>{t('common.confirm')} {t('common.delete')}</AlertDialogTitle>
             <AlertDialogDescription>
-              هل أنت متأكد من حذف المشروع "{project.name}"؟ سيتم حذف جميع المباني والوحدات والمشاكل والتقارير المرتبطة بهذا المشروع. هذا الإجراء لا يمكن التراجع عنه.
+              {t('project.deleteProjectConfirm')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleting}>إلغاء</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleting}>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={deleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {deleting ? 'جاري الحذف...' : 'نعم، احذف المشروع'}
+              {deleting ? t('common.loading') : `${t('common.yes')}, ${t('common.delete')}`}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

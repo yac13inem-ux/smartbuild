@@ -12,7 +12,10 @@
     "confirm": "Confirm",
     "back": "Back",
     "next": "Next",
-    "submit": "Submit"
+    "submit": "Submit",
+    "all": "All",
+    "yes": "Yes",
+    "no": "No"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -79,14 +82,18 @@
     "floorDetailsCesCet": "Floor Details - Finishing & Technical",
     "grosOeuvreNotes": "Gros Œuvre Notes",
     "cesCetNotes": "Finishing & Technical Notes",
-    "reinforcementInspection": "Reinforcement Inspection"
+    "reinforcementInspection": "Reinforcement Inspection",
+    "deleteProjectConfirm": "Are you sure you want to delete this project? All blocks, units, problems, and reports associated with this project will be deleted. This action cannot be undone."
   },
   "block": {
     "title": "Blocks",
     "addBlock": "Add Block",
     "editBlock": "Edit Block",
     "blockName": "Block Name",
-    "selectProject": "Select Project"
+    "selectProject": "Select Project",
+    "deleteBlockConfirm": "Are you sure you want to delete this block? All units, problems, and reports associated with this block will be deleted. This action cannot be undone.",
+    "viewUnits": "View Units",
+    "trackGrosOeuvre": "Track Gros Œuvre"
   },
   "unit": {
     "title": "Units",
@@ -141,5 +148,78 @@
     "light": "Light",
     "dark": "Dark",
     "about": "About"
+  },
+  "addBlockDialog": {
+    "title": "Add New Block",
+    "blockInfo": "Block Information",
+    "blockName": "Block Name",
+    "blockNamePlaceholder": "e.g., Block A",
+    "description": "Description",
+    "descriptionPlaceholder": "Optional description for the block",
+    "numberOfFloors": "Number of Floors",
+    "floorsConfiguration": "Floors Configuration",
+    "configureFloors": "Configure Floor Details",
+    "floorNumber": "Floor Number",
+    "floorType": "Floor Type",
+    "groundFloor": "Ground Floor",
+    "regularFloor": "Regular Floor",
+    "apartmentsPerFloor": "Apartments per Floor",
+    "totalApartments": "Total Apartments",
+    "progressTracking": "Progress Tracking",
+    "grosOeuvre": "Gros Œuvre",
+    "ces": "CES",
+    "cet": "CET",
+    "addFloor": "Add Floor",
+    "removeFloor": "Remove Floor",
+    "createBlock": "Create Block",
+    "creating": "Creating...",
+    "validation": {
+      "blockNameRequired": "Block name is required",
+      "numberOfFloorsRequired": "Number of floors is required",
+      "floorsConfigRequired": "Floors configuration is required",
+      "apartmentsCountRequired": "Apartments count is required"
+    },
+    "success": {
+      "blockCreated": "Block created successfully"
+    }
+  },
+  "floorDetails": {
+    "title": "Floor Details",
+    "floor": "Floor",
+    "apartments": "Apartments",
+    "grosOeuvre": "Gros Œuvre",
+    "ces": "CES",
+    "cet": "CET",
+    "concretePourDate": "Concrete Pour Date",
+    "reinforcementInspectionDate": "Reinforcement Inspection Date",
+    "notes": "Notes",
+    "progress": "Progress",
+    "completed": "Completed",
+    "inProgress": "In Progress",
+    "notStarted": "Not Started",
+    "markComplete": "Mark as Complete",
+    "viewDetails": "View Details"
+  },
+  "blockWizard": {
+    "title": "Block Creation Wizard",
+    "step1": "Basic Information",
+    "step2": "Floor Details",
+    "step3": "Review & Create",
+    "blockInformation": "Block Information",
+    "floorsConfiguration": "Floors Configuration",
+    "reviewAndCreate": "Review & Create",
+    "next": "Next",
+    "previous": "Previous",
+    "finish": "Finish",
+    "summary": {
+      "blockName": "Block Name",
+      "totalFloors": "Total Floors",
+      "totalApartments": "Total Apartments",
+      "groundFloor": "Ground Floor",
+      "floors": "Regular Floors",
+      "grosOeuvre": "Gros Œuvre",
+      "ces": "CES",
+      "cet": "CET"
+    }
   }
 }
