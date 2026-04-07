@@ -139,7 +139,9 @@ model GrosOeuvreFloor {
   blockId          String
   floorNumber      Int
   ironReviewDate   String?
+  ironReviewTime   String?
   concretePourDate String?
+  concretePourTime String?
   ironApproval     Boolean  @default(false)
   concretePoured   Boolean  @default(false)
   notes            String?

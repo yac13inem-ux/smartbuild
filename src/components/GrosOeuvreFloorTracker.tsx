@@ -22,6 +22,22 @@ function formatDate(date: string | null): string {
   return `${year}/${month}/${day}`;
 }
 
+// Format time for display
+function formatTime(time: string | null): string {
+  if (!time) return '';
+  return time; // Time is already in HH:MM format
+}
+
+// Format date and time together
+function formatDateTime(date: string | null, time: string | null): string {
+  if (!date) return '';
+  const formattedDate = formatDate(date);
+  if (time) {
+    return `${formattedDate} - ${time}`;
+  }
+  return formattedDate;
+}
+
 // Calculate days between two dates
 function calculateDays(startDate: string, endDate: string): number {
   const start = new Date(startDate);
@@ -42,7 +58,9 @@ interface GrosOeuvreFloor {
   blockId: string;
   floorNumber: number;
   ironReviewDate: string | null;
+  ironReviewTime: string | null;
   concretePourDate: string | null;
+  concretePourTime: string | null;
   ironApproval: boolean;
   concretePoured: boolean;
   notes: string | null;
@@ -97,7 +115,9 @@ export function GrosOeuvreFloorTracker({
     setEditData({
       ...floor,
       ironReviewDate: floor.ironReviewDate ? floor.ironReviewDate.split('T')[0] : '',
+      ironReviewTime: floor.ironReviewTime || '',
       concretePourDate: floor.concretePourDate ? floor.concretePourDate.split('T')[0] : '',
+      concretePourTime: floor.concretePourTime || '',
       startDate: floor.startDate ? floor.startDate.split('T')[0] : '',
       endDate: floor.endDate ? floor.endDate.split('T')[0] : '',
     });
@@ -190,14 +210,6 @@ export function GrosOeuvreFloorTracker({
     toast.success(`تم إنشاء ${selectedFloors.length} طابق`);
     setFloorSelectionDialog(false);
     loadFloors();
-  };
-
-  // Get status color for progress
-  const getProgressColor = (progress: number): string => {
-    if (progress >= 100) return 'bg-green-500';
-    if (progress >= 50) return 'bg-blue-500';
-    if (progress > 0) return 'bg-yellow-500';
-    return 'bg-gray-300';
   };
 
   if (loading) {
@@ -340,15 +352,27 @@ export function GrosOeuvreFloorTracker({
                             />
                             <Label>تمت الموافقة</Label>
                           </div>
-                          <div>
-                            <Label>تاريخ المراجعة</Label>
-                            <Input
-                              type="date"
-                              value={editData.ironReviewDate || ''}
-                              onChange={(e) =>
-                                setEditData({ ...editData, ironReviewDate: e.target.value })
-                              }
-                            />
+                          <div className="grid grid-cols-2 gap-2">
+                            <div>
+                              <Label>تاريخ المراجعة</Label>
+                              <Input
+                                type="date"
+                                value={editData.ironReviewDate || ''}
+                                onChange={(e) =>
+                                  setEditData({ ...editData, ironReviewDate: e.target.value })
+                                }
+                              />
+                            </div>
+                            <div>
+                              <Label>وقت المراجعة</Label>
+                              <Input
+                                type="time"
+                                value={editData.ironReviewTime || ''}
+                                onChange={(e) =>
+                                  setEditData({ ...editData, ironReviewTime: e.target.value })
+                                }
+                              />
+                            </div>
                           </div>
                         </div>
 
@@ -363,15 +387,27 @@ export function GrosOeuvreFloorTracker({
                             />
                             <Label>تم الصب</Label>
                           </div>
-                          <div>
-                            <Label>تاريخ الصب</Label>
-                            <Input
-                              type="date"
-                              value={editData.concretePourDate || ''}
-                              onChange={(e) =>
-                                setEditData({ ...editData, concretePourDate: e.target.value })
-                              }
-                            />
+                          <div className="grid grid-cols-2 gap-2">
+                            <div>
+                              <Label>تاريخ الصب</Label>
+                              <Input
+                                type="date"
+                                value={editData.concretePourDate || ''}
+                                onChange={(e) =>
+                                  setEditData({ ...editData, concretePourDate: e.target.value })
+                                }
+                              />
+                            </div>
+                            <div>
+                              <Label>وقت الصب</Label>
+                              <Input
+                                type="time"
+                                value={editData.concretePourTime || ''}
+                                onChange={(e) =>
+                                  setEditData({ ...editData, concretePourTime: e.target.value })
+                                }
+                              />
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -468,13 +504,13 @@ export function GrosOeuvreFloorTracker({
                         <div className="flex items-center gap-2 text-muted-foreground">
                           <Calendar className="h-4 w-4" />
                           {floor.ironReviewDate
-                            ? `تاريخ مراجعة الحديد: ${formatDate(new Date(floor.ironReviewDate))}`
+                            ? `تاريخ مراجعة الحديد: ${formatDateTime(floor.ironReviewDate, floor.ironReviewTime)}`
                             : 'لم يتم تحديد تاريخ مراجعة الحديد'}
                         </div>
                         <div className="flex items-center gap-2 text-muted-foreground">
                           <Calendar className="h-4 w-4" />
                           {floor.concretePourDate
-                            ? `تاريخ الصب: ${formatDate(new Date(floor.concretePourDate))}`
+                            ? `تاريخ الصب: ${formatDateTime(floor.concretePourDate, floor.concretePourTime)}`
                             : 'لم يتم تحديد تاريخ الصب'}
                         </div>
                       </div>
