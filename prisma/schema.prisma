@@ -58,7 +58,7 @@ model Block {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  project  Project  @relation(fields: [projectId], references: [id])
+  project  Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   units    Unit[]
   reports  Report[]
   problems Problem[]
@@ -76,7 +76,7 @@ model Unit {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  block    Block    @relation(fields: [blockId], references: [id])
+  block    Block    @relation(fields: [blockId], references: [id], onDelete: Cascade)
   reports  Report[]
   problems Problem[]
 }
@@ -104,9 +104,9 @@ model Report {
   updatedAt   DateTime   @updatedAt
 
   author   User?    @relation(fields: [createdBy], references: [id])
-  project  Project? @relation(fields: [projectId], references: [id])
-  block    Block?   @relation(fields: [blockId], references: [id])
-  unit     Unit?    @relation(fields: [unitId], references: [id])
+  project  Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  block    Block?   @relation(fields: [blockId], references: [id], onDelete: Cascade)
+  unit     Unit?    @relation(fields: [unitId], references: [id], onDelete: Cascade)
 }
 
 enum ProblemStatus {
@@ -127,8 +127,8 @@ model Problem {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
-  project Project? @relation(fields: [projectId], references: [id])
-  block   Block?   @relation(fields: [blockId], references: [id])
-  unit    Unit?    @relation(fields: [unitId], references: [id])
+  project Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  block   Block?   @relation(fields: [blockId], references: [id], onDelete: Cascade)
+  unit    Unit?    @relation(fields: [unitId], references: [id], onDelete: Cascade)
   author  User?    @relation(fields: [createdBy], references: [id])
 }

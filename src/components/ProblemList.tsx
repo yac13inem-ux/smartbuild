@@ -178,7 +178,8 @@ export function ProblemList({ problems = [], onProblemsChange, problemUpdateKey 
     setDeletingProblem(problem);
   };
 
-  const confirmDelete = async () => {
+  const confirmDelete = async (e: React.MouseEvent) => {
+    e.preventDefault();
     if (!deletingProblem) return;
 
     try {
@@ -192,8 +193,8 @@ export function ProblemList({ problems = [], onProblemsChange, problemUpdateKey 
 
       if (response.ok || result.success) {
         await fetchProblems();
+        setDeletingProblem(null);
       }
-      setDeletingProblem(null);
       if (onProblemsChange) onProblemsChange();
     } catch (error) {
       console.error('Error deleting problem:', error);

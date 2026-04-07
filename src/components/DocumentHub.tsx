@@ -178,7 +178,8 @@ export function DocumentHub({ documents = [], onDocumentsChange, documentUpdateK
     setDeletingDoc(doc);
   };
 
-  const confirmDelete = async () => {
+  const confirmDelete = async (e: React.MouseEvent) => {
+    e.preventDefault();
     if (!deletingDoc) return;
 
     try {
@@ -194,8 +195,8 @@ export function DocumentHub({ documents = [], onDocumentsChange, documentUpdateK
       if (response.ok || result.success) {
         // Refresh the documents list
         await fetchDocuments();
+        setDeletingDoc(null);
       }
-      setDeletingDoc(null);
       if (onDocumentsChange) onDocumentsChange();
     } catch (error) {
       console.error('Error deleting document:', error);

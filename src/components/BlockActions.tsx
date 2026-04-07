@@ -36,7 +36,8 @@ export function BlockActions({ block, onBlockUpdate, onNavigateToUnits, onNaviga
   const [editBlock, setEditBlock] = useState<any>(null);
   const [addUnitOpen, setAddUnitOpen] = useState(false);
 
-  const handleDelete = async () => {
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.preventDefault();
     try {
       setDeleting(true);
       console.log('🗑️ Starting delete for block:', block.id, block.name);

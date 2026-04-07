@@ -35,7 +35,8 @@ export function ProjectActions({ project, onProjectUpdate, onNavigateToBlocks }:
   const [editProject, setEditProject] = useState<any>(null);
   const [addBlockOpen, setAddBlockOpen] = useState(false);
 
-  const handleDelete = async () => {
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.preventDefault();
     try {
       setDeleting(true);
       console.log('🗑️ Starting delete for project:', project.id, project.name);
