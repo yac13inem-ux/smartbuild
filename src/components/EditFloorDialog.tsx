@@ -25,7 +25,9 @@ interface FloorData {
   // Gros Œuvre data
   grosOeuvreProgress: number;
   concretePourDate: string | null;
+  concretePourTime: string | null;
   reinforcementInspectionDate: string | null;
+  reinforcementInspectionTime: string | null;
   grosOeuvreNotes: string;
   // CES & CET data
   cesProgress: number;
@@ -67,7 +69,9 @@ export function EditFloorDialog({
           apartments: 0,
           grosOeuvreProgress: 0,
           concretePourDate: null,
+          concretePourTime: null,
           reinforcementInspectionDate: null,
+          reinforcementInspectionTime: null,
           grosOeuvreNotes: '',
           cesProgress: 0,
           cetProgress: 0,
@@ -252,43 +256,91 @@ export function EditFloorDialog({
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-3">
-                          <div className="space-y-1">
-                            <Label htmlFor={`go-${floorIndex}-concrete`} className="text-xs">
-                              {t('project.concretePourDate')}
-                            </Label>
-                            <Input
-                              id={`go-${floorIndex}-concrete`}
-                              type="date"
-                              value={floor.concretePourDate || ''}
-                              onChange={(e) =>
-                                handleFloorChange(
-                                  floorIndex,
-                                  'concretePourDate',
-                                  e.target.value || null
-                                )
-                              }
-                              className="h-8"
-                            />
+                        <div className="space-y-2">
+                          <Label className="text-xs font-semibold mb-2 block">
+                            {t('grosOeuvreFloorTracker.ironReview')}
+                          </Label>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                              <Label htmlFor={`go-${floorIndex}-reinforcement`} className="text-xs">
+                                {t('grosOeuvreFloorTracker.ironReviewDate')}
+                              </Label>
+                              <Input
+                                id={`go-${floorIndex}-reinforcement`}
+                                type="date"
+                                value={floor.reinforcementInspectionDate || ''}
+                                onChange={(e) =>
+                                  handleFloorChange(
+                                    floorIndex,
+                                    'reinforcementInspectionDate',
+                                    e.target.value || null
+                                  )
+                                }
+                                className="h-8"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <Label htmlFor={`go-${floorIndex}-reinforcement-time`} className="text-xs">
+                                {t('grosOeuvreFloorTracker.ironReviewTime')}
+                              </Label>
+                              <Input
+                                id={`go-${floorIndex}-reinforcement-time`}
+                                type="time"
+                                value={floor.reinforcementInspectionTime || ''}
+                                onChange={(e) =>
+                                  handleFloorChange(
+                                    floorIndex,
+                                    'reinforcementInspectionTime',
+                                    e.target.value || null
+                                  )
+                                }
+                                className="h-8"
+                              />
+                            </div>
                           </div>
+                        </div>
 
-                          <div className="space-y-1">
-                            <Label htmlFor={`go-${floorIndex}-reinforcement`} className="text-xs">
-                              {t('project.reinforcementInspection')}
-                            </Label>
-                            <Input
-                              id={`go-${floorIndex}-reinforcement`}
-                              type="date"
-                              value={floor.reinforcementInspectionDate || ''}
-                              onChange={(e) =>
-                                handleFloorChange(
-                                  floorIndex,
-                                  'reinforcementInspectionDate',
-                                  e.target.value || null
-                                )
-                              }
-                              className="h-8"
-                            />
+                        <div className="space-y-2">
+                          <Label className="text-xs font-semibold mb-2 block">
+                            {t('grosOeuvreFloorTracker.concretePour')}
+                          </Label>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                              <Label htmlFor={`go-${floorIndex}-concrete`} className="text-xs">
+                                {t('grosOeuvreFloorTracker.concretePourDate')}
+                              </Label>
+                              <Input
+                                id={`go-${floorIndex}-concrete`}
+                                type="date"
+                                value={floor.concretePourDate || ''}
+                                onChange={(e) =>
+                                  handleFloorChange(
+                                    floorIndex,
+                                    'concretePourDate',
+                                    e.target.value || null
+                                  )
+                                }
+                                className="h-8"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <Label htmlFor={`go-${floorIndex}-concrete-time`} className="text-xs">
+                                {t('grosOeuvreFloorTracker.concretePourTime')}
+                              </Label>
+                              <Input
+                                id={`go-${floorIndex}-concrete-time`}
+                                type="time"
+                                value={floor.concretePourTime || ''}
+                                onChange={(e) =>
+                                  handleFloorChange(
+                                    floorIndex,
+                                    'concretePourTime',
+                                    e.target.value || null
+                                  )
+                                }
+                                className="h-8"
+                              />
+                            </div>
                           </div>
                         </div>
 
