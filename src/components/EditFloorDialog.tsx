@@ -81,8 +81,22 @@ export function EditFloorDialog({
       console.log('Creating new floors:', newFloors);
       setEditFloors(newFloors);
     } else if (open) {
-      console.log('Setting existing floors:', floorsData);
-      setEditFloors(floorsData);
+      // Ensure existing floors have all required fields, including time fields
+      const normalizedFloors = floorsData.map((floor: any) => ({
+        floorNumber: floor.floorNumber || 0,
+        apartments: floor.apartments || 0,
+        grosOeuvreProgress: floor.grosOeuvreProgress || 0,
+        concretePourDate: floor.concretePourDate || null,
+        concretePourTime: floor.concretePourTime || null,
+        reinforcementInspectionDate: floor.reinforcementInspectionDate || null,
+        reinforcementInspectionTime: floor.reinforcementInspectionTime || null,
+        grosOeuvreNotes: floor.grosOeuvreNotes || '',
+        cesProgress: floor.cesProgress || 0,
+        cetProgress: floor.cetProgress || 0,
+        cesCetNotes: floor.cesCetNotes || '',
+      }));
+      console.log('Setting existing floors (normalized):', normalizedFloors);
+      setEditFloors(normalizedFloors);
     }
   }, [open, floorsData, numberOfFloors]);
 
