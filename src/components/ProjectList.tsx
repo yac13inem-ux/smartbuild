@@ -78,7 +78,7 @@ export function ProjectList() {
       }
     } catch (error) {
       console.error('Error fetching projects:', error);
-      toast.error('فشل تحميل المشاريع');
+      toast.error(t('messages.loadProjectsFailed'));
     } finally {
       setLoading(false);
     }
@@ -101,7 +101,7 @@ export function ProjectList() {
       }
     } catch (error) {
       console.error('Error fetching blocks:', error);
-      toast.error('فشل تحميل العمارات');
+      toast.error(t('messages.loadBlocksFailed'));
     }
   };
 
@@ -169,7 +169,7 @@ export function ProjectList() {
       const result = await response.json();
 
       if (result.success) {
-        toast.success('تم حفظ التعديلات');
+        toast.success(t('messages.saveSuccess'));
         setSelectedBlock({
           ...selectedBlock,
           floorsData: JSON.stringify(updatedFloors),
@@ -180,11 +180,11 @@ export function ProjectList() {
         });
         setEditingFloor(null);
       } else {
-        toast.error('فشل الحفظ');
+        toast.error(t('messages.saveFailed'));
       }
     } catch (error) {
       console.error('Error updating floor:', error);
-      toast.error('حدث خطأ');
+      toast.error(t('messages.errorOccurred'));
     }
   };
 
@@ -199,16 +199,16 @@ export function ProjectList() {
       const result = await response.json();
 
       if (result.success) {
-        toast.success('تم حذف العمارة بنجاح');
+        toast.success(t('messages.deleteBlockSuccess'));
         setBlockToDelete(null);
         setSelectedBlock(null);
         await fetchProjectBlocks(selectedProject.id);
       } else {
-        toast.error('فشل حذف العمارة');
+        toast.error(t('messages.deleteFailed'));
       }
     } catch (error) {
       console.error('Error deleting block:', error);
-      toast.error('حدث خطأ أثناء الحذف');
+      toast.error(t('messages.deleteError'));
     }
   };
 
@@ -223,15 +223,15 @@ export function ProjectList() {
       const result = await response.json();
 
       if (result.success) {
-        toast.success('تم حذف المشروع بنجاح');
+        toast.success(t('messages.deleteProjectSuccess'));
         setProjectToDelete(null);
         await fetchProjects();
       } else {
-        toast.error('فشل حذف المشروع');
+        toast.error(t('messages.deleteFailed'));
       }
     } catch (error) {
       console.error('Error deleting project:', error);
-      toast.error('حدث خطأ أثناء الحذف');
+      toast.error(t('messages.deleteError'));
     }
   };
 
@@ -258,7 +258,7 @@ export function ProjectList() {
                 size="sm"
                 variant="ghost"
                 onClick={() => {
-                  toast.info(`عرض تفاصيل: ${selectedBlock.name}`);
+                  toast.info(`${t('messages.viewDetails')}: ${selectedBlock.name}`);
                 }}
               >
                 <Eye className="h-4 w-4" />
@@ -270,7 +270,7 @@ export function ProjectList() {
                   console.log('Edit button clicked');
                   console.log('Selected block:', selectedBlock);
                   console.log('Floors data:', floorsData);
-                  toast.info(`فتح تعديل العمارة: ${selectedBlock.name}`);
+                  toast.info(`${t('messages.editBlock')}: ${selectedBlock.name}`);
                   setEditDialogOpen(true);
                   console.log('setEditDialogOpen called');
                 }}
@@ -290,15 +290,15 @@ export function ProjectList() {
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+                    <AlertDialogTitle>{t('common.confirm')} {t('common.delete')}</AlertDialogTitle>
                     <AlertDialogDescription>
-                      هل أنت متأكد من حذف العمارة "{blockToDelete?.name}"؟
-                      لا يمكن التراجع عن هذا الإجراء.
+                      {t('messages.deleteBlockConfirm')} "{blockToDelete?.name}"
+                      {t('messages.cannotUndo')}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel onClick={() => setBlockToDelete(null)}>إلغاء</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleDeleteBlock}>حذف</AlertDialogAction>
+                    <AlertDialogCancel onClick={() => setBlockToDelete(null)}>{t('common.cancel')}</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDeleteBlock}>{t('common.delete')}</AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
@@ -348,7 +348,7 @@ export function ProjectList() {
                           </Button>
                           <div className="flex items-center gap-1 text-sm text-muted-foreground">
                             <Home className="h-4 w-4" />
-                            <span>{floor.apartments} {t('project.apartmentsCount')}</span>
+                            <span>{floor.apartments} {t('messages.apartmentsCount')}</span>
                           </div>
                         </div>
                       </div>
@@ -358,7 +358,7 @@ export function ProjectList() {
                         <div className="space-y-3 p-3 bg-muted/50 rounded-lg border">
                           <div className="grid grid-cols-2 gap-2">
                             <div className="space-y-1">
-                              <Label className="text-xs">نسبة التقدم (%)</Label>
+                              <Label className="text-xs">{t('messages.progressPercentage')}</Label>
                               <Input
                                 type="number"
                                 min="0"
@@ -379,7 +379,7 @@ export function ProjectList() {
                               />
                             </div>
                             <div className="space-y-1">
-                              <Label className="text-xs">عدد الشقق</Label>
+                              <Label className="text-xs">{t('messages.apartmentsCount')}</Label>
                               <Input
                                 type="number"
                                 min="0"
@@ -401,7 +401,7 @@ export function ProjectList() {
                           </div>
                           <div className="grid grid-cols-2 gap-2">
                             <div className="space-y-1">
-                              <Label className="text-xs">تاريخ الصب</Label>
+                              <Label className="text-xs">{t('messages.concretePourDate')}</Label>
                               <Input
                                 type="date"
                                 value={floor.concretePourDate || ''}
@@ -420,7 +420,7 @@ export function ProjectList() {
                               />
                             </div>
                             <div className="space-y-1">
-                              <Label className="text-xs">تاريخ فحص التسليح</Label>
+                              <Label className="text-xs">{t('messages.reinforcementInspectionDate')}</Label>
                               <Input
                                 type="date"
                                 value={floor.reinforcementInspectionDate || ''}
@@ -440,7 +440,7 @@ export function ProjectList() {
                             </div>
                           </div>
                           <div className="space-y-1">
-                            <Label className="text-xs">ملاحظات</Label>
+                            <Label className="text-xs">{t('messages.notes')}</Label>
                             <Textarea
                               value={floor.grosOeuvreNotes}
                               onChange={(e) => {
@@ -464,14 +464,14 @@ export function ProjectList() {
                               onClick={() => handleFloorUpdate(floorIndex, floorsData[floorIndex])}
                               className="flex-1"
                             >
-                              حفظ
+                              {t('common.save')}
                             </Button>
                             <Button
                               size="sm"
                               variant="outline"
                               onClick={() => setEditingFloor(null)}
                             >
-                              إلغاء
+                              {t('common.cancel')}
                             </Button>
                           </div>
                         </div>
@@ -550,7 +550,7 @@ export function ProjectList() {
                           </Button>
                           <div className="flex items-center gap-1 text-sm text-muted-foreground">
                             <Home className="h-4 w-4" />
-                            <span>{floor.apartments} {t('project.apartmentsCount')}</span>
+                            <span>{floor.apartments} {t('messages.apartmentsCount')}</span>
                           </div>
                         </div>
                       </div>
@@ -560,7 +560,7 @@ export function ProjectList() {
                         <div className="space-y-3 p-3 bg-muted/50 rounded-lg border">
                           <div className="grid grid-cols-2 gap-2">
                             <div className="space-y-1">
-                              <Label className="text-xs">تقدم CES (%)</Label>
+                              <Label className="text-xs">{t('messages.cesProgress')}</Label>
                               <Input
                                 type="number"
                                 min="0"
@@ -581,7 +581,7 @@ export function ProjectList() {
                               />
                             </div>
                             <div className="space-y-1">
-                              <Label className="text-xs">تقدم CET (%)</Label>
+                              <Label className="text-xs">{t('messages.cetProgress')}</Label>
                               <Input
                                 type="number"
                                 min="0"
@@ -603,7 +603,7 @@ export function ProjectList() {
                             </div>
                           </div>
                           <div className="space-y-1">
-                            <Label className="text-xs">ملاحظات</Label>
+                            <Label className="text-xs">{t('messages.notes')}</Label>
                             <Textarea
                               value={floor.cesCetNotes}
                               onChange={(e) => {
@@ -627,14 +627,14 @@ export function ProjectList() {
                               onClick={() => handleFloorUpdate(floorIndex, floorsData[floorIndex])}
                               className="flex-1"
                             >
-                              حفظ
+                              {t('common.save')}
                             </Button>
                             <Button
                               size="sm"
                               variant="outline"
                               onClick={() => setEditingFloor(null)}
                             >
-                              إلغاء
+                              {t('common.cancel')}
                             </Button>
                           </div>
                         </div>
@@ -699,7 +699,7 @@ export function ProjectList() {
               <CardContent className="p-8 text-center">
                 <Building2 className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
                 <p className="text-muted-foreground">
-                  لا توجد بيانات للطوابق بعد
+                  {t('messages.noFloorsDataYet')}
                 </p>
               </CardContent>
             </Card>
@@ -818,7 +818,7 @@ export function ProjectList() {
             <CardContent className="p-8 text-center">
               <Building2 className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
               <p className="text-muted-foreground mb-4">
-                لا توجد عمارات في هذا المشروع بعد
+                {t('messages.noBlocksYet')}
               </p>
               <AddBlockDialog
                 projectId={selectedProject.id}
@@ -858,7 +858,7 @@ export function ProjectList() {
             </div>
             <h2 className="text-xl font-bold mb-2">{t('project.title')}</h2>
             <p className="text-muted-foreground mb-6">
-              لم يتم إنشاء أي مشروع بعد
+              {t('messages.noProjectsYet')}
             </p>
             <div className="flex justify-center">
               <SimpleAddProjectDialog onProjectAdded={fetchProjects} />
@@ -928,19 +928,19 @@ export function ProjectList() {
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>تأكيد حذف المشروع</AlertDialogTitle>
+                    <AlertDialogTitle>{t('messages.confirmDelete')}</AlertDialogTitle>
                     <AlertDialogDescription>
-                      هل أنت متأكد من حذف المشروع "{projectToDelete?.name}"؟
-                      سيتم حذف جميع العمارات والتقارير والمشاكل المرتبطة بهذا المشروع.
-                      لا يمكن التراجع عن هذا الإجراء.
+                      {t('messages.deleteProjectConfirm')} "{projectToDelete?.name}"
+                      {t('messages.willDeleteAllBlocks')}
+                      {t('messages.cannotUndo')}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel onClick={() => setProjectToDelete(null)}>
-                      إلغاء
+                      {t('common.cancel')}
                     </AlertDialogCancel>
                     <AlertDialogAction onClick={handleDeleteProject} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                      حذف
+                      {t('common.delete')}
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>

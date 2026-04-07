@@ -103,7 +103,7 @@ export function EditFloorDialog({
 
       // Validate that we have floors data
       if (!editFloors || editFloors.length === 0) {
-        toast.error('لا توجد بيانات للطوابق للحفظ');
+        toast.error(t('messages.noFloorsData'));
         setLoading(false);
         return;
       }
@@ -146,15 +146,15 @@ export function EditFloorDialog({
       console.log('Response result:', result);
 
       if (result.success) {
-        toast.success('تم حفظ التغييرات بنجاح');
+        toast.success(t('messages.saveChangesSuccess'));
         onSave?.(editFloors);
         onOpenChange(false);
       } else {
-        toast.error(result.error || 'فشل حفظ التغييرات');
+        toast.error(result.error || t('messages.saveChangesFailed'));
       }
     } catch (error) {
       console.error('Error updating floors:', error);
-      toast.error('حدث خطأ أثناء الحفظ');
+      toast.error(t('messages.errorOccurred'));
     } finally {
       setLoading(false);
     }
@@ -167,9 +167,9 @@ export function EditFloorDialog({
     }}>
       <SheetContent className="sm:max-w-[800px] overflow-y-auto" side="right">
         <SheetHeader>
-          <SheetTitle>تعديل بيانات الطوابق - {blockName}</SheetTitle>
+          <SheetTitle>{t('messages.editFloorsData')} - {blockName}</SheetTitle>
           <SheetDescription>
-            قم بتعديل تفاصيل الطوابق وحقوق التتبع
+            {t('messages.editFloorsDescription')}
           </SheetDescription>
         </SheetHeader>
 
@@ -178,9 +178,7 @@ export function EditFloorDialog({
             <Card>
               <CardContent className="p-8 text-center">
                 <p className="text-muted-foreground">
-                  لم يتم تحديد عدد الطوابق لهذه العمارة.
-                  <br />
-                  الرجاء إنشاء عمارة جديدة مع عدد الطوابق المحدد.
+                  {t('messages.noFloorsCount')}
                 </p>
               </CardContent>
             </Card>
@@ -300,7 +298,7 @@ export function EditFloorDialog({
                           </Label>
                           <Textarea
                             id={`go-${floorIndex}-notes`}
-                            placeholder="أضف ملاحظات عن الأشغال الكبرى..."
+                            placeholder={t('messages.addGrosOeuvreNotes')}
                             value={floor.grosOeuvreNotes}
                             onChange={(e) =>
                               handleFloorChange(floorIndex, 'grosOeuvreNotes', e.target.value)
@@ -382,7 +380,7 @@ export function EditFloorDialog({
                           </Label>
                           <Textarea
                             id={`ces-${floorIndex}-notes`}
-                            placeholder="أضف ملاحظات عن الأشغال التشطيبية والتقنية..."
+                            placeholder={t('messages.addCesCetNotes')}
                             value={floor.cesCetNotes}
                             onChange={(e) =>
                               handleFloorChange(floorIndex, 'cesCetNotes', e.target.value)
