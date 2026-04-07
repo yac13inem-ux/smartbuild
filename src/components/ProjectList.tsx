@@ -116,7 +116,21 @@ export function ProjectList() {
   const parseFloorsData = (floorsDataString: string | null): FloorData[] => {
     if (!floorsDataString) return [];
     try {
-      return JSON.parse(floorsDataString);
+      const parsed = JSON.parse(floorsDataString);
+      // Ensure each floor has all required fields, including time fields
+      return parsed.map((floor: any) => ({
+        floorNumber: floor.floorNumber || 0,
+        apartments: floor.apartments || 0,
+        grosOeuvreProgress: floor.grosOeuvreProgress || 0,
+        concretePourDate: floor.concretePourDate || null,
+        concretePourTime: floor.concretePourTime || null, // NEW
+        reinforcementInspectionDate: floor.reinforcementInspectionDate || null,
+        reinforcementInspectionTime: floor.reinforcementInspectionTime || null, // NEW
+        grosOeuvreNotes: floor.grosOeuvreNotes || '',
+        cesProgress: floor.cesProgress || 0,
+        cetProgress: floor.cetProgress || 0,
+        cesCetNotes: floor.cesCetNotes || '',
+      }));
     } catch {
       return [];
     }
