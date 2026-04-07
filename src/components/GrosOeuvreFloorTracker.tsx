@@ -339,8 +339,9 @@ export function GrosOeuvreFloorTracker({
 
                       {/* Work Status Section */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-3">
-                          <h5 className="font-medium text-sm text-muted-foreground">
+                        <div className="space-y-4">
+                          <h5 className="font-medium text-sm text-muted-foreground flex items-center gap-2">
+                            <Calendar className="h-4 w-4" />
                             مراجعة الحديد
                           </h5>
                           <div className="flex items-center gap-3">
@@ -350,36 +351,44 @@ export function GrosOeuvreFloorTracker({
                                 setEditData({ ...editData, ironApproval: checked })
                               }
                             />
-                            <Label>تمت الموافقة</Label>
+                            <Label className="font-medium">تمت الموافقة على الحديد</Label>
                           </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div>
-                              <Label>تاريخ المراجعة</Label>
-                              <Input
-                                type="date"
-                                value={editData.ironReviewDate || ''}
-                                onChange={(e) =>
-                                  setEditData({ ...editData, ironReviewDate: e.target.value })
-                                }
-                                className="w-full"
-                              />
-                            </div>
-                            <div>
-                              <Label>وقت المراجعة</Label>
-                              <Input
-                                type="time"
-                                value={editData.ironReviewTime || ''}
-                                onChange={(e) =>
-                                  setEditData({ ...editData, ironReviewTime: e.target.value })
-                                }
-                                className="w-full"
-                              />
+                          <div className="space-y-3 p-4 bg-white dark:bg-gray-800 rounded-lg border">
+                            <Label className="text-sm font-semibold text-muted-foreground block mb-2">
+                              تاريخ ووقت المراجعة
+                            </Label>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <Label className="text-sm">التاريخ</Label>
+                                <Input
+                                  type="date"
+                                  value={editData.ironReviewDate || ''}
+                                  onChange={(e) =>
+                                    setEditData({ ...editData, ironReviewDate: e.target.value })
+                                  }
+                                  className="w-full mt-1"
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-sm">الوقت</Label>
+                                <Input
+                                  type="time"
+                                  value={editData.ironReviewTime || ''}
+                                  onChange={(e) =>
+                                    setEditData({ ...editData, ironReviewTime: e.target.value })
+                                  }
+                                  className="w-full mt-1"
+                                />
+                              </div>
                             </div>
                           </div>
                         </div>
 
-                        <div className="space-y-3">
-                          <h5 className="font-medium text-sm text-muted-foreground">الصب</h5>
+                        <div className="space-y-4">
+                          <h5 className="font-medium text-sm text-muted-foreground flex items-center gap-2">
+                            <Clock className="h-4 w-4" />
+                            صب الخرسانة
+                          </h5>
                           <div className="flex items-center gap-3">
                             <Switch
                               checked={editData.concretePoured || false}
@@ -387,30 +396,35 @@ export function GrosOeuvreFloorTracker({
                                 setEditData({ ...editData, concretePoured: checked })
                               }
                             />
-                            <Label>تم الصب</Label>
+                            <Label className="font-medium">تم الصب</Label>
                           </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div>
-                              <Label>تاريخ الصب</Label>
-                              <Input
-                                type="date"
-                                value={editData.concretePourDate || ''}
-                                onChange={(e) =>
-                                  setEditData({ ...editData, concretePourDate: e.target.value })
-                                }
-                                className="w-full"
-                              />
-                            </div>
-                            <div>
-                              <Label>وقت الصب</Label>
-                              <Input
-                                type="time"
-                                value={editData.concretePourTime || ''}
-                                onChange={(e) =>
-                                  setEditData({ ...editData, concretePourTime: e.target.value })
-                                }
-                                className="w-full"
-                              />
+                          <div className="space-y-3 p-4 bg-white dark:bg-gray-800 rounded-lg border">
+                            <Label className="text-sm font-semibold text-muted-foreground block mb-2">
+                              تاريخ ووقت الصب
+                            </Label>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <Label className="text-sm">التاريخ</Label>
+                                <Input
+                                  type="date"
+                                  value={editData.concretePourDate || ''}
+                                  onChange={(e) =>
+                                    setEditData({ ...editData, concretePourDate: e.target.value })
+                                  }
+                                  className="w-full mt-1"
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-sm">الوقت</Label>
+                                <Input
+                                  type="time"
+                                  value={editData.concretePourTime || ''}
+                                  onChange={(e) =>
+                                    setEditData({ ...editData, concretePourTime: e.target.value })
+                                  }
+                                  className="w-full mt-1"
+                                />
+                              </div>
                             </div>
                           </div>
                         </div>
