@@ -50,18 +50,19 @@ model Block {
   description String?
   projectId   String
   numberOfFloors Int?
-  floorsData  String?  // JSON: [{ "floorNumber": 1, "apartments": 4, "grosOeuvre": 0, "ces": 0, "cet": 0, "concretePourDate": null, "reinforcementInspectionDate": null }, ...]
-  grosOeuvreProgress Int @default(0) // 0-100, calculated from floors
-  cesProgress      Int     @default(0) // 0-100, calculated from floors
-  cetProgress      Int     @default(0) // 0-100, calculated from floors
-  globalProgress   Int     @default(0) // 0-100, calculated
+  floorsData  String?
+  grosOeuvreProgress Int @default(0)
+  cesProgress      Int     @default(0)
+  cetProgress      Int     @default(0)
+  globalProgress   Int     @default(0)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  project  Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project  Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
   units    Unit[]
   reports  Report[]
   problems Problem[]
+  grosOeuvreFloors GrosOeuvreFloor[]
 }
 
 model Unit {
@@ -131,4 +132,29 @@ model Problem {
   block   Block?   @relation(fields: [blockId], references: [id], onDelete: Cascade)
   unit    Unit?    @relation(fields: [unitId], references: [id], onDelete: Cascade)
   author  User?    @relation(fields: [createdBy], references: [id])
+}
+
+model GrosOeuvreFloor {
+  id               String   @id @default(cuid())
+  blockId          String
+  floorNumber      Int
+  ironReviewDate   String?
+  concretePourDate String?
+  ironApproval     Boolean  @default(false)
+  concretePoured   Boolean  @default(false)
+  notes            String?
+
+  // Timing fields
+  startDate        String?  // Start date of floor work
+  endDate          String?  // End date of floor work
+  estimatedDays    Int?     // Estimated duration in days
+  actualDays       Int?     // Actual duration in days (calculated)
+  progress         Int      @default(0) // Overall progress 0-100
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  block            Block    @relation(fields: [blockId], references: [id], onDelete: Cascade)
+
+  @@unique([blockId, floorNumber])
 }

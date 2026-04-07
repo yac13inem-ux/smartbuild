@@ -43,6 +43,12 @@ export async function POST(request: NextRequest) {
       ironApproval,
       concretePoured,
       notes,
+      // Timing fields
+      startDate,
+      endDate,
+      estimatedDays,
+      actualDays,
+      progress,
     } = body;
 
     if (!blockId || !floorNumber) {
@@ -62,16 +68,31 @@ export async function POST(request: NextRequest) {
 
     let floor;
 
+    // Calculate actual days if both dates are provided
+    let calculatedActualDays = actualDays;
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      const diffTime = Math.abs(end.getTime() - start.getTime());
+      calculatedActualDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    }
+
     if (existingFloor) {
       // Update existing floor
       floor = await db.grosOeuvreFloor.update({
         where: { id: existingFloor.id },
         data: {
-          ...(ironReviewDate && { ironReviewDate: new Date(ironReviewDate) }),
-          ...(concretePourDate && { concretePourDate: new Date(concretePourDate) }),
+          ...(ironReviewDate && { ironReviewDate: new Date(ironReviewDate).toISOString() }),
+          ...(concretePourDate && { concretePourDate: new Date(concretePourDate).toISOString() }),
           ...(ironApproval !== undefined && { ironApproval }),
           ...(concretePoured !== undefined && { concretePoured }),
           ...(notes !== undefined && { notes }),
+          // Timing fields
+          ...(startDate && { startDate: new Date(startDate).toISOString() }),
+          ...(endDate && { endDate: new Date(endDate).toISOString() }),
+          ...(estimatedDays !== undefined && { estimatedDays }),
+          ...(calculatedActualDays !== undefined && { actualDays: calculatedActualDays }),
+          ...(progress !== undefined && { progress }),
           updatedAt: new Date(),
         },
       });
@@ -81,11 +102,17 @@ export async function POST(request: NextRequest) {
         data: {
           blockId,
           floorNumber,
-          ...(ironReviewDate && { ironReviewDate: new Date(ironReviewDate) }),
-          ...(concretePourDate && { concretePourDate: new Date(concretePourDate) }),
+          ...(ironReviewDate && { ironReviewDate: new Date(ironReviewDate).toISOString() }),
+          ...(concretePourDate && { concretePourDate: new Date(concretePourDate).toISOString() }),
           ironApproval: ironApproval || false,
           concretePoured: concretePoured || false,
           notes,
+          // Timing fields
+          ...(startDate && { startDate: new Date(startDate).toISOString() }),
+          ...(endDate && { endDate: new Date(endDate).toISOString() }),
+          estimatedDays,
+          actualDays: calculatedActualDays,
+          progress: progress || 0,
         },
       });
     }
