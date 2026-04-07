@@ -420,9 +420,9 @@ export function ProjectList() {
                             <Label className="text-sm font-semibold text-muted-foreground block mb-2">
                               {t('messages.concretePourDate')}
                             </Label>
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-3">
                               <div className="space-y-1">
-                                <Label className="text-xs">{t('grosOeuvre.date')}</Label>
+                                <Label className="text-xs font-medium">📅 {t('grosOeuvre.date')}</Label>
                                 <Input
                                   type="date"
                                   value={floor.concretePourDate || ''}
@@ -437,11 +437,11 @@ export function ProjectList() {
                                       floorsData: JSON.stringify(updated)
                                     });
                                   }}
-                                  className="h-8 text-sm"
+                                  className="h-10 text-sm"
                                 />
                               </div>
                               <div className="space-y-1">
-                                <Label className="text-xs">{t('grosOeuvre.time')}</Label>
+                                <Label className="text-xs font-medium">⏰ {t('grosOeuvre.time')}</Label>
                                 <Input
                                   type="time"
                                   value={floor.concretePourTime || ''}
@@ -456,7 +456,7 @@ export function ProjectList() {
                                       floorsData: JSON.stringify(updated)
                                     });
                                   }}
-                                  className="h-8 text-sm"
+                                  className="h-10 text-sm"
                                 />
                               </div>
                             </div>
@@ -467,9 +467,9 @@ export function ProjectList() {
                             <Label className="text-sm font-semibold text-muted-foreground block mb-2">
                               {t('messages.reinforcementInspectionDate')}
                             </Label>
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-3">
                               <div className="space-y-1">
-                                <Label className="text-xs">{t('grosOeuvre.date')}</Label>
+                                <Label className="text-xs font-medium">📅 {t('grosOeuvre.date')}</Label>
                                 <Input
                                   type="date"
                                   value={floor.reinforcementInspectionDate || ''}
@@ -484,11 +484,11 @@ export function ProjectList() {
                                       floorsData: JSON.stringify(updated)
                                     });
                                   }}
-                                  className="h-8 text-sm"
+                                  className="h-10 text-sm"
                                 />
                               </div>
                               <div className="space-y-1">
-                                <Label className="text-xs">{t('grosOeuvre.time')}</Label>
+                                <Label className="text-xs font-medium">⏰ {t('grosOeuvre.time')}</Label>
                                 <Input
                                   type="time"
                                   value={floor.reinforcementInspectionTime || ''}
@@ -503,7 +503,7 @@ export function ProjectList() {
                                       floorsData: JSON.stringify(updated)
                                     });
                                   }}
-                                  className="h-8 text-sm"
+                                  className="h-10 text-sm"
                                 />
                               </div>
                             </div>

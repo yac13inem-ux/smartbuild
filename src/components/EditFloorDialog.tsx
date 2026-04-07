@@ -274,10 +274,10 @@ export function EditFloorDialog({
                           <Label className="text-xs font-semibold mb-2 block">
                             {t('grosOeuvreFloorTracker.ironReview')}
                           </Label>
-                          <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-3">
                             <div className="space-y-1">
-                              <Label htmlFor={`go-${floorIndex}-reinforcement`} className="text-xs">
-                                {t('grosOeuvreFloorTracker.ironReviewDate')}
+                              <Label htmlFor={`go-${floorIndex}-reinforcement`} className="text-xs font-medium">
+                                📅 {t('grosOeuvreFloorTracker.ironReviewDate')}
                               </Label>
                               <Input
                                 id={`go-${floorIndex}-reinforcement`}
@@ -290,12 +290,12 @@ export function EditFloorDialog({
                                     e.target.value || null
                                   )
                                 }
-                                className="h-8"
+                                className="h-10"
                               />
                             </div>
                             <div className="space-y-1">
-                              <Label htmlFor={`go-${floorIndex}-reinforcement-time`} className="text-xs">
-                                {t('grosOeuvreFloorTracker.ironReviewTime')}
+                              <Label htmlFor={`go-${floorIndex}-reinforcement-time`} className="text-xs font-medium">
+                                ⏰ {t('grosOeuvreFloorTracker.ironReviewTime')}
                               </Label>
                               <Input
                                 id={`go-${floorIndex}-reinforcement-time`}
@@ -308,7 +308,7 @@ export function EditFloorDialog({
                                     e.target.value || null
                                   )
                                 }
-                                className="h-8"
+                                className="h-10"
                               />
                             </div>
                           </div>
@@ -318,10 +318,10 @@ export function EditFloorDialog({
                           <Label className="text-xs font-semibold mb-2 block">
                             {t('grosOeuvreFloorTracker.concretePour')}
                           </Label>
-                          <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-3">
                             <div className="space-y-1">
-                              <Label htmlFor={`go-${floorIndex}-concrete`} className="text-xs">
-                                {t('grosOeuvreFloorTracker.concretePourDate')}
+                              <Label htmlFor={`go-${floorIndex}-concrete`} className="text-xs font-medium">
+                                📅 {t('grosOeuvreFloorTracker.concretePourDate')}
                               </Label>
                               <Input
                                 id={`go-${floorIndex}-concrete`}
@@ -334,12 +334,12 @@ export function EditFloorDialog({
                                     e.target.value || null
                                   )
                                 }
-                                className="h-8"
+                                className="h-10"
                               />
                             </div>
                             <div className="space-y-1">
-                              <Label htmlFor={`go-${floorIndex}-concrete-time`} className="text-xs">
-                                {t('grosOeuvreFloorTracker.concretePourTime')}
+                              <Label htmlFor={`go-${floorIndex}-concrete-time`} className="text-xs font-medium">
+                                ⏰ {t('grosOeuvreFloorTracker.concretePourTime')}
                               </Label>
                               <Input
                                 id={`go-${floorIndex}-concrete-time`}
@@ -352,7 +352,7 @@ export function EditFloorDialog({
                                     e.target.value || null
                                   )
                                 }
-                                className="h-8"
+                                className="h-10"
                               />
                             </div>
                           </div>
