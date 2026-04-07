@@ -352,7 +352,7 @@ export function GrosOeuvreFloorTracker({
                             />
                             <Label>تمت الموافقة</Label>
                           </div>
-                          <div className="grid grid-cols-2 gap-2">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             <div>
                               <Label>تاريخ المراجعة</Label>
                               <Input
@@ -361,6 +361,7 @@ export function GrosOeuvreFloorTracker({
                                 onChange={(e) =>
                                   setEditData({ ...editData, ironReviewDate: e.target.value })
                                 }
+                                className="w-full"
                               />
                             </div>
                             <div>
@@ -371,6 +372,7 @@ export function GrosOeuvreFloorTracker({
                                 onChange={(e) =>
                                   setEditData({ ...editData, ironReviewTime: e.target.value })
                                 }
+                                className="w-full"
                               />
                             </div>
                           </div>
@@ -387,7 +389,7 @@ export function GrosOeuvreFloorTracker({
                             />
                             <Label>تم الصب</Label>
                           </div>
-                          <div className="grid grid-cols-2 gap-2">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             <div>
                               <Label>تاريخ الصب</Label>
                               <Input
@@ -396,6 +398,7 @@ export function GrosOeuvreFloorTracker({
                                 onChange={(e) =>
                                   setEditData({ ...editData, concretePourDate: e.target.value })
                                 }
+                                className="w-full"
                               />
                             </div>
                             <div>
@@ -406,6 +409,7 @@ export function GrosOeuvreFloorTracker({
                                 onChange={(e) =>
                                   setEditData({ ...editData, concretePourTime: e.target.value })
                                 }
+                                className="w-full"
                               />
                             </div>
                           </div>
