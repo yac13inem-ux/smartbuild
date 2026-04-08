@@ -1,4 +1,4 @@
-# BuildTrack - Construction Project Management System
+# SmartBuild - نظام إدارة المشاريع الإنشائية الشامل
 
 ## 📋 نظرة عامة
 نظام إدارة المشاريع الإنشائية الشامل مع دعم متعدد اللغات (العربية، الفرنسية، الإنجليزية) وتتبع مفصل للتقدم على مستوى المشاريع والعمارات والطوابق.
@@ -31,11 +31,19 @@
 ## 🚀 التطبيق المباشر
 
 **التطبيق منشور ومتاح على:**
-🌐 [https://buildtrack-omega.vercel.app](https://buildtrack-omega.vercel.app)
+🌐 GitHub Repository: [yac13inem-ux/smartbuild](https://github.com/yac13inem-ux/smartbuild)
+
+**قم بنشر التطبيق على Vercel باستخدام الدليل:**
+📖 [VERCEL_DEPLOYMENT_GUIDE.md](./VERCEL_DEPLOYMENT_GUIDE.md)
 
 ## 🗄️ قاعدة البيانات
 
 يستخدم المشروع **Supabase (PostgreSQL)** في بيئة الإنتاج:
+
+### معلومات المشروع:
+- **Project Ref**: `bycjhpqrzyptobgtgxbt`
+- **Region**: Europe West 1
+- **Dashboard**: [https://supabase.com/dashboard/project/bycjhpqrzyptobgtgxbt](https://supabase.com/dashboard/project/bycjhpqrzyptobgtgxbt)
 
 ### الجداول الرئيسية:
 - `User` - معلومات المستخدمين
@@ -102,26 +110,29 @@ bun run lint         # فحص الكود
 
 ## 🚀 النشر على Vercel
 
-المشروع منشور بالفعل على Vercel مع Supabase!
+### الخطوات السريعة:
 
-### التكوين الحالي:
-- ✅ **Platform**: Vercel
-- ✅ **Database**: Supabase (PostgreSQL)
-- ✅ **URL**: https://buildtrack-omega.vercel.app
-- ✅ **Status**: 🟢 Active and Working
+1. **إعداد قاعدة البيانات**:
+   - افتح [Supabase Dashboard](https://supabase.com/dashboard/project/bycjhpqrzyptobgtgxbt)
+   - انتقل إلى SQL Editor
+   - شغل سكريبت `supabase-migration.sql`
 
-### فحص صحة النظام:
-يمكنك فحص حالة النظام عبر:
-```
-https://buildtrack-omega.vercel.app/api/health
-```
+2. **نشر على Vercel**:
+   - اذهب إلى [vercel.com/new](https://vercel.com/new)
+   - استورد المستودع: `yac13inem-ux/smartbuild`
+   - أضف Environment Variables (انظر أدناه)
+   - اضغط Deploy!
 
 ### Environment Variables المطلوبة:
+```bash
+DATABASE_URL="postgresql://postgres.bycjhpqrzyptobgtgxbt:TdwdU5jFL7nAVEQA@aws-0-eu-west-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
+DIRECT_URL="postgresql://postgres.bycjhpqrzyptobgtgxbt:TdwdU5jFL7nAVEQA@aws-0-eu-west-1.pooler.supabase.com:5432/postgres"
+NEXT_PUBLIC_SUPABASE_URL="https://bycjhpqrzyptobgtgxbt.supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5Y2pocHFyenlwdG9iZ3RneGJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2NzI1NTUsImV4cCI6MjA5MTI0ODU1NX0.mNIPbMT4rOa_P3U0xZUZRXw78kfvv0wHg9PbZFV1edY"
 ```
-DATABASE_URL=postgresql://postgres.fziikvgrnwkqfzfnebjw:YOUR_PASSWORD@aws-0-eu-west-1.pooler.supabase.com:6543/postgres
-NEXT_PUBLIC_SUPABASE_URL=https://fziikvgrnwkqfzfnebjw.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_Ajim28MARlzKgCDULfqqtA_NILNke6C
-```
+
+### الدليل الكامل:
+📖 راجع [VERCEL_DEPLOYMENT_GUIDE.md](./VERCEL_DEPLOYMENT_GUIDE.md) للتوضيحات الكاملة
 
 ## 🎯 الميزات الجديدة
 
@@ -145,15 +156,12 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_Ajim28MARlzKgCDULfqqtA_NILNke6C
 
 ## 🔗 روابط مفيدة
 
-- 📖 [دليل تكامل Supabase الكامل](./SUPABASE_INTEGRATION.md) ⭐
-- 📖 [دليل النشر على Vercel و Supabase](./SUPABASE_DEPLOYMENT_GUIDE.md)
-- 📖 [دليل إصلاح الجداول المفقودة](./FIX_TABLES_GUIDE.md)
-- 📖 [دليل التشخيص وإصلاح المشاكل](./TROUBLESHOOTING.md)
-- 📖 [حالة النشر الحالية](./DEPLOYMENT_STATUS.md)
-- 📖 [البدء السريع](./QUICK_SETUP.md)
-- 🌐 [GitHub Repository](https://github.com/yac13inem-ux/BuildTrack)
-- 🚀 [Live Demo](https://buildtrack-omega.vercel.app)
-- 🗄️ [Supabase Dashboard](https://supabase.com/dashboard/project/fziikvgrnwkqfzfnebjw)
+- 📖 [دليل النشر على Vercel](./VERCEL_DEPLOYMENT_GUIDE.md) ⭐
+- 📖 [تكوين Supabase](./SUPABASE_NEW_PROJECT.md) ⭐
+- 📖 [سكريبت الهجرة](./supabase-migration.sql)
+- 🌐 [GitHub Repository](https://github.com/yac13inem-ux/smartbuild)
+- 🗄️ [Supabase Dashboard](https://supabase.com/dashboard/project/bycjhpqrzyptobgtgxbt)
+- 🔧 [SQL Editor](https://supabase.com/dashboard/project/bycjhpqrzyptobgtgxbt/sql/new)
 
 ## 🤝 المساهمة
 
@@ -170,8 +178,11 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_Ajim28MARlzKgCDULfqqtA_NILNke6C
 
 ## 👥 المطور
 
-BuildTrack by Adel Ben Belaid
+SmartBuild by Yacine Ben Belaid
 
 ---
 
 **ملاحظة**: هذا مشروع في التطوير المستمر. الميزات الجديدة قيد الإضافة.
+
+**الإصدار الحالي**: 1.0.0
+**آخر تحديث**: 2025-02-04

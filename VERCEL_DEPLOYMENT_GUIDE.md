@@ -1,11 +1,11 @@
-# 🚀 BuildTrack - دليل نشر Vercel
+# 🚀 SmartBuild - دليل نشر Vercel
 
 ## الخطوة 1: إعداد قاعدة البيانات في Supabase
 
 ### 1.1 افتح Supabase Dashboard
 - اذهب إلى: https://supabase.com/dashboard
 - سجل الدخول باستخدام حسابك
-- اختر مشروع BuildTrack: `fziikvgrnwkqfzfnebjw`
+- اختر مشروع SmartBuild: `bycjhpqrzyptobgtgxbt`
 
 ### 1.2 افتح SQL Editor
 - من القائمة الجانبية، انقر على "SQL Editor"
@@ -39,14 +39,17 @@
 
 ### 2.2 استيراد المشروع من GitHub
 - انقر على "Add New" → "Project"
-- ابحث عن المستودع: `yac13inem-ux/BuildTrack`
+- ابحث عن المستودع: `yac13inem-ux/smartbuild`
 - انقر على "Import"
 
 ### 2.3 إعدادات المشروع
 في قسم "Environment Variables"، أضف المتغيرات التالية:
 
 ```
-DATABASE_URL=postgresql://postgres:lL5OvpM9vSzCKYGW@db.fziikvgrnwkqfzfnebjw.supabase.co:5432/postgres
+DATABASE_URL=postgresql://postgres.bycjhpqrzyptobgtgxbt:TdwdU5jFL7nAVEQA@aws-0-eu-west-1.pooler.supabase.com:6543/postgres?pgbouncer=true
+DIRECT_URL=postgresql://postgres.bycjhpqrzyptobgtgxbt:TdwdU5jFL7nAVEQA@aws-0-eu-west-1.pooler.supabase.com:5432/postgres
+NEXT_PUBLIC_SUPABASE_URL=https://bycjhpqrzyptobgtgxbt.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5Y2pocHFyenlwdG9iZ3RneGJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2NzI1NTUsImV4cCI6MjA5MTI0ODU1NX0.mNIPbMT4rOa_P3U0xZUZRXw78kfvv0wHg9PbZFV1edY
 ```
 
 ### 2.4 إعدادات البناء (Build Settings)
@@ -59,7 +62,7 @@ DATABASE_URL=postgresql://postgres:lL5OvpM9vSzCKYGW@db.fziikvgrnwkqfzfnebjw.supa
 ### 2.5 نشر المشروع
 - انقر على "Deploy"
 - انتظر حتى يكتمل البناء والنشر
-- ستحصل على رابط مثل: `https://buildtrack-xxx.vercel.app`
+- ستحصل على رابط مثل: `https://smartbuild-xxx.vercel.app`
 
 ---
 
@@ -93,9 +96,10 @@ DATABASE_URL=postgresql://postgres:lL5OvpM9vSzCKYGW@db.fziikvgrnwkqfzfnebjw.supa
 ## معلومات مهمة
 
 ### 📌 بيانات Supabase
-- **Project URL**: https://fziikvgrnwkqfzfnebjw.supabase.co
-- **Database URL**: `postgresql://postgres:lL5OvpM9vSzCKYGW@db.fziikvgrnwkqfzfnebjw.supabase.co:5432/postgres`
-- **Anon Key**: `sb_publishable_Ajim28MARlzKgCDULfqqtA_NILNke6C`
+- **Project URL**: https://bycjhpqrzyptobgtgxbt.supabase.co
+- **Database URL (Pooling)**: `postgresql://postgres.bycjhpqrzyptobgtgxbt:TdwdU5jFL7nAVEQA@aws-0-eu-west-1.pooler.supabase.com:6543/postgres?pgbouncer=true`
+- **Database URL (Direct)**: `postgresql://postgres.bycjhpqrzyptobgtgxbt:TdwdU5jFL7nAVEQA@aws-0-eu-west-1.pooler.supabase.com:5432/postgres`
+- **Anon Key**: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5Y2pocHFyenlwdG9iZ3RneGJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2NzI1NTUsImV4cCI6MjA5MTI0ODU1NX0.mNIPbMT4rOa_P3U0xZUZRXw78kfvv0wHg9PbZFV1edY`
 
 ### 📌 ملفات مهمة
 - **Database Schema**: `prisma/schema.prisma`
@@ -103,9 +107,9 @@ DATABASE_URL=postgresql://postgres:lL5OvpM9vSzCKYGW@db.fziikvgrnwkqfzfnebjw.supa
 - **Environment Example**: `.env.example`
 
 ### 📌 GitHub Repository
-- **URL**: https://github.com/yac13inem-ux/BuildTrack
+- **URL**: https://github.com/yac13inem-ux/smartbuild
 - **Branch**: `main`
-- **Commits**: 79+ (بعد آخر تحديث)
+- **Commits**: 80+ (بعد آخر تحديث)
 
 ---
 
@@ -142,4 +146,4 @@ DATABASE_URL=postgresql://postgres:lL5OvpM9vSzCKYGW@db.fziikvgrnwkqfzfnebjw.supa
 
 ---
 
-**تم إنشاء هذا الدليل بواسطة BuildTrack AI Assistant** 🤖
+**تم إنشاء هذا الدليل بواسطة SmartBuild AI Assistant** 🤖
