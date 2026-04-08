@@ -6,59 +6,52 @@
 ## ✨ المميزات الرئيسية
 
 ### إدارة المشاريع
-- إنشاء وإدارة المشاريع الإنشائية
-- تتبع المعلومات الأساسية (الاسم، الموقع، عدد الشقق)
-- إدارة عدد العمارات لكل مشروع
+- ✅ إنشاء وإدارة المشاريع الإنشائية
+- ✅ تتبع المعلومات الأساسية (الاسم، الموقع، عدد الشقق)
+- ✅ إدارة عدد العمارات لكل مشروع
 
 ### إدارة العمارات
-- إضافة عمارات متعددة لكل مشروع
-- تحديد عدد الطوابق لكل عمارة
-- تتبع التقدم الشامل لكل عمارة
+- ✅ إضافة عمارات متعددة لكل مشروع
+- ✅ تحديد عدد الطوابق لكل عمارة
+- ✅ تتبع التقدم الشامل لكل عمارة
 
 ### تتبع الطوابق (Gros Œuvre)
-- **الأشغال الكبرى**:
+- ✅ **الأشغال الكبرى**:
   - نسبة التقدم لكل طابق
   - عدد الشقق لكل طابق
-  - تاريخ الصب الخرساني
-  - تاريخ فحص التسليح
+  - 🆕 **تاريخ الصب الخرساني** (التاريخ والوقت ⏰)
+  - 🆕 **تاريخ فحص التسليح** (التاريخ والوقت ⏰)
   - ملاحظات الأشغال الكبرى
 
-### تتبع الطوابق (CES & CET)
-- **الأشغال التشطيبية (CES)**:
-  - نسبة التقدم لكل طابق
-  - ملاحظات الأشغال التشطيبية
+### إدارة التقارير والمشاكل
+- ✅ إنشاء وتتبع التقارير (PV_VISITE, PV_CONSTAT, RAPPORT_MENSUEL)
+- ✅ إبلاغ عن المشاكل وحلها
+- ✅ إرفاق الصور بالمشاكل
 
-- **الأشغال التقنية (CET)**:
-  - نسبة التقدم لكل طابق
-  - ملاحظات الأشغال التقنية
+## 🚀 التطبيق المباشر
 
-## 🚀 البدء السريع
+**التطبيق منشور ومتاح على:**
+🌐 [https://buildtrack-omega.vercel.app](https://buildtrack-omega.vercel.app)
 
-### المتطلبات
-- Node.js 18+ 
-- Bun أو npm
-- Prisma CLI
+## 🗄️ قاعدة البيانات
 
-### التثبيت
+يستخدم المشروع **Supabase (PostgreSQL)** في بيئة الإنتاج:
 
-```bash
-# استنساخ المستودع
-git clone https://github.com/adelbenbelaid091-cpu/BuildTrack.git
-cd BuildTrack
+### الجداول الرئيسية:
+- `User` - معلومات المستخدمين
+- `Project` - المشاريع الإنشائية
+- `Block` - العمارات
+- `Unit` - الوحدات/الشقق
+- `Report` - التقارير والمستندات
+- `Problem` - المشاكل والملاحظات
+- `GrosOeuvreFloor` - تتبع تقدم الطوابق (بما في ذلك حقول الوقت)
 
-# تثبيت الاعتماديات
-bun install
-# أو
-npm install
+## 🌍 دعم اللغات
 
-# إعداد قاعدة البيانات
-bun run db:push
-
-# تشغيل خادم التطوير
-bun run dev
-```
-
-التمتع بالتطبيق على: http://localhost:3000
+التطبيق يدعم ثلاث لغات:
+- 🇸🇦 العربية (الافتراضية)
+- 🇫🇷 Français (French)
+- 🇺🇸 English
 
 ## 📁 هيكل المشروع
 
@@ -69,7 +62,9 @@ src/
 │   │   ├── projects/    # إدارة المشاريع
 │   │   ├── blocks/      # إدارة العمارات
 │   │   ├── reports/     # التقارير
-│   │   └── problems/    # المشاكل
+│   │   ├── problems/    # المشاكل
+│   │   ├── units/       # الوحدات
+│   │   └── health/      # فحص صحة النظام
 │   ├── layout.tsx       # التخطيط الرئيسي
 │   └── page.tsx         # الصفحة الرئيسية
 ├── components/          # مكونات React
@@ -77,6 +72,7 @@ src/
 │   ├── ProjectList.tsx
 │   ├── AddBlockDialog.tsx
 │   ├── EditFloorDialog.tsx
+│   ├── DocumentHub.tsx
 │   └── ...
 ├── lib/                # المكتبات المساعدة
 │   ├── db.ts          # Prisma Client
@@ -84,38 +80,6 @@ src/
 │   └── locales/       # ملفات الترجمة
 └── contexts/          # React Contexts
     └── LanguageContext.tsx
-```
-
-## 🌍 دعم اللغات
-
-التطبيق يدعم ثلاث لغات:
-- العربية (الافتراضية)
-- Français (French)
-- English
-
-## 🗄️ قاعدة البيانات
-
-يستخدم المشروع Prisma ORM مع SQLite:
-
-```prisma
-model Project {
-  id              String   @id @default(cuid())
-  name            String
-  description     String?
-  location        String?
-  totalApartments Int?
-  blocks          Block[]
-  // ...
-}
-
-model Block {
-  id          String   @id @default(cuid())
-  name        String
-  projectId   String
-  numberOfFloors Int?
-  floorsData  String?  // JSON
-  // ...
-}
 ```
 
 ## 🔧 الأوامر المتاحة
@@ -138,92 +102,38 @@ bun run lint         # فحص الكود
 
 ## 🚀 النشر على Vercel
 
-> ⚠️ **مهم**: راجع [دليل النشر الشامل](./DEPLOYMENT.md) للحصول على تعليمات مفصلة
+المشروع منشور بالفعل على Vercel مع Supabase!
 
-### نظرة سريعة:
+### التكوين الحالي:
+- ✅ **Platform**: Vercel
+- ✅ **Database**: Supabase (PostgreSQL)
+- ✅ **URL**: https://buildtrack-omega.vercel.app
+- ✅ **Status**: 🟢 Active and Working
 
-### طريقة 1: النشر التلقائي عبر GitHub (موصى به)
-
-1. **تأكد من إعداد قاعدة البيانات للإنتاج:**
-   ```bash
-   # استخدم PostgreSQL أو MySQL للإنتاج
-   # أضف DATABASE_URL إلى Environment Variables
-   ```
-
-2. **اتصل بمستودع GitHub الخاص بك:**
-   - قم بزيارة [vercel.com](https://vercel.com)
-   - انقر على "Add New" → "Project"
-   - اختر مستودع `BuildTrack` من GitHub
-
-3. **إعدادات النشر:**
-   - **Framework Preset**: Next.js
-   - **Build Command**: `bun run build`
-   - **Install Command**: `bun install && bun run db:generate`
-
-4. **Environment Variables:**
-   ```
-   DATABASE_URL=<your-production-database-url>
-   ```
-
-5. **انقر على Deploy**
-
-### طريقة 2: النشر عبر Vercel CLI
-
-```bash
-# تثبيت Vercel CLI
-bun install -g vercel
-
-# تسجيل الدخول
-vercel login
-
-# النشر
-cd BuildTrack
-vercel
-
-# للنشر في بيئة الإنتاج
-vercel --prod
+### فحص صحة النظام:
+يمكنك فحص حالة النظام عبر:
+```
+https://buildtrack-omega.vercel.app/api/health
 ```
 
-### ملاحظات هامة للنشر:
+### Environment Variables المطلوبة:
+```
+DATABASE_URL=postgresql://postgres.fziikvgrnwkqfzfnebjw:YOUR_PASSWORD@aws-0-eu-west-1.pooler.supabase.com:6543/postgres
+NEXT_PUBLIC_SUPABASE_URL=https://fziikvgrnwkqfzfnebjw.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_Ajim28MARlzKgCDULfqqtA_NILNke6C
+```
 
-- ✅ المشروع يستخدم Next.js 16 مع `output: standalone` للإنتاج
-- ✅ تم إعداد `vercel.json` للنشر التلقائي
-- ✅ جميع API routes تستخدم `await params` للتوافق مع Next.js 16
-- ⚠️ يجب استخدام قاعدة بيانات PostgreSQL أو MySQL للإنتاج (وليس SQLite)
-- ⚠️ لا تنسَ إضافة `DATABASE_URL` في Environment Variables
+## 🎯 الميزات الجديدة
 
-### المشاكل الشائعة والحلول
+### حقول الوقت ⏰
+- 🆕 إضافة حقول الوقت للتواريخ في قسم Gros Œuvre
+- 🆕 عرض التاريخ والوقت بشكل عمودي (سهل القراءة)
+- 🆅 دعم لجميع اللغات الثلاث
 
-#### ❌ "لا يمكن إضافة شيء" على Vercel
-
-**الحل:**
-1. تأكد من إعداد `DATABASE_URL` في Environment Variables
-2. تحقق من أن قاعدة البيانات متصلة
-3. راجع سجلات Vercel Function Logs
-4. تأكد من تشغيل `db:push` لإنشاء الجداول
-
-#### ❌ "النسبة لا تظهر في لوحة التحكم"
-
-**الحل:**
-1. تأكد من إضافة عمارات (blocks) للمشروع
-2. تحقق من أن `floorsData` محفوظ بشكل صحيح
-3. راجع API route: `/api/blocks` للتأكد من البيانات
-4. تحقق من Console في المتصفح للأخطاء
-
-#### ❌ "Database connection failed"
-
-**الحل:**
-1. تحقق من صحة `DATABASE_URL`
-2. تأكد من أن قاعدة البيانات تقبل الاتصالات
-3. أضف نطاق IP الخاص بـ Vercel إذا تم تفعيل IP Whitelisting
-
-### للحصول على مساعدة مفصلة:
-
-📖 راجع [DEPLOYMENT.md](./DEPLOYMENT.md) للحصول على:
-- إعداد قاعدة بيانات إنتاج (Supabase, Neon, PlanetScale)
-- خطوات النشر التفصيلية
-- استكشاف الأخطاء وإصلاحها
-- استراتيجيات النسخ الاحتياطي
+### الفحص الصحي للنظام
+- 🆕 API endpoint لفحص صحة قاعدة البيانات
+- 🆕 التحقق من وجود جميع الجداول
+- 🆕 تشخيص مشاكل الاتصال
 
 ## 📱 التصميم
 
@@ -232,6 +142,14 @@ vercel --prod
 - **الأيقونات**: Lucide React
 - **التنبيهات**: Sonner
 - **الأدوات**: Framer Motion
+
+## 🔗 روابط مفيدة
+
+- 📖 [دليل النشر على Vercel و Supabase](./SUPABASE_DEPLOYMENT_GUIDE.md)
+- 📖 [دليل التشخيص وإصلاح المشاكل](./TROUBLESHOOTING.md)
+- 📖 [البدء السريع](./QUICK_SETUP.md)
+- 🌐 [GitHub Repository](https://github.com/yac13inem-ux/BuildTrack)
+- 🚀 [Live Demo](https://buildtrack-omega.vercel.app)
 
 ## 🤝 المساهمة
 
