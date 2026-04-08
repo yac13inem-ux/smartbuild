@@ -251,7 +251,8 @@ export function ProblemList({ problems = [], onProblemsChange, problemUpdateKey 
 
       if (!response.ok) {
         console.error('Server error:', result);
-        alert(result.error || 'Failed to create problem');
+        const errorMsg = result.details || result.error || 'Failed to create problem';
+        alert(`${t('problems.addProblem') || 'Add Problem'}: ${errorMsg}`);
         setIsLoading(false);
         return;
       }
@@ -268,7 +269,8 @@ export function ProblemList({ problems = [], onProblemsChange, problemUpdateKey 
         if (onProblemsChange) onProblemsChange();
       } else {
         console.error('API returned success: false', result);
-        alert(result.error || 'Failed to create problem');
+        const errorMsg = result.details || result.error || 'Failed to create problem';
+        alert(`${t('problems.addProblem') || 'Add Problem'}: ${errorMsg}`);
       }
     } catch (error) {
       console.error('Error creating problem:', error);

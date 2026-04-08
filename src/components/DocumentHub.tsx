@@ -252,7 +252,8 @@ export function DocumentHub({ documents = [], onDocumentsChange, documentUpdateK
 
       if (!response.ok) {
         console.error('Server error:', result);
-        alert(result.error || 'Failed to create document');
+        const errorMsg = result.details || result.error || 'Failed to create document';
+        alert(`${t('documents.createDocument') || 'Create Document'}: ${errorMsg}`);
         setIsLoading(false);
         return;
       }
@@ -274,7 +275,8 @@ export function DocumentHub({ documents = [], onDocumentsChange, documentUpdateK
         if (onDocumentsChange) onDocumentsChange();
       } else {
         console.error('API returned success: false', result);
-        alert(result.error || 'Failed to create document');
+        const errorMsg = result.details || result.error || 'Failed to create document';
+        alert(`${t('documents.createDocument') || 'Create Document'}: ${errorMsg}`);
       }
     } catch (error) {
       console.error('Error creating document:', error);

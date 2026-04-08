@@ -90,8 +90,10 @@ export async function POST(request: NextRequest) {
     }, { status: 201 });
   } catch (error) {
     console.error('Error creating problem:', error);
+    console.error('Error details:', JSON.stringify(error, null, 2));
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { error: 'Failed to create problem' },
+      { error: 'Failed to create problem', details: errorMessage },
       { status: 500 }
     );
   }
