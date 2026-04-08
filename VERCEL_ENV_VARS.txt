@@ -1,0 +1,23 @@
+# ============================================
+# Vercel Environment Variables
+# Copy these to Vercel Dashboard -> Settings -> Environment Variables
+# ============================================
+
+# DATABASE_URL (Supabase Connection Pooling for Vercel)
+DATABASE_URL=postgresql://postgres.bycjhpqrzyptobgtgxbt:TdwdU5jFL7nAVEQA@aws-0-eu-west-1.pooler.supabase.com:6543/postgres?pgbouncer=true
+
+# DIRECT_URL (Direct connection for migrations)
+DIRECT_URL=postgresql://postgres.bycjhpqrzyptobgtgxbt:TdwdU5jFL7nAVEQA@aws-0-eu-west-1.pooler.supabase.com:5432/postgres
+
+# NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_URL=https://bycjhpqrzyptobgtgxbt.supabase.co
+
+# NEXT_PUBLIC_SUPABASE_ANON_KEY
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5Y2pocHFyenlwdG9iZ3RneGJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2NzI1NTUsImV4cCI6MjA5MTI0ODU1NX0.mNIPbMT4rOa_P3U0xZUZRXw78kfvv0wHg9PbZFV1edY
+
+# ============================================
+# IMPORTANT NOTES:
+# 1. Do NOT add quotes around the values in Vercel
+# 2. Make sure you added the enum types to Supabase first
+# 3. Run the SQL in FIX_ENUMS.md or add-enums.sql
+# ============================================
