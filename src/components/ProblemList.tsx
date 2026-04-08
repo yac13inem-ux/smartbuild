@@ -227,6 +227,7 @@ export function ProblemList({ problems = [], onProblemsChange, problemUpdateKey 
 
   const handleCreateProblem = async () => {
     if (!createForm.description) {
+      alert(t('problems.descriptionRequired') || 'Description is required');
       return;
     }
 
@@ -239,13 +240,22 @@ export function ProblemList({ problems = [], onProblemsChange, problemUpdateKey 
         },
         body: JSON.stringify({
           description: createForm.description,
-          projectId: createForm.projectId || undefined,
-          blockId: createForm.blockId || undefined,
+          projectId: createForm.projectId || null,
+          blockId: createForm.blockId || null,
           status: createForm.status,
         }),
       });
 
       const result = await response.json();
+      console.log('Create problem result:', result, 'Status:', response.status);
+
+      if (!response.ok) {
+        console.error('Server error:', result);
+        alert(result.error || 'Failed to create problem');
+        setIsLoading(false);
+        return;
+      }
+
       if (result.success) {
         setIsCreateDialogOpen(false);
         setCreateForm({
@@ -256,9 +266,13 @@ export function ProblemList({ problems = [], onProblemsChange, problemUpdateKey 
         });
         await fetchProblems();
         if (onProblemsChange) onProblemsChange();
+      } else {
+        console.error('API returned success: false', result);
+        alert(result.error || 'Failed to create problem');
       }
     } catch (error) {
       console.error('Error creating problem:', error);
+      alert('Error creating problem. Please try again.');
     } finally {
       setIsLoading(false);
     }

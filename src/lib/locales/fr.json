@@ -121,7 +121,8 @@
     "observations": "Observations",
     "uploadImages": "Télécharger des images",
     "generatePDF": "Générer PDF",
-    "downloadPDF": "Télécharger PDF"
+    "downloadPDF": "Télécharger PDF",
+    "requiredFields": "Le titre et le type sont requis"
   },
   "problems": {
     "title": "Problèmes",
@@ -135,6 +136,7 @@
     "pending": "En attente",
     "inProgress": "En cours",
     "resolved": "Résolu",
+    "descriptionRequired": "La description est requise",
     "selectProject": "Sélectionner le projet",
     "selectBlock": "Sélectionner le bloc",
     "selectUnit": "Sélectionner l'unité (Optionnel)",

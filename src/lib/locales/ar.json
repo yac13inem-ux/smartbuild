@@ -121,7 +121,8 @@
     "observations": "الملاحظات",
     "uploadImages": "رفع الصور",
     "generatePDF": "إنشاء PDF",
-    "downloadPDF": "تحميل PDF"
+    "downloadPDF": "تحميل PDF",
+    "requiredFields": "العنوان والنوع مطلوبان"
   },
   "problems": {
     "title": "المشاكل",
@@ -133,13 +134,14 @@
     "problemDescription": "وصف المشكلة",
     "status": "الحالة",
     "pending": "قيد الانتظار",
-    "inProgress": "جاري العمل",
-    "resolved": "تم الحل",
+    "descriptionRequired": "الوصف مطلوب",
     "selectProject": "اختر المشروع",
     "selectBlock": "اختر المبنى",
+    "inProgress": "جاري العمل",
+    "resolved": "تم الحل",
+    "whatsapp": "واتساب",
     "selectUnit": "اختر الوحدة (اختياري)",
-    "uploadImages": "رفع الصور",
-    "whatsapp": "إرسال عبر واتساب"
+    "uploadImages": "رفع الصور"
   },
   "settings": {
     "title": "الإعدادات",

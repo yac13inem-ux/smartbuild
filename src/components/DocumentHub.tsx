@@ -225,6 +225,8 @@ export function DocumentHub({ documents = [], onDocumentsChange, documentUpdateK
   const handleCreateDocument = async () => {
     console.log('Creating document:', createForm);
     if (!createForm.title || !createForm.type) {
+      console.error('Missing required fields:', { title: createForm.title, type: createForm.type });
+      alert(t('documents.requiredFields') || 'Title and type are required');
       return;
     }
 
@@ -239,14 +241,22 @@ export function DocumentHub({ documents = [], onDocumentsChange, documentUpdateK
           title: createForm.title,
           description: createForm.description,
           type: createForm.type,
-          projectId: createForm.projectId || undefined,
-          blockId: createForm.blockId || undefined,
+          projectId: createForm.projectId || null,
+          blockId: createForm.blockId || null,
           date: createForm.date ? new Date(createForm.date) : new Date(),
         }),
       });
 
       const result = await response.json();
-      console.log('Create result:', result);
+      console.log('Create result:', result, 'Status:', response.status);
+
+      if (!response.ok) {
+        console.error('Server error:', result);
+        alert(result.error || 'Failed to create document');
+        setIsLoading(false);
+        return;
+      }
+
       if (result.success) {
         setIsCreateDialogOpen(false);
         setCreateForm({
@@ -262,9 +272,13 @@ export function DocumentHub({ documents = [], onDocumentsChange, documentUpdateK
         await fetchDocuments();
         console.log('Documents fetched after create');
         if (onDocumentsChange) onDocumentsChange();
+      } else {
+        console.error('API returned success: false', result);
+        alert(result.error || 'Failed to create document');
       }
     } catch (error) {
       console.error('Error creating document:', error);
+      alert('Error creating document. Please try again.');
     } finally {
       setIsLoading(false);
     }
