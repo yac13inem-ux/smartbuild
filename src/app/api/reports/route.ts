@@ -79,12 +79,12 @@ export async function POST(request: NextRequest) {
         title,
         description,
         type,
-        projectId,
-        blockId,
-        unitId,
+        projectId: projectId || null,
+        blockId: blockId || null,
+        unitId: unitId || null,
         images: images ? JSON.stringify(images) : null,
         observations,
-        date: new Date(),
+        date: body.date ? new Date(body.date) : new Date(),
       },
     });
 

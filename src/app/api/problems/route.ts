@@ -65,9 +65,9 @@ export async function POST(request: NextRequest) {
       status,
     } = body;
 
-    if (!description || !projectId) {
+    if (!description) {
       return NextResponse.json(
-        { error: 'Description and project ID are required' },
+        { error: 'Description is required' },
         { status: 400 }
       );
     }
@@ -75,9 +75,9 @@ export async function POST(request: NextRequest) {
     const problem = await db.problem.create({
       data: {
         description,
-        projectId,
-        blockId,
-        unitId,
+        projectId: projectId || null,
+        blockId: blockId || null,
+        unitId: unitId || null,
         images: images ? JSON.stringify(images) : null,
         status: status || 'PENDING',
         createdAt: new Date(),
