@@ -145,11 +145,15 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_Ajim28MARlzKgCDULfqqtA_NILNke6C
 
 ## 🔗 روابط مفيدة
 
+- 📖 [دليل تكامل Supabase الكامل](./SUPABASE_INTEGRATION.md) ⭐
 - 📖 [دليل النشر على Vercel و Supabase](./SUPABASE_DEPLOYMENT_GUIDE.md)
+- 📖 [دليل إصلاح الجداول المفقودة](./FIX_TABLES_GUIDE.md)
 - 📖 [دليل التشخيص وإصلاح المشاكل](./TROUBLESHOOTING.md)
+- 📖 [حالة النشر الحالية](./DEPLOYMENT_STATUS.md)
 - 📖 [البدء السريع](./QUICK_SETUP.md)
 - 🌐 [GitHub Repository](https://github.com/yac13inem-ux/BuildTrack)
 - 🚀 [Live Demo](https://buildtrack-omega.vercel.app)
+- 🗄️ [Supabase Dashboard](https://supabase.com/dashboard/project/fziikvgrnwkqfzfnebjw)
 
 ## 🤝 المساهمة
 
